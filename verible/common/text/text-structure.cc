@@ -307,7 +307,7 @@ void TextStructureView::RebaseTokensToSuperstring(std::string_view superstring,
   MutateTokens([&](TokenInfo *token) {
     const int delta = token->left(src_base);
     // Superstring must point to separate memory space.
-    token->RebaseStringView(superstring.begin() + offset + delta);
+    token->RebaseDocumentView(superstring.begin() + offset + delta);
   });
   // Assigning superstring for the sake of maintaining range invariants.
   contents_ = superstring;

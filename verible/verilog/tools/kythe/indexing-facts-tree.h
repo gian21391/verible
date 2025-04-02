@@ -128,7 +128,7 @@ class IndexingNodeData {
   // Redirects all non-owned string_views to point into a different copy of the
   // same text, located 'delta' away.  This is useful for testing, when source
   // text is copied to a different location.
-  void RebaseStringViewsForTesting(std::ptrdiff_t delta);
+  void RebaseDocumentViewsForTesting(std::ptrdiff_t delta);
 
   bool operator==(const IndexingNodeData &) const;
   bool operator!=(const IndexingNodeData &other) const {

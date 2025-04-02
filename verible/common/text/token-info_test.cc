@@ -32,7 +32,7 @@ namespace {
 
 // Test construction with a token enum and text.
 TEST(TokenInfoTest, EnumTextConstruction) {
-  constexpr std::string_view text("string of length 19");
+  constexpr document_view text("string of length 19");
   TokenInfo token_info(143, text);
   EXPECT_EQ(token_info.token_enum(), 143);
   EXPECT_EQ(token_info.left(text), 0);
@@ -42,7 +42,7 @@ TEST(TokenInfoTest, EnumTextConstruction) {
 
 // Test updating text.
 TEST(TokenInfoTest, AdvanceText) {
-  constexpr std::string_view text = "This quick brown fox...";
+  constexpr document_view text = "This quick brown fox...";
   TokenInfo token_info(1, text.substr(0, 0));
   EXPECT_TRUE(BoundsEqual(token_info.text(), text.substr(0, 0)));
   token_info.AdvanceText(3);
@@ -76,7 +76,7 @@ TEST(TokenInfoTest, EOFEquality) {
 }
 
 TEST(TokenInfoTest, EOFWithBuffer) {
-  constexpr std::string_view text("string of length 21");
+  constexpr document_view text("string of length 21");
   TokenInfo token_info = TokenInfo::EOFToken(text);
   EXPECT_EQ(token_info.token_enum(), TK_EOF);
   EXPECT_EQ(token_info.text().begin(), text.end());
@@ -85,7 +85,7 @@ TEST(TokenInfoTest, EOFWithBuffer) {
 
 // Test operator !=.
 TEST(TokenInfoTest, Inequality) {
-  constexpr std::string_view text("string of length 21");
+  constexpr document_view text("string of length 21");
   const std::vector<TokenInfo> token_infos = {
       TokenInfo(143, text),
       TokenInfo(43, text),
@@ -102,7 +102,7 @@ TEST(TokenInfoTest, Inequality) {
 }
 
 TEST(TokenInfoTest, EquivalentWithoutLocation) {
-  const std::string_view foo1("foo"), foo2("foo");
+  const document_view foo1("foo"), foo2("foo");
   TokenInfo token_0(1, foo1);   // reference token
   TokenInfo token_1(1, "bar");  // different text
   TokenInfo token_2(1, foo2);   // different location
@@ -174,14 +174,14 @@ TEST(TokenInfoTest, IsEOFAnyString) {
 
 // Test string representation of token_info.
 TEST(TokenInfoTest, ToStringEOF) {
-  const std::string_view base;  // empty
+  const document_view base;  // empty
   const TokenInfo::Context context(base);
   TokenInfo token_info(TK_EOF, base);
   EXPECT_EQ(token_info.ToString(context), "(#0 @0-0: \"\")");
 }
 
 TEST(TokenInfoTest, ToStringWithBase) {
-  const std::string_view base("basement cat");
+  const document_view base("basement cat");
   const TokenInfo::Context context(base);
   TokenInfo token_info(7, base.substr(9, 3));
   EXPECT_EQ(token_info.ToString(context), "(#7 @9-12: \"cat\")");
@@ -198,14 +198,14 @@ void TokenTranslator(std::ostream &stream, int e) {
 }
 
 TEST(TokenInfoTest, ToStringWithBaseAndTranslator) {
-  const std::string_view base("basement cat");
+  const document_view base("basement cat");
   const TokenInfo::Context context(base, TokenTranslator);
   TokenInfo token_info(7, base.substr(9, 3));
   EXPECT_EQ(token_info.ToString(context), "(#lucky-seven @9-12: \"cat\")");
 }
 
 TEST(TokenWithContextTest, StreamOutput) {
-  const std::string_view base("basement cat");
+  const document_view base("basement cat");
   const TokenInfo::Context context(base, TokenTranslator);
   TokenInfo token_info(7, base.substr(9, 3));
   std::ostringstream stream;
@@ -213,10 +213,10 @@ TEST(TokenWithContextTest, StreamOutput) {
   EXPECT_EQ(stream.str(), "(#lucky-seven @9-12: \"cat\")");
 }
 
-// RebaseStringView() tests
+// RebaseDocumentView() tests
 
 // Test that empty string token rebases correctly.
-TEST(RebaseStringViewTest, EmptyStringsZeroOffset) {
+TEST(RebaseDocumentViewTest, EmptyStringsZeroOffset) {
   const std::string text;
   // We want another empty string, but we need to trick too smart compilers
   // to give us a different memory address.
@@ -227,103 +227,103 @@ TEST(RebaseStringViewTest, EmptyStringsZeroOffset) {
   EXPECT_FALSE(BoundsEqual(text, substr));
   TokenInfo token(0, text);
   EXPECT_EQ(token.left(text), 0);
-  token.RebaseStringView(substr);
+  token.RebaseDocumentView(substr);
   EXPECT_EQ(token.left(substr), 0);
   EXPECT_EQ(token.text(), substr);
 }
 
 // Test that non-empty whole-string copy rebases correctly.
-TEST(RebaseStringViewTest, IdenticalCopy) {
+TEST(RebaseDocumentViewTest, IdenticalCopy) {
   const std::string text = "hello";
   const std::string substr = "hello";  // different memory space
   EXPECT_FALSE(BoundsEqual(text, substr));
   TokenInfo token(3, text);
   EXPECT_EQ(token.left(text), 0);
-  token.RebaseStringView(substr);
+  token.RebaseDocumentView(substr);
   EXPECT_EQ(token.left(substr), 0);
   EXPECT_EQ(token.text(), substr);
 }
 
 // Test that substring mismatch between new and old is checked.
-TEST(RebaseStringViewDeathTest, SubstringMismatch) {
-  const std::string_view text = "hell0";
-  const std::string_view substr = "hello";
+TEST(RebaseDocumentViewDeathTest, SubstringMismatch) {
+  const document_view text = "hell0";
+  const document_view substr = "hello";
   TokenInfo token(1, text);
   EXPECT_EQ(token.left(text), 0);
-  EXPECT_DEATH(token.RebaseStringView(substr),
+  EXPECT_DEATH(token.RebaseDocumentView(substr),
                "only valid when the new text referenced matches the old text");
 }
 
-TEST(RebaseStringViewDeathTest, SubstringMismatch2) {
-  const std::string_view text = "hello";
-  const std::string_view substr = "Hello";
+TEST(RebaseDocumentViewDeathTest, SubstringMismatch2) {
+  const document_view text = "hello";
+  const document_view substr = "Hello";
   TokenInfo token(1, text);
   EXPECT_EQ(token.left(text), 0);
-  EXPECT_DEATH(token.RebaseStringView(substr),
+  EXPECT_DEATH(token.RebaseDocumentView(substr),
                "only valid when the new text referenced matches the old text");
 }
 
 // Test that substring in the middle of old string is rebased correctly.
-TEST(RebaseStringViewTest, NewSubstringNotAtFront) {
-  const std::string_view text = "hello";
-  const std::string_view new_base = "xxxhelloyyy";
+TEST(RebaseDocumentViewTest, NewSubstringNotAtFront) {
+  const document_view text = "hello";
+  const document_view new_base = "xxxhelloyyy";
   TokenInfo token(1, text);
-  token.RebaseStringView(new_base.substr(3, 5));
+  token.RebaseDocumentView(new_base.substr(3, 5));
   EXPECT_EQ(token.left(new_base), 3);
   EXPECT_EQ(token.right(new_base), 8);
   EXPECT_EQ(token.text(), text);
 }
 
 // Test that substring in the middle of old string is rebased correctly.
-TEST(RebaseStringViewTest, UsingCharPointer) {
-  const std::string_view text = "hello";
-  const std::string_view new_base = "xxxhelloyyy";
+TEST(RebaseDocumentViewTest, UsingCharPointer) {
+  const document_view text = "hello";
+  const document_view new_base = "xxxhelloyyy";
   TokenInfo token(1, text);
-  token.RebaseStringView(new_base.begin() + 3);  // assume original length
+  token.RebaseDocumentView(new_base.begin() + 3);  // assume original length
   EXPECT_EQ(token.left(new_base), 3);
   EXPECT_EQ(token.right(new_base), 8);
   EXPECT_EQ(token.text(), text);
 }
 
 // Test integration with substr() function rebases correctly.
-TEST(RebaseStringViewTest, RelativeToOldBase) {
-  const std::string_view full_text = "xxxxxxhelloyyyyy";
-  const std::string_view substr = full_text.substr(6, 5);
+TEST(RebaseDocumentViewTest, RelativeToOldBase) {
+  const document_view full_text = "xxxxxxhelloyyyyy";
+  const document_view substr = full_text.substr(6, 5);
   EXPECT_EQ(substr, "hello");
   TokenInfo token(1, substr);
   EXPECT_EQ(token.left(full_text), 6);
   EXPECT_EQ(token.text(), substr);
-  const std::string_view new_base = "aahellobbb";
-  token.RebaseStringView(new_base.substr(2, substr.length()));
+  const document_view new_base = "aahellobbb";
+  token.RebaseDocumentView(new_base.substr(2, substr.length()));
   EXPECT_EQ(token.left(new_base), 2);
   EXPECT_EQ(token.right(new_base), 7);
   EXPECT_EQ(token.text(), substr);
 }
 
 // Test rebasing into middle of superstring.
-TEST(RebaseStringViewTest, MiddleOfSuperstring) {
-  const std::string_view dest_text = "xxxxxxhell0yyyyy";
-  const std::string_view src_text = "ccchell0ddd";
+TEST(RebaseDocumentViewTest, MiddleOfSuperstring) {
+  const document_view dest_text = "xxxxxxhell0yyyyy";
+  const document_view src_text = "ccchell0ddd";
   const int dest_offset = 6;
-  const std::string_view src_substr = src_text.substr(3, 5);
+  const document_view src_substr = src_text.substr(3, 5);
   EXPECT_EQ(src_substr, "hell0");
   TokenInfo token(2, src_substr);
   // src_text[3] lines up with dest_text[6].
-  token.RebaseStringView(dest_text.substr(dest_offset, src_substr.length()));
+  token.RebaseDocumentView(dest_text.substr(dest_offset, src_substr.length()));
   EXPECT_EQ(token.left(dest_text), dest_offset);
   EXPECT_EQ(token.text(), src_substr);
 }
 
 // Test rebasing into prefix superstring.
-TEST(RebaseStringViewTest, PrefixSuperstring) {
-  const std::string_view dest_text = "xxxhell0yyyyyzzzzzzz";
-  const std::string_view src_text = "ccchell0ddd";
+TEST(RebaseDocumentViewTest, PrefixSuperstring) {
+  const document_view dest_text = "xxxhell0yyyyyzzzzzzz";
+  const document_view src_text = "ccchell0ddd";
   const int dest_offset = 3;
-  const std::string_view src_substr = src_text.substr(3, 5);
+  const document_view src_substr = src_text.substr(3, 5);
   EXPECT_EQ(src_substr, "hell0");
   TokenInfo token(1, src_substr);
   // src_text[3] lines up with dest_text[3].
-  token.RebaseStringView(dest_text.substr(dest_offset, src_substr.length()));
+  token.RebaseDocumentView(dest_text.substr(dest_offset, src_substr.length()));
   EXPECT_EQ(token.left(dest_text), dest_offset);
   EXPECT_EQ(token.text(), src_substr);
 }

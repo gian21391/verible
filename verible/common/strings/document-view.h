@@ -16,6 +16,8 @@ class document_view {
 public:
     using traits_type = std::char_traits<char>;
     using size_type = std::size_t;
+    using const_iterator = const char*;
+    using iterator = const_iterator;
     static constexpr size_type npos = static_cast<size_type>(-1);
 
     constexpr document_view() noexcept : data_(nullptr), size_(0) {}
@@ -29,10 +31,10 @@ public:
     constexpr document_view(const std::string& str) noexcept
         : data_(str.c_str()), size_(str.size()) {}
 
-    constexpr const char* begin() const noexcept { return data_; }
-    constexpr const char* end() const noexcept { return data_ + size_; }
-    constexpr const char* cbegin() const noexcept { return data_; }
-    constexpr const char* cend() const noexcept { return data_ + size_; }
+    constexpr iterator begin() const noexcept { return data_; }
+    constexpr iterator end() const noexcept { return data_ + size_; }
+    constexpr const_iterator cbegin() const noexcept { return data_; }
+    constexpr const_iterator cend() const noexcept { return data_ + size_; }
 
     constexpr size_type size() const noexcept { return size_; }
     constexpr size_type length() const noexcept { return size_; }

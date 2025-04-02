@@ -59,7 +59,7 @@ TextStructureTokenized::TextStructureTokenized(
       new_tokens.push_back(token);
       // Maintain the invariant that all tokens in a TextStructureView
       // must belong to the string owned by the TextStructure.
-      new_tokens.back().RebaseStringView(
+      new_tokens.back().RebaseDocumentView(
           joined_text.substr(offset, token.text().length()));
       offset += token.text().length();
     }

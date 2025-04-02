@@ -93,7 +93,7 @@ void TokenInfoTestData::RebaseToCodeCopy(std::vector<TokenInfo> *tokens,
   for (TokenInfo &token : *tokens) {
     const auto offset =
         std::distance(std::string_view(code).begin(), token.text().begin());
-    token.RebaseStringView(base.begin() + offset);
+    token.RebaseDocumentView(base.begin() + offset);
   }
 }
 

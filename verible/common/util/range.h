@@ -20,6 +20,7 @@
 
 #include <utility>
 
+#include <verible/common/strings/document-view.h>
 #include "verible/common/util/logging.h"
 
 namespace verible {
@@ -45,7 +46,9 @@ bool IsSubRange(const SubRange &sub, const SuperRange &super) {
 // Could have also been named IntervalEqual.
 template <class LRange, class RRange>
 bool BoundsEqual(const LRange &l, const RRange &r) {
-  return l.begin() == r.begin() && l.end() == r.end();
+  document_view l_range = l;
+  document_view r_range = r;
+  return l_range.begin() == r_range.begin() && l_range.end() == r_range.end();
 }
 
 // TODO(fangism): bool RangesOverlap(l, r);

@@ -30,12 +30,12 @@
 namespace verible {
 
 TokenInfo TokenInfo::EOFToken() {
-  static constexpr std::string_view null_text;
+  static constexpr document_view null_text;
   return {TK_EOF, null_text};
 }
 
-TokenInfo TokenInfo::EOFToken(std::string_view buffer) {
-  return {TK_EOF, std::string_view(buffer.data() + buffer.length(), 0)};
+TokenInfo TokenInfo::EOFToken(document_view buffer) {
+  return {TK_EOF, document_view(buffer.data() + buffer.length(), 0)};
 }
 
 bool TokenInfo::operator==(const TokenInfo &token) const {
@@ -44,7 +44,7 @@ bool TokenInfo::operator==(const TokenInfo &token) const {
           BoundsEqual(text_, token.text_));
 }
 
-TokenInfo::Context::Context(std::string_view b)
+TokenInfo::Context::Context(document_view b)
     : base(b),
       // By default, just print the enum integer value, un-translated.
       token_enum_translator([](std::ostream &stream, int e) { stream << e; }) {}
@@ -53,16 +53,18 @@ std::ostream &TokenInfo::ToStream(std::ostream &output_stream,
                                   const Context &context) const {
   output_stream << "(#";
   context.token_enum_translator(output_stream, token_enum_);
+  auto escaped_text = absl::CEscape(
+    std::string_view(text_.data(), text_.length()));
   output_stream << " @" << left(context.base) << '-' << right(context.base)
-                << ": \"" << absl::CEscape(text_) << "\")";
+                << ": \"" << escaped_text << "\")";
   const auto dist = std::distance(context.base.end(), text_.end());
   CHECK(IsSubRange(text_, context.base)) << "text.end() is off by " << dist;
   return output_stream;
 }
 
 std::ostream &TokenInfo::ToStream(std::ostream &output_stream) const {
-  return output_stream << "(#" << token_enum_ << ": \"" << absl::CEscape(text_)
-                       << "\")";
+  auto escaped_text = absl::CEscape(std::string_view(text_.data(), text_.length()));
+  return output_stream << "(#" << token_enum_ << ": \"" << escaped_text << "\")";
 }
 
 std::string TokenInfo::ToString(const Context &context) const {
@@ -77,8 +79,8 @@ std::string TokenInfo::ToString() const {
   return output_stream.str();
 }
 
-void TokenInfo::RebaseStringView(std::string_view new_text) {
-  verible::RebaseStringView(&text_, new_text);
+void TokenInfo::RebaseDocumentView(document_view new_text) {
+  verible::RebaseDocumentView(&text_, new_text);
 }
 
 void TokenInfo::Concatenate(std::string *out, std::vector<TokenInfo> *tokens) {

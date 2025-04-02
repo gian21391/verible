@@ -15,6 +15,8 @@
 #ifndef VERIBLE_COMMON_TEXT_TOKEN_INFO_H_
 #define VERIBLE_COMMON_TEXT_TOKEN_INFO_H_
 
+#include <verible/common/strings/document-view.h>
+
 #include <algorithm>  // for std::distance, std::copy
 #include <cstddef>
 #include <functional>  // for std::function
@@ -45,13 +47,13 @@ class TokenInfo {
   static TokenInfo EOFToken();
 
   // Construct an EOF token that points to the end of a string buffer.
-  static TokenInfo EOFToken(std::string_view);
+  static TokenInfo EOFToken(document_view);
 
   // Hide default constructor, force explicit initialization or call to
   // EOFToken().
   TokenInfo() = delete;
 
-  TokenInfo(int token_enum, std::string_view text)
+  TokenInfo(int token_enum, document_view text)
       : token_enum_(token_enum), text_(text) {}
 
   TokenInfo(const TokenInfo &) = default;
@@ -63,30 +65,30 @@ class TokenInfo {
   struct Context {
     // Full range of text in which a token appears.
     // This is used to calculate byte offsets.
-    std::string_view base;
+    document_view base;
 
     // Prints a human-readable interpretation form of a token enumeration.
     std::function<void(std::ostream &, int)> token_enum_translator;
 
-    explicit Context(std::string_view b);
+    explicit Context(document_view b);
 
-    Context(std::string_view b,
+    Context(document_view b,
             std::function<void(std::ostream &, int)> translator)
         : base(b), token_enum_translator(std::move(translator)) {}
   };
 
   int token_enum() const { return token_enum_; }
   void set_token_enum(int t) { token_enum_ = t; }
-  std::string_view text() const { return text_; }
-  void set_text(std::string_view t) { text_ = t; }
+  document_view text() const { return text_; }
+  void set_text(document_view t) { text_ = t; }
 
   // Return position of this token's text start relative to a base buffer.
-  int left(std::string_view base) const {
+  int left(document_view base) const {
     return std::distance(base.begin(), text_.begin());
   }
 
   // Return position of this token's text end relative to a base buffer.
-  int right(std::string_view base) const {
+  int right(document_view base) const {
     return std::distance(base.begin(), text_.end());
   }
 
@@ -95,7 +97,7 @@ class TokenInfo {
   // a series of abutting substring ranges.  Useful for lexer operation.
   void AdvanceText(int token_length) {
     // The end of the previous token is the beginning of the next.
-    text_ = std::string_view(text_.data() + text_.length(), token_length);
+    text_ = document_view(text_.data() + text_.length(), token_length);
   }
 
   // Writes a human-readable string representation of the token.
@@ -117,14 +119,14 @@ class TokenInfo {
   // This is a potentially dangerous operation, which can be validated
   // using a combination of object lifetime management and range-checking.
   // It is the caller's responsibility that it points to valid memory.
-  void RebaseStringView(std::string_view new_text);
+  void RebaseDocumentView(document_view new_text);
 
   // This overload assumes that the string of interest from other has the
   // same length as the current string_view.
   // string_view::iterator happens to be const char*, but don't rely on that
   // fact as it can be implementation-dependent.
-  void RebaseStringView(std::string_view::const_iterator new_text) {
-    RebaseStringView(std::string_view(&*new_text, text_.length()));
+  void RebaseDocumentView(document_view::const_iterator new_text) {
+    RebaseDocumentView(document_view(&*new_text, text_.length()));
   }
 
   // Joins the text from a sequence of (text-disjoint) tokens, and also
@@ -162,7 +164,7 @@ class TokenInfo {
   int token_enum_;
 
   // The substring of a larger text that this token represents.
-  std::string_view text_;
+  document_view text_;
 };
 
 std::ostream &operator<<(std::ostream &, const TokenInfo &);
@@ -192,7 +194,7 @@ void ConcatenateTokenInfos(std::string *out, TokenIter begin, TokenIter end) {
     total_length += token.text().length();
   }
   out->resize(total_length);
-  const std::string_view out_view(*out);
+  const document_view out_view(*out);
 
   // Copy text into new buffer.
   auto code_iter = out->begin();  // writeable iterator (like char*)
@@ -202,7 +204,7 @@ void ConcatenateTokenInfos(std::string *out, TokenIter begin, TokenIter end) {
     code_iter = std::copy(token.text().begin(), token.text().end(), code_iter);
     const auto new_text = out_view.substr(offset, token.text().length());
     // Adjust locations relative to newly concatenated string.
-    token.RebaseStringView(new_text);
+    token.RebaseDocumentView(new_text);
     offset += token.text().length();
   }
 }
