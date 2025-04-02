@@ -12,12 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Unit tests for RebaseStringView
+// Unit tests for RebaseDocumentView
 
 #include "verible/common/strings/rebase.h"
 
 #include <string>
-#include <string_view>
 
 #include "gtest/gtest.h"
 #include "verible/common/util/range.h"
@@ -26,7 +25,7 @@ namespace verible {
 namespace {
 
 // Test that empty string token rebases correctly.
-TEST(RebaseStringViewTest, EmptyStringsZeroOffset) {
+TEST(RebaseDocumentViewTest, EmptyStringsZeroOffset) {
   const std::string text;
   // We want another empty string, but we need to trick too smart compilers
   // to give us a different memory address.
@@ -34,99 +33,99 @@ TEST(RebaseStringViewTest, EmptyStringsZeroOffset) {
   substr.resize(0);  // Force empty string such as 'text' but memory space
   ASSERT_NE(text.c_str(), substr.c_str()) << "Mismatch in memory assumption";
 
-  std::string_view text_view(text);
-  const std::string_view substr_view(substr);
+  document_view text_view(text);
+  const document_view substr_view(substr);
   EXPECT_FALSE(BoundsEqual(text_view, substr_view));
-  RebaseStringView(&text_view, substr);
+  RebaseDocumentView(&text_view, substr);
   EXPECT_TRUE(BoundsEqual(text_view, substr_view));
 }
 
 // Test that non-empty whole-string copy rebases correctly.
-TEST(RebaseStringViewTest, IdenticalCopy) {
+TEST(RebaseDocumentViewTest, IdenticalCopy) {
   const std::string text = "hello";
   const std::string substr = "hello";  // different memory space
-  std::string_view text_view(text);
-  const std::string_view substr_view(substr);
+  document_view text_view(text);
+  const document_view substr_view(substr);
   EXPECT_FALSE(BoundsEqual(text_view, substr_view));
-  RebaseStringView(&text_view, substr);
+  RebaseDocumentView(&text_view, substr);
   EXPECT_TRUE(BoundsEqual(text_view, substr_view));
 }
 
 // Test that substring mismatch between new and old is checked.
-TEST(RebaseStringViewDeathTest, SubstringMismatch) {
-  const std::string_view text = "hell0";
-  const std::string_view substr = "hello";
-  std::string_view text_view(text);
-  EXPECT_DEATH(RebaseStringView(&text_view, substr),
+TEST(RebaseDocumentViewDeathTest, SubstringMismatch) {
+  const document_view text = "hell0";
+  const document_view substr = "hello";
+  document_view text_view(text);
+  EXPECT_DEATH(RebaseDocumentView(&text_view, substr),
                "only valid when the new text referenced matches the old text");
 }
 
-TEST(RebaseStringViewDeathTest, SubstringMismatch2) {
-  const std::string_view text = "hello";
-  const std::string_view substr = "Hello";
-  std::string_view text_view(text);
-  EXPECT_DEATH(RebaseStringView(&text_view, substr),
+TEST(RebaseDocumentViewDeathTest, SubstringMismatch2) {
+  const document_view text = "hello";
+  const document_view substr = "Hello";
+  document_view text_view(text);
+  EXPECT_DEATH(RebaseDocumentView(&text_view, substr),
                "only valid when the new text referenced matches the old text");
 }
 
 // Test that substring in the middle of old string is rebased correctly.
-TEST(RebaseStringViewTest, NewSubstringNotAtFront) {
-  const std::string_view text = "hello";
-  const std::string_view new_base = "xxxhelloyyy";
-  const std::string_view new_view(new_base.substr(3, 5));
-  std::string_view text_view(text);
+TEST(RebaseDocumentViewTest, NewSubstringNotAtFront) {
+  const document_view text = "hello";
+  const document_view new_base = "xxxhelloyyy";
+  const document_view new_view(new_base.substr(3, 5));
+  document_view text_view(text);
   EXPECT_FALSE(BoundsEqual(text_view, new_view));
-  RebaseStringView(&text_view, new_view);
+  RebaseDocumentView(&text_view, new_view);
   EXPECT_TRUE(BoundsEqual(text_view, new_view));
 }
 
 // Test that substring in the middle of old string is rebased correctly.
-TEST(RebaseStringViewTest, UsingCharPointer) {
-  const std::string_view text = "hello";
+TEST(RebaseDocumentViewTest, UsingCharPointer) {
+  const document_view text = "hello";
   const char *new_base = "xxxhelloyyy";
   const char *new_view_offset = new_base + 3;
-  std::string_view text_view(text);
-  RebaseStringView(&text_view, new_view_offset);  // assume original length
-  const std::string_view new_base_view(new_base);
+  document_view text_view(text);
+  RebaseDocumentView(&text_view, new_view_offset);  // assume original length
+  const document_view new_base_view(new_base);
   EXPECT_TRUE(BoundsEqual(text_view, new_base_view.substr(3, 5)));
 }
 
 // Test integration with substr() function rebases correctly.
-TEST(RebaseStringViewTest, RelativeToOldBase) {
-  const std::string_view full_text = "xxxxxxhelloyyyyy";
-  std::string_view substr = full_text.substr(6, 5);
+TEST(RebaseDocumentViewTest, RelativeToOldBase) {
+  const document_view full_text = "xxxxxxhelloyyyyy";
+  document_view substr = full_text.substr(6, 5);
   EXPECT_EQ(substr, "hello");
-  const std::string_view new_base = "aahellobbb";
-  const std::string_view new_view(new_base.substr(2, substr.length()));
-  RebaseStringView(&substr, new_view);
+  const document_view new_base = "aahellobbb";
+  const document_view new_view(new_base.substr(2, substr.length()));
+  RebaseDocumentView(&substr, new_view);
   EXPECT_TRUE(BoundsEqual(substr, new_view));
 }
 
 // Test rebasing into middle of superstring.
-TEST(RebaseStringViewTest, MiddleOfSuperstring) {
-  const std::string_view dest_text = "xxxxxxhell0yyyyy";
-  const std::string_view src_text = "ccchell0ddd";
+TEST(RebaseDocumentViewTest, MiddleOfSuperstring) {
+  const document_view dest_text = "xxxxxxhell0yyyyy";
+  const document_view src_text = "ccchell0ddd";
   const int dest_offset = 6;
-  std::string_view src_substr(src_text.substr(3, 5));
+  document_view src_substr(src_text.substr(3, 5));
   EXPECT_EQ(src_substr, "hell0");
   // src_text[3] lines up with dest_text[6].
-  const std::string_view dest_view(
+  const document_view dest_view(
       dest_text.substr(dest_offset, src_substr.length()));
-  RebaseStringView(&src_substr, dest_view);
+  RebaseDocumentView(&src_substr, dest_view);
   EXPECT_TRUE(BoundsEqual(src_substr, dest_view));
 }
 
 // Test rebasing into prefix superstring.
-TEST(RebaseStringViewTest, PrefixSuperstring) {
-  const std::string_view dest_text = "xxxhell0yyyyyzzzzzzz";
-  const std::string_view src_text = "ccchell0ddd";
+TEST(RebaseDocumentViewTest, PrefixSuperstring) {
+  const document_view dest_text = "xxxhell0yyyyyzzzzzzz";
+  const document_view src_text = "ccchell0ddd";
   const int dest_offset = 3;
-  std::string_view src_substr = src_text.substr(3, 5);
+  document_view src_substr = src_text.substr(3, 5);
   EXPECT_EQ(src_substr, "hell0");
   // src_text[3] lines up with dest_text[3].
-  const std::string_view dest_view(
+  const document_view dest_view(
       dest_text.substr(dest_offset, src_substr.length()));
-  RebaseStringView(&src_substr, dest_view);
+  RebaseDocumentView(&src_substr, dest_view);
   EXPECT_TRUE(BoundsEqual(src_substr, dest_view));
 }
 

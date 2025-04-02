@@ -14,20 +14,19 @@
 
 #include "verible/common/strings/rebase.h"
 
-#include <string_view>
-
+#include "verible/common/strings/document-view.h"
 #include "verible/common/util/logging.h"
 
 namespace verible {
 
-void RebaseStringView(std::string_view *src, std::string_view dest) {
-  CHECK_EQ(*src, dest) << "RebaseStringView() is only valid when the "
+void RebaseDocumentView(document_view *src, document_view dest) {
+  CHECK_EQ(*src, dest) << "RebaseDocumentView() is only valid when the "
                           "new text referenced matches the old text.";
   *src = dest;
 }
 
-void RebaseStringView(std::string_view *src, const char *dest) {
-  RebaseStringView(src, std::string_view(dest, src->length()));
+void RebaseDocumentView(document_view *src, const char *dest) {
+  RebaseDocumentView(src, document_view(dest, src->length()));
 }
 
 }  // namespace verible
