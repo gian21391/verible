@@ -89,17 +89,17 @@ const SyntaxTreeLeaf *GetLeftmostLeaf(const Symbol &symbol) {
   return nullptr;
 }
 
-std::string_view StringSpanOfSymbol(const Symbol &symbol) {
+document_view StringSpanOfSymbol(const Symbol &symbol) {
   return StringSpanOfSymbol(symbol, symbol);
 }
 
-std::string_view StringSpanOfSymbol(const Symbol &lsym, const Symbol &rsym) {
+document_view StringSpanOfSymbol(const Symbol &lsym, const Symbol &rsym) {
   const auto *left = GetLeftmostLeaf(lsym);
   const auto *right = GetRightmostLeaf(rsym);
   if (left != nullptr && right != nullptr) {
     const auto range_begin = left->get().text().begin();
     const auto range_end = right->get().text().end();
-    return std::string_view(&*range_begin,
+    return document_view(&*range_begin,
                             std::distance(range_begin, range_end));
   }
   return "";
@@ -271,7 +271,7 @@ const Symbol *FindLastSubtree(const Symbol *tree, const TreePredicate &pred) {
 
 ConcreteSyntaxTree *FindSubtreeStartingAtOffset(
     ConcreteSyntaxTree *tree,
-    std::string_view::const_iterator first_token_offset) {
+    document_view::const_iterator first_token_offset) {
   auto predicate = [=](const Symbol &s) {
     const SyntaxTreeLeaf *leftmost = GetLeftmostLeaf(s);
     if (leftmost != nullptr) {
@@ -294,7 +294,7 @@ ConcreteSyntaxTree *FindSubtreeStartingAtOffset(
 namespace {
 // Returns true if this node should be deleted by parent (pop_back).
 bool PruneTreeFromRight(ConcreteSyntaxTree *tree,
-                        std::string_view::const_iterator offset) {
+                        document_view::const_iterator offset) {
   const auto kind = (*ABSL_DIE_IF_NULL(tree))->Kind();
   switch (kind) {
     case SymbolKind::kLeaf: {
@@ -332,14 +332,14 @@ bool PruneTreeFromRight(ConcreteSyntaxTree *tree,
 }  // namespace
 
 void PruneSyntaxTreeAfterOffset(ConcreteSyntaxTree *tree,
-                                std::string_view::const_iterator offset) {
+                                document_view::const_iterator offset) {
   PruneTreeFromRight(tree, offset);
 }
 
 // Helper functions for ZoomSyntaxTree
 namespace {
 // Return the upper bound offset of the rightmost token in the tree.
-std::string_view::const_iterator RightmostOffset(const Symbol &symbol) {
+document_view::const_iterator RightmostOffset(const Symbol &symbol) {
   const SyntaxTreeLeaf *leaf_ptr = verible::GetRightmostLeaf(symbol);
   return ABSL_DIE_IF_NULL(leaf_ptr)->get().text().end();
 }
@@ -359,7 +359,7 @@ ConcreteSyntaxTree *LeftSubtree(ConcreteSyntaxTree *tree) {
 }  // namespace
 
 ConcreteSyntaxTree *ZoomSyntaxTree(ConcreteSyntaxTree *tree,
-                                   std::string_view trim_range) {
+                                   document_view trim_range) {
   if (*tree == nullptr) return nullptr;
 
   const auto left_offset = trim_range.begin();
@@ -376,7 +376,7 @@ ConcreteSyntaxTree *ZoomSyntaxTree(ConcreteSyntaxTree *tree,
   return match;
 }
 
-void TrimSyntaxTree(ConcreteSyntaxTree *tree, std::string_view trim_range) {
+void TrimSyntaxTree(ConcreteSyntaxTree *tree, document_view trim_range) {
   auto *replacement = ZoomSyntaxTree(tree, trim_range);
   if (replacement == nullptr || *replacement == nullptr) {
     *tree = nullptr;

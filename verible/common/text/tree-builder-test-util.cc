@@ -24,7 +24,7 @@
 
 namespace verible {
 
-constexpr std::string_view kDontCareText;
+constexpr document_view kDontCareText;
 
 SymbolPtr XLeaf(int token_enum) { return Leaf(token_enum, kDontCareText); }
 
