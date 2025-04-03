@@ -18,6 +18,8 @@ public:
     using size_type = std::size_t;
     using const_iterator = const char*;
     using iterator = const_iterator;
+    using reverse_iterator = std::reverse_iterator<iterator>;
+    using const_reverse_iterator = std::reverse_iterator<const_iterator>;
     static constexpr size_type npos = static_cast<size_type>(-1);
 
     constexpr document_view() noexcept : data_(nullptr), size_(0) {}
@@ -33,8 +35,12 @@ public:
 
     constexpr iterator begin() const noexcept { return data_; }
     constexpr iterator end() const noexcept { return data_ + size_; }
-    constexpr const_iterator cbegin() const noexcept { return data_; }
-    constexpr const_iterator cend() const noexcept { return data_ + size_; }
+    constexpr const_iterator cbegin() const noexcept { return begin(); }
+    constexpr const_iterator cend() const noexcept { return end(); }
+    constexpr reverse_iterator rbegin() const noexcept { return std::reverse_iterator(end()); }
+    constexpr reverse_iterator rend() const noexcept { return std::reverse_iterator(begin()); }
+    constexpr const_reverse_iterator crbegin() const noexcept { return rbegin(); }
+    constexpr const_reverse_iterator crend() const noexcept { return rend(); }
 
     constexpr size_type size() const noexcept { return size_; }
     constexpr size_type length() const noexcept { return size_; }
@@ -99,6 +105,28 @@ public:
         return npos;
     }
 
+    constexpr size_type find_first_not_of(char ch, size_type pos = 0) const noexcept {
+        for (; pos < size_; ++pos) {
+            if (!traits_type::eq(data_[pos], ch))
+                return pos;
+        }
+        return npos;
+    }
+
+    constexpr size_type find_first_not_of(document_view str, size_type pos = 0) const noexcept {
+        for (; pos < size_; ++pos) {
+            bool found = false;
+            for (size_type i = 0; i < str.size_; ++i) {
+                if (traits_type::eq(data_[pos], str.data_[i])) {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) return pos;
+        }
+        return npos;
+    }
+
     constexpr bool starts_with(document_view str) const noexcept {
         return size_ >= str.size_
             && traits_type::compare(data_, str.data_, str.size_) == 0;
@@ -107,6 +135,14 @@ public:
     constexpr bool ends_with(document_view str) const noexcept {
         return size_ >= str.size_
             && traits_type::compare(data_ + size_ - str.size_, str.data_, str.size_) == 0;
+    }
+
+    constexpr std::string to_string() const noexcept {
+        return std::string(data_, size_);
+    }
+
+    constexpr std::string_view to_string_view() const noexcept {
+        return std::string_view(data_, size_);
     }
 
 private:
