@@ -244,3 +244,130 @@ target_link_libraries(token-stream-lint-rule INTERFACE
         verible::common::analysis::lint-rule
         verible::common::text::token-info
 )
+
+add_executable(lint-rule-status_test lint-rule-status_test.cc)
+target_link_libraries(lint-rule-status_test PRIVATE
+        verible::common::analysis::lint-rule-status
+        verible::common::text::concrete-syntax-tree
+        verible::common::text::token-info
+        verible::common::text::tree-builder-test-util
+        absl::strings
+        GTest::gtest
+        GTest::gtest_main
+)
+add_test(NAME lint-rule-status_test COMMAND lint-rule-status_test)
+
+add_executable(lint-waiver_test lint-waiver_test.cc)
+target_link_libraries(lint-waiver_test PRIVATE
+        verible::common::analysis::lint-waiver
+        verible::common::strings::line-column-map
+        verible::common::text::text-structure-test-utils
+        verible::common::text::token-info
+        verible::common::text::token-stream-view
+        verible::common::util::iterator-range
+        GTest::gtest
+        GTest::gtest_main
+)
+add_test(NAME lint-waiver_test COMMAND lint-waiver_test)
+
+add_executable(file-analyzer_test file-analyzer_test.cc)
+target_link_libraries(file-analyzer_test PRIVATE
+        verible::common::analysis::file-analyzer
+        verible::common::strings::line-column-map
+        verible::common::text::text-structure
+        verible::common::text::token-info
+        absl::status
+        absl::strings
+        GTest::gtest
+        GTest::gtest_main
+)
+add_test(NAME file-analyzer_test COMMAND file-analyzer_test)
+
+add_executable(linter-test-utils_test linter-test-utils_test.cc)
+target_link_libraries(linter-test-utils_test PRIVATE
+        verible::common::analysis::lint-rule-status
+        verible::common::analysis::linter-test-utils
+        verible::common::util::range
+        absl::strings
+        GTest::gtest
+        GTest::gtest_main
+)
+add_test(NAME linter-test-utils_test COMMAND linter-test-utils_test)
+
+add_executable(line-linter_test line-linter_test.cc)
+target_link_libraries(line-linter_test PRIVATE
+        verible::common::analysis::line-lint-rule
+        verible::common::analysis::line-linter
+        verible::common::analysis::lint-rule-status
+        verible::common::text::token-info
+        GTest::gtest
+        GTest::gtest_main
+)
+add_test(NAME line-linter_test COMMAND line-linter_test)
+
+add_executable(syntax-tree-linter_test syntax-tree-linter_test.cc)
+target_link_libraries(syntax-tree-linter_test PRIVATE
+        verible::common::analysis::lint-rule-status
+        verible::common::analysis::syntax-tree-lint-rule
+        verible::common::analysis::syntax-tree-linter
+        verible::common::text::concrete-syntax-leaf
+        verible::common::text::concrete-syntax-tree
+        verible::common::text::symbol
+        verible::common::text::syntax-tree-context
+        verible::common::text::token-info
+        verible::common::text::tree-builder-test-util
+        verible::common::util::casts
+        GTest::gtest
+        GTest::gtest_main
+)
+add_test(NAME syntax-tree-linter_test COMMAND syntax-tree-linter_test)
+
+add_executable(syntax-tree-search_test syntax-tree-search_test.cc)
+target_link_libraries(syntax-tree-search_test PRIVATE
+        verible::common::analysis::syntax-tree-search
+        verible::common::analysis::matcher::matcher-builders
+        verible::common::text::symbol
+        verible::common::text::syntax-tree-context
+        verible::common::text::tree-builder-test-util
+        verible::common::text::tree-utils
+        GTest::gtest
+        GTest::gtest_main
+)
+add_test(NAME syntax-tree-search_test COMMAND syntax-tree-search_test)
+
+add_executable(syntax-tree-search-test-utils_test syntax-tree-search-test-utils_test.cc)
+target_link_libraries(syntax-tree-search-test-utils_test PRIVATE
+        verible::common::analysis::syntax-tree-search
+        verible::common::analysis::syntax-tree-search-test-utils
+        verible::common::text::tree-builder-test-util
+        verible::common::util::range
+        absl::strings
+        GTest::gtest
+        GTest::gtest_main
+)
+add_test(NAME syntax-tree-search-test-utils_test COMMAND syntax-tree-search-test-utils_test)
+
+add_executable(text-structure-linter_test text-structure-linter_test.cc)
+target_link_libraries(text-structure-linter_test PRIVATE
+        verible::common::analysis::lint-rule-status
+        verible::common::analysis::text-structure-lint-rule
+        verible::common::analysis::text-structure-linter
+        verible::common::text::text-structure
+        verible::common::text::token-info
+        absl::strings
+        GTest::gtest
+        GTest::gtest_main
+)
+add_test(NAME text-structure-linter_test COMMAND text-structure-linter_test)
+
+add_executable(token-stream-linter_test token-stream-linter_test.cc)
+target_link_libraries(token-stream-linter_test PRIVATE
+        verible::common::analysis::lint-rule-status
+        verible::common::analysis::token-stream-lint-rule
+        verible::common::analysis::token-stream-linter
+        verible::common::text::token-info
+        verible::common::text::token-stream-view
+        GTest::gtest
+        GTest::gtest_main
+)
+add_test(NAME token-stream-linter_test COMMAND token-stream-linter_test)
