@@ -6,24 +6,140 @@
 
 #include <algorithm>
 #include <cstddef>
+#include <iterator>
 #include <stdexcept>
 #include <string>
 #include <iostream>
 
 namespace verible {
 
+class document_view_iterator {
+public:
+    using iterator_category = std::random_access_iterator_tag;
+    using value_type = char;
+    using difference_type = std::ptrdiff_t;
+    using pointer = const char*;
+    using reference = const char&;
+
+    constexpr document_view_iterator() noexcept = default;
+
+    constexpr document_view_iterator(pointer current,
+                                    pointer source_start,
+                                    pointer source_end) noexcept
+        : current_(current),
+          source_start_(source_start),
+          source_end_(source_end) {}
+
+    constexpr reference operator*() const noexcept {
+        return *current_;
+    }
+
+    constexpr document_view_iterator& operator++() noexcept {
+        ++current_;
+        return *this;
+    }
+
+    constexpr document_view_iterator operator++(int) noexcept {
+        auto tmp = *this;
+        ++current_;
+        return tmp;
+    }
+
+    constexpr document_view_iterator& operator--() noexcept {
+        --current_;
+        return *this;
+    }
+
+    constexpr document_view_iterator operator--(int) noexcept {
+        auto tmp = *this;
+        --current_;
+        return tmp;
+    }
+
+    constexpr document_view_iterator& operator+=(difference_type n) noexcept {
+        current_ += n;
+        return *this;
+    }
+
+    constexpr document_view_iterator operator+(difference_type n) const noexcept {
+        return {current_ + n, source_start_, source_end_};
+    }
+
+    constexpr document_view_iterator& operator-=(difference_type n) noexcept {
+        current_ -= n;
+        return *this;
+    }
+
+    constexpr document_view_iterator operator-(difference_type n) const noexcept {
+        return {current_ - n, source_start_, source_end_};
+    }
+
+    constexpr difference_type operator-(const document_view_iterator& other) const {
+        validate_source(other);
+        return current_ - other.current_;
+    }
+
+    constexpr bool operator==(const document_view_iterator& other) const {
+        validate_source(other);
+        return current_ == other.current_;
+    }
+
+    constexpr bool operator!=(const document_view_iterator& other) const {
+        return !(*this == other);
+    }
+
+    constexpr bool operator<(const document_view_iterator& other) const {
+        validate_source(other);
+        return current_ < other.current_;
+    }
+
+    constexpr bool operator<=(const document_view_iterator& other) const {
+        validate_source(other);
+        return current_ <= other.current_;
+    }
+
+    constexpr bool operator>(const document_view_iterator& other) const {
+        validate_source(other);
+        return current_ > other.current_;
+    }
+
+    constexpr bool operator>=(const document_view_iterator& other) const {
+        validate_source(other);
+        return current_ >= other.current_;
+    }
+
+private:
+    pointer current_ = nullptr;
+    pointer source_start_ = nullptr;
+    pointer source_end_ = nullptr;
+
+    constexpr void validate_source(const document_view_iterator& other) const {
+        // optionally a no-op controlled by NDEBUG
+        if (source_start_ != other.source_start_ || source_end_ != other.source_end_) {
+            throw std::logic_error("Iterator comparison between different source documents");
+        }
+    }
+};
+
+constexpr document_view_iterator operator+(document_view_iterator::difference_type n,
+                                          const document_view_iterator& it) noexcept {
+    return it + n;
+}
+
 class document_view {
 public:
     using traits_type = std::char_traits<char>;
     using size_type = std::size_t;
-    using const_iterator = const char*;
-    using iterator = const_iterator;
+    static constexpr size_type npos = static_cast<size_type>(-1);
+    using iterator = document_view_iterator;
+    using const_iterator = iterator;
     using reverse_iterator = std::reverse_iterator<iterator>;
     using const_reverse_iterator = std::reverse_iterator<const_iterator>;
-    static constexpr size_type npos = static_cast<size_type>(-1);
+    using value_type = traits_type::char_type;
+    using reference = value_type&;
+    using const_reference = const value_type&;
 
-    constexpr document_view() noexcept
-        : data_(nullptr), size_(0), source_start_(nullptr), source_end_(nullptr) {}
+    constexpr document_view() noexcept = default;
 
     constexpr document_view(const char* str) noexcept
         : data_(str), size_(traits_type::length(str)),
@@ -41,8 +157,8 @@ public:
         : data_(data), size_(size),
           source_start_(source_start), source_end_(source_end) {}
 
-    constexpr iterator begin() const noexcept { return data_; }
-    constexpr iterator end() const noexcept { return data_ + size_; }
+    constexpr iterator begin() const noexcept { return {data_, source_start_, source_end_}; }
+    constexpr iterator end() const noexcept { return {data_ + size_, source_start_, source_end_}; }
     constexpr const_iterator cbegin() const noexcept { return begin(); }
     constexpr const_iterator cend() const noexcept { return end(); }
     constexpr reverse_iterator rbegin() const noexcept { return std::reverse_iterator(end()); }
@@ -181,15 +297,15 @@ public:
 
     template <typename Sink>
     friend void AbslStringify(Sink& sink, const document_view& p) {
-        sink.append(p.data_, p.size_);
+        sink.Append(std::string_view(p.data_, p.size_));
     }
 
 private:
-    const char* data_;
-    size_type size_;
+    const char* data_ = nullptr;
+    size_type size_ = 0;
     // the following pointers could be controlled by NDEBUG
-    const char* source_start_;
-    const char* source_end_;
+    const char* source_start_ = nullptr;
+    const char* source_end_ = nullptr;
 };
 
 constexpr bool operator==(document_view lhs, document_view rhs) noexcept {
