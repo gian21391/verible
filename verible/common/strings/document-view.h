@@ -137,6 +137,18 @@ public:
             && traits_type::compare(data_ + size_ - str.size_, str.data_, str.size_) == 0;
     }
 
+    [[nodiscard]] constexpr bool contains(char ch) const noexcept {
+        return find(ch) != npos;
+    }
+
+    [[nodiscard]] constexpr bool contains(document_view str) const noexcept {
+        return find(str) != npos;
+    }
+
+    [[nodiscard]] constexpr bool contains(const char* s) const noexcept {
+        return find(document_view(s)) != npos;
+    }
+
     constexpr std::string to_string() const noexcept {
         return std::string(data_, size_);
     }
