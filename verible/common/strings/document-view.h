@@ -22,16 +22,24 @@ public:
     using const_reverse_iterator = std::reverse_iterator<const_iterator>;
     static constexpr size_type npos = static_cast<size_type>(-1);
 
-    constexpr document_view() noexcept : data_(nullptr), size_(0) {}
+    constexpr document_view() noexcept
+        : data_(nullptr), size_(0), source_start_(nullptr), source_end_(nullptr) {}
 
     constexpr document_view(const char* str) noexcept
-        : data_(str), size_(traits_type::length(str)) {}
+        : data_(str), size_(traits_type::length(str)),
+          source_start_(str), source_end_(str + size_) {}
 
     constexpr document_view(const char* str, size_type len) noexcept
-        : data_(str), size_(len) {}
+        : data_(str), size_(len), source_start_(str), source_end_(str + len) {}
 
     constexpr document_view(const std::string& str) noexcept
-        : data_(str.c_str()), size_(str.size()) {}
+        : data_(str.c_str()), size_(str.size()),
+          source_start_(str.c_str()), source_end_(str.c_str() + str.size()) {}
+
+    constexpr document_view(const char* data, size_type size,
+                        const char* source_start, const char* source_end) noexcept
+        : data_(data), size_(size),
+          source_start_(source_start), source_end_(source_end) {}
 
     constexpr iterator begin() const noexcept { return data_; }
     constexpr iterator end() const noexcept { return data_ + size_; }
@@ -71,12 +79,15 @@ public:
     constexpr void swap(document_view& other) noexcept {
         std::swap(data_, other.data_);
         std::swap(size_, other.size_);
+        std::swap(source_start_, other.source_start_);
+        std::swap(source_end_, other.source_end_);
     }
 
     constexpr document_view substr(size_type pos = 0, size_type count = npos) const {
         pos = pos > size_ ? throw std::out_of_range("document_view::substr") : pos;
+        // alternative: pos = std::min(pos, size_);
         count = std::min(count, size_ - pos);
-        return {data_ + pos, count};
+        return {data_ + pos, count, source_start_, source_end_};
     }
 
     constexpr int compare(document_view other) const noexcept {
@@ -149,6 +160,17 @@ public:
         return find(document_view(s)) != npos;
     }
 
+    constexpr bool is_same_source(const document_view& other) const noexcept {
+        return source_start_ == other.source_start_ &&
+               source_end_ == other.source_end_;
+    }
+
+    constexpr bool is_subview_of(const document_view& potential_parent) const noexcept {
+        return data_ >= potential_parent.data_ &&
+               data_ + size_ <= potential_parent.data_ + potential_parent.size_ &&
+               is_same_source(potential_parent);
+    }
+
     constexpr std::string to_string() const noexcept {
         return std::string(data_, size_);
     }
@@ -157,9 +179,17 @@ public:
         return std::string_view(data_, size_);
     }
 
+    template <typename Sink>
+    friend void AbslStringify(Sink& sink, const document_view& p) {
+        sink.append(p.data_, p.size_);
+    }
+
 private:
     const char* data_;
     size_type size_;
+    // the following pointers could be controlled by NDEBUG
+    const char* source_start_;
+    const char* source_end_;
 };
 
 constexpr bool operator==(document_view lhs, document_view rhs) noexcept {
