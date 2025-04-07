@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.30)
+cmake_minimum_required(VERSION 3.20)
 project(verible)
 
 set(CMAKE_CXX_STANDARD 20)
@@ -27,6 +27,7 @@ find_package(GTest CONFIG REQUIRED)
 find_package(re2 CONFIG REQUIRED)
 find_package(nlohmann_json CONFIG REQUIRED)
 find_package(ZLIB REQUIRED)
+find_package(Python3 REQUIRED COMPONENTS Interpreter)
 
 file(GLOB_RECURSE V_GLOB LIST_DIRECTORIES true "*")
 foreach(item ${V_GLOB})

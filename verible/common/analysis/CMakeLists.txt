@@ -64,6 +64,7 @@ target_link_libraries(lint-waiver PUBLIC
         verible::common::util::file-util
         verible::common::util::iterator-range
         verible::common::util::logging
+        re2::re2
         absl::flat_hash_map
         absl::statusor
 )

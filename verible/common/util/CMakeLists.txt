@@ -58,7 +58,7 @@ target_link_libraries(file-util PUBLIC
 
 add_custom_command(
         OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/generated-verible-build-version.h
-        COMMAND python ${CMAKE_SOURCE_DIR}/cmake/build_version.py > ${CMAKE_CURRENT_BINARY_DIR}/generated-verible-build-version.h
+        COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/cmake/build_version.py > ${CMAKE_CURRENT_BINARY_DIR}/generated-verible-build-version.h
         COMMENT "Generating generated-verible-build-version.h"
 )
 

@@ -12,27 +12,9 @@ bison_target(verilog_parser
 )
 add_flex_bison_dependency(verilog_lexer verilog_parser)
 
-file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/extract_script.cmake "
-function(extract_token_section input_file output_file)
-    file(READ \"\${input_file}\" content)
-    string(REGEX MATCH \"#ifndef VERILOG_TOKENTYPE.*\" first_match \"\${content}\")
-    string(REGEX REPLACE \"#endif.*\" \"#endif\\n\" token_section \"\${first_match}\")
-    file(APPEND \"\${output_file}\" \"\${token_section}\")
-endfunction()
-
-extract_token_section(
-  \"${CMAKE_CURRENT_BINARY_DIR}/verilog.tab.hh\"
-  \"${CMAKE_CURRENT_BINARY_DIR}/verilog-token-enum.h\"
-)
-")
-
 add_custom_command(
         OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/verilog-token-enum.h
-        COMMAND ${CMAKE_COMMAND} -E echo "#ifndef VERIBLE_VERILOG_TOKEN_ENUM_H_" > ${CMAKE_CURRENT_BINARY_DIR}/verilog-token-enum.h
-        COMMAND ${CMAKE_COMMAND} -E echo "#define VERIBLE_VERILOG_TOKEN_ENUM_H_" >> ${CMAKE_CURRENT_BINARY_DIR}/verilog-token-enum.h
-        COMMAND ${CMAKE_COMMAND} -E echo "// DO NOT EDIT -- generated from ${CMAKE_CURRENT_BINARY_DIR}/verilog.tab.hh" >> ${CMAKE_CURRENT_BINARY_DIR}/verilog-token-enum.h
-        COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/extract_script.cmake
-        COMMAND ${CMAKE_COMMAND} -E echo "#endif  // VERIBLE_VERILOG_TOKEN_ENUM_H_" >> ${CMAKE_CURRENT_BINARY_DIR}/verilog-token-enum.h
+        COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/cmake/gen_verilog_token_enum.py ${CMAKE_CURRENT_BINARY_DIR}/verilog.tab.hh ${CMAKE_CURRENT_BINARY_DIR}/verilog-token-enum.h
         DEPENDS ${BISON_verilog_parser_OUTPUTS}
 )
 add_custom_target(verilog-token-enum-gen DEPENDS
@@ -41,7 +23,7 @@ add_custom_target(verilog-token-enum-gen DEPENDS
 
 add_custom_command(
         OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/verilog-moved.tab.cc
-        COMMAND python ${CMAKE_SOURCE_DIR}/cmake/parser_utils.py std_move_parser_symbols --src "${CMAKE_CURRENT_BINARY_DIR}/verilog.tab.cc" --out "${CMAKE_CURRENT_BINARY_DIR}/verilog-moved.tab.cc"
+        COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/cmake/parser_utils.py std_move_parser_symbols --src "${CMAKE_CURRENT_BINARY_DIR}/verilog.tab.cc" --out "${CMAKE_CURRENT_BINARY_DIR}/verilog-moved.tab.cc"
         DEPENDS ${BISON_verilog_parser_OUTPUTS}
 )
 add_custom_target(verilog-moved-tab-gen DEPENDS
@@ -50,7 +32,7 @@ add_custom_target(verilog-moved-tab-gen DEPENDS
 
 add_custom_command(
         OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/verilog-final.tab.cc
-        COMMAND python ${CMAKE_SOURCE_DIR}/cmake/parser_utils.py record_recovered_syntax_errors --src "${CMAKE_CURRENT_BINARY_DIR}/verilog-moved.tab.cc" --out "${CMAKE_CURRENT_BINARY_DIR}/verilog-final.tab.cc"
+        COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/cmake/parser_utils.py record_recovered_syntax_errors --src "${CMAKE_CURRENT_BINARY_DIR}/verilog-moved.tab.cc" --out "${CMAKE_CURRENT_BINARY_DIR}/verilog-final.tab.cc"
         DEPENDS verilog-moved-tab-gen
 )
 add_custom_target(verilog-final-tab-gen DEPENDS
