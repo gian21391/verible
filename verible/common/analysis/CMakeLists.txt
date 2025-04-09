@@ -25,10 +25,18 @@ target_link_libraries(lint-rule INTERFACE
         verible::common::analysis::lint-rule-status
 )
 
-add_library(command-file-lexer INTERFACE)
+flex_target(command-file-lex
+        ${CMAKE_CURRENT_SOURCE_DIR}/command_file.lex
+        ${CMAKE_CURRENT_BINARY_DIR}/command-file.yy.cc
+)
+add_custom_target(command-file-lex-gen DEPENDS
+        ${CMAKE_CURRENT_BINARY_DIR}/command-file.yy.cc
+)
+
+add_library(command-file-lexer STATIC command-file-lexer.cc ${CMAKE_BINARY_DIR}/verible/common/analysis/command-file.yy.cc)
 add_library(verible::common::analysis::command-file-lexer ALIAS command-file-lexer)
-target_include_directories(command-file-lexer INTERFACE ${CMAKE_SOURCE_DIR} ${FLEX_INCLUDE_DIR})
-target_link_libraries(command-file-lexer INTERFACE
+target_include_directories(command-file-lexer PUBLIC ${CMAKE_SOURCE_DIR} ${FLEX_INCLUDE_DIR})
+target_link_libraries(command-file-lexer PUBLIC
         verible::common::lexer::flex-lexer-adapter
         verible::common::lexer::token-stream-adapter
         verible::common::text::token-info
@@ -36,6 +44,19 @@ target_link_libraries(command-file-lexer INTERFACE
         verible::common::util::iterator-range
         verible::common::util::logging
 )
+add_dependencies(command-file-lexer command-file-lex-gen)
+
+add_executable(command-file-lexer_test command-file-lexer_test.cc)
+target_link_libraries(command-file-lexer_test PRIVATE
+        verible::common::analysis::command-file-lexer
+        verible::common::lexer::lexer-test-util
+        verible::common::text::constants
+        verible::common::text::token-info
+        verible::common::text::token-info-test-util
+        GTest::gtest
+        GTest::gtest_main
+)
+add_test(NAME command-file-lexer_test COMMAND command-file-lexer_test)
 
 add_library(violation-handler STATIC violation-handler.cc)
 add_library(verible::common::analysis::violation-handler ALIAS violation-handler)

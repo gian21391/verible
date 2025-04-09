@@ -35,7 +35,7 @@ TokenInfo TokenInfo::EOFToken() {
 }
 
 TokenInfo TokenInfo::EOFToken(document_view buffer) {
-  return {TK_EOF, document_view(buffer.data() + buffer.length(), 0)};
+  return {TK_EOF, document_view(buffer.data() + buffer.length(), 0, buffer)};
 }
 
 bool TokenInfo::operator==(const TokenInfo &token) const {
@@ -80,7 +80,7 @@ std::string TokenInfo::ToString() const {
 }
 
 void TokenInfo::RebaseDocumentView(document_view new_text) {
-  verible::RebaseDocumentView(&text_, new_text);
+  verible::RebaseDocumentView(&text_, document_view(new_text.data(), text_.size(), new_text));
 }
 
 void TokenInfo::Concatenate(std::string *out, std::vector<TokenInfo> *tokens) {

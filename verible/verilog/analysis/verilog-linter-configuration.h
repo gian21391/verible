@@ -80,7 +80,7 @@ struct RuleBundle {
   std::map<std::string_view, RuleSetting> rules;
   // Parse configuration from input. Separator between rules is 'separator',
   // typically that would be a comma or newline.
-  bool ParseConfiguration(std::string_view text, char separator,
+  bool ParseConfiguration(verible::document_view text, char separator,
                           std::string *error);
   // Unparse the rules structure back to a string. Separator between rules
   // is 'separator', typically that would be a comma or newline. The String

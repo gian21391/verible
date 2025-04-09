@@ -783,7 +783,7 @@ static WithReason<SpacingOptions> BreakDecisionBetween(
     // Check if there are any newlines between these tokens' texts.
     // Caution: when testing this case, must provide valid text between
     // tokens to avoid reading uninitialized memory.
-    auto preceding_whitespace = verible::make_string_view_range(
+    auto preceding_whitespace = verible::make_document_view_range(
         left.token->text().end(), right.token->text().begin());
 
     auto pos = preceding_whitespace.find_first_of('\n', 0);
@@ -797,7 +797,7 @@ static WithReason<SpacingOptions> BreakDecisionBetween(
 
   if (left.format_token_enum == FTT::comment_block ||
       right.format_token_enum == FTT::comment_block) {
-    auto preceding_whitespace = verible::make_string_view_range(
+    auto preceding_whitespace = verible::make_document_view_range(
         left.token->text().end(), right.token->text().begin());
 
     auto pos = preceding_whitespace.find_first_of('\n', 0);

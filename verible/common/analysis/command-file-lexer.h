@@ -54,7 +54,7 @@ class CommandFileLexer : public FlexLexerAdapter<veribleCommandFileFlexLexer> {
     kError,
   };
 
-  explicit CommandFileLexer(std::string_view config);
+  explicit CommandFileLexer(document_view config);
 
   // Returns true if token is invalid.
   bool TokenIsError(const verible::TokenInfo &) const final;

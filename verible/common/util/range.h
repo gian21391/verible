@@ -20,8 +20,8 @@
 
 #include <utility>
 
-#include <verible/common/strings/document-view.h>
 #include "verible/common/util/logging.h"
+#include <verible/common/strings/document-view.h>
 
 namespace verible {
 
@@ -31,8 +31,15 @@ namespace verible {
 // The iterator categories need to be RandomAccessIterator for less-comparison.
 // This can be used to check string_view ranges and their invariants.
 template <class SubRange, class SuperRange>
-bool IsSubRange(const SubRange &sub, const SuperRange &super) {
-  return sub.begin() >= super.begin() && sub.end() <= super.end();
+bool IsSubRange(const SubRange &sub_range, const SuperRange &super_range) {
+  if constexpr (std::is_convertible_v<SubRange, document_view> && std::is_convertible_v<SuperRange, document_view>) {
+    const document_view sub = sub_range;
+    const document_view super = super_range;
+    return sub.is_subview_of(super);
+  }
+  else {
+    return sub_range.begin() >= super_range.begin() && sub_range.end() <= super_range.end();
+  }
 }
 
 // Returns true if the end points of the two ranges are equal, i.e. they point
@@ -45,10 +52,15 @@ bool IsSubRange(const SubRange &sub, const SuperRange &super) {
 // std::equal_range (and other STL uses of that name).
 // Could have also been named IntervalEqual.
 template <class LRange, class RRange>
-bool BoundsEqual(const LRange &l, const RRange &r) {
-  document_view l_range = l;
-  document_view r_range = r;
-  return l_range.begin() == r_range.begin() && l_range.end() == r_range.end();
+bool BoundsEqual(const LRange &l_range, const RRange &r_range) {
+  if constexpr (std::is_convertible_v<LRange, document_view> && std::is_convertible_v<RRange, document_view>) {
+    const document_view l = l_range;
+    const document_view r = r_range;
+    return l.begin() == r.begin() && l.end() == r.end();
+  }
+  else {
+    return l_range.begin() == r_range.begin() && l_range.end() == r_range.end();
+  }
 }
 
 // TODO(fangism): bool RangesOverlap(l, r);
@@ -84,12 +96,25 @@ bool BoundsEqual(const LRange &l, const RRange &r) {
 template <class SubRange, class SuperRange>
 std::pair<int, int> SubRangeIndices(const SubRange &subrange,
                                     const SuperRange &superrange) {
-  const int max = std::distance(superrange.begin(), superrange.end());
-  const int begin = std::distance(superrange.begin(), subrange.begin());
-  const int end = std::distance(superrange.begin(), subrange.end());
-  CHECK(IsSubRange(subrange, superrange))
-      << "got: (" << begin << ',' << end << "), max: " << max;
-  return {begin, end};
+
+  if constexpr (std::is_convertible_v<SubRange, document_view> && std::is_convertible_v<SuperRange, document_view>) {
+    const document_view sub = subrange;
+    const document_view super = superrange;
+    const int max = std::distance(super.begin(), super.end());
+    const int begin = std::distance(super.begin(), sub.begin());
+    const int end = std::distance(super.begin(), sub.end());
+    CHECK(IsSubRange(sub, super))
+        << "got: (" << begin << ',' << end << "), max: " << max;
+    return {begin, end};
+  }
+  else {
+    const int max = std::distance(superrange.begin(), superrange.end());
+    const int begin = std::distance(superrange.begin(), subrange.begin());
+    const int end = std::distance(superrange.begin(), subrange.end());
+    CHECK(IsSubRange(subrange, superrange))
+        << "got: (" << begin << ',' << end << "), max: " << max;
+    return {begin, end};
+  }
 }
 
 }  // namespace verible

@@ -37,7 +37,7 @@ namespace verilog {
 
 class VerilogTreeToJsonConverter : public verible::SymbolVisitor {
  public:
-  explicit VerilogTreeToJsonConverter(std::string_view base);
+  explicit VerilogTreeToJsonConverter(verible::document_view base);
 
   void Visit(const verible::SyntaxTreeLeaf &) final;
   void Visit(const verible::SyntaxTreeNode &) final;
@@ -56,7 +56,7 @@ class VerilogTreeToJsonConverter : public verible::SymbolVisitor {
   json *value_;
 };
 
-VerilogTreeToJsonConverter::VerilogTreeToJsonConverter(std::string_view base)
+VerilogTreeToJsonConverter::VerilogTreeToJsonConverter(verible::document_view base)
     : context_(base,
                [](std::ostream &stream, int e) {
                  stream << TokenTypeToString(static_cast<verilog_tokentype>(e));
@@ -66,7 +66,7 @@ VerilogTreeToJsonConverter::VerilogTreeToJsonConverter(std::string_view base)
 void VerilogTreeToJsonConverter::Visit(const verible::SyntaxTreeLeaf &leaf) {
   const verilog_tokentype tokentype =
       static_cast<verilog_tokentype>(leaf.Tag().tag);
-  std::string_view type_str = TokenTypeToString(tokentype);
+  verible::document_view type_str = TokenTypeToString(tokentype);
   // Don't include token's text for operators, keywords, or anything that is a
   // part of Verilog syntax. For such types, TokenTypeToString() is equal to
   // token's text. Exception has to be made for identifiers, because things like
@@ -94,7 +94,7 @@ void VerilogTreeToJsonConverter::Visit(const verible::SyntaxTreeNode &node) {
 }
 
 json ConvertVerilogTreeToJson(const verible::Symbol &root,
-                              std::string_view base) {
+                              verible::document_view base) {
   VerilogTreeToJsonConverter converter(base);
   root.Accept(&converter);
   return converter.TakeJsonValue();

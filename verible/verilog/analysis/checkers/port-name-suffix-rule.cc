@@ -71,7 +71,7 @@ static const Matcher &PortMatcher() {
   return matcher;
 }
 
-void PortNameSuffixRule::Violation(std::string_view direction,
+void PortNameSuffixRule::Violation(verible::document_view direction,
                                    const TokenInfo &token,
                                    const SyntaxTreeContext &context) {
   if (direction == "input") {
@@ -98,7 +98,7 @@ bool PortNameSuffixRule::IsSuffixCorrect(std::string_view suffix,
 
 void PortNameSuffixRule::HandleSymbol(const Symbol &symbol,
                                       const SyntaxTreeContext &context) {
-  constexpr std::string_view implicit_direction = "input";
+  constexpr verible::document_view implicit_direction = "input";
   verible::matcher::BoundSymbolManager manager;
   if (PortMatcher().Matches(symbol, &manager)) {
     const auto *identifier_leaf = GetIdentifierFromPortDeclaration(symbol);
@@ -106,7 +106,7 @@ void PortNameSuffixRule::HandleSymbol(const Symbol &symbol,
     const auto token = identifier_leaf->get();
     const auto direction =
         direction_leaf ? direction_leaf->get().text() : implicit_direction;
-    const auto name = ABSL_DIE_IF_NULL(identifier_leaf)->get().text();
+    const auto name = ABSL_DIE_IF_NULL(identifier_leaf)->get().text().to_string_view();
 
     // Check if there is any suffix
     std::vector<std::string> name_parts =
@@ -117,7 +117,7 @@ void PortNameSuffixRule::HandleSymbol(const Symbol &symbol,
       Violation(direction, token, context);
     }
 
-    if (!IsSuffixCorrect(name_parts.back(), direction)) {
+    if (!IsSuffixCorrect(name_parts.back(), direction.to_string_view())) {
       Violation(direction, token, context);
     }
   }

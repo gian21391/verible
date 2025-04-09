@@ -98,7 +98,7 @@ class FileAnalyzer {
         filename_(filename) {}
 
   // Legacy constructor.
-  FileAnalyzer(std::string_view contents, std::string_view filename)
+  FileAnalyzer(document_view contents, std::string_view filename)
       : text_structure_(new TextStructure(contents)), filename_(filename) {}
 
   virtual ~FileAnalyzer() = default;
@@ -131,8 +131,8 @@ class FileAnalyzer {
   // TODO(hzeller): these are a lot of parameters, maybe a struct would be good.
   using ReportLinterErrorFunction = std::function<void(
       const std::string &filename, LineColumnRange range,
-      ErrorSeverity severity, AnalysisPhase phase, std::string_view token_text,
-      std::string_view context_line, const std::string &message)>;
+      ErrorSeverity severity, AnalysisPhase phase, document_view token_text,
+      document_view context_line, const std::string &message)>;
 
   // Extract detailed diagnostic information for rejected token.
   void ExtractLinterTokenErrorDetail(

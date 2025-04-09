@@ -93,7 +93,7 @@ TEST(SyntaxTreeLinterTest, BasicUsageFailure) {
 }
 
 TEST(SyntaxTreeLinterTest, MultipleRules) {
-  constexpr std::string_view text("abcd");
+  constexpr document_view text("abcd");
   SymbolPtr root =
       Node(Leaf(2, text.substr(0, 1)), Leaf(2, text.substr(1, 1)),
            Node(Leaf(2, text.substr(2, 1))), Leaf(2, text.substr(3, 1)));
@@ -151,7 +151,7 @@ std::unique_ptr<SyntaxTreeLintRule> MakeAscending() {
 }
 
 TEST(SyntaxTreeLinterTest, AscendingSuccess) {
-  constexpr std::string_view text("abcde");
+  constexpr document_view text("abcde");
   SymbolPtr root =
       Node(Leaf(1, text.substr(0, 1)), Leaf(4, text.substr(1, 1)),
            Node(Leaf(2, text.substr(2, 1)), Leaf(10, text.substr(3, 1))),
@@ -167,7 +167,7 @@ TEST(SyntaxTreeLinterTest, AscendingSuccess) {
 }
 
 TEST(SyntaxTreeLinterTest, AscendingFailsOnce) {
-  constexpr std::string_view text("abcde");
+  constexpr document_view text("abcde");
   SymbolPtr root =
       Node(Leaf(1, text.substr(0, 1)), Leaf(4, text.substr(1, 1)),
            Node(Leaf(2, text.substr(2, 1)), Leaf(10, text.substr(3, 1))),
@@ -184,7 +184,7 @@ TEST(SyntaxTreeLinterTest, AscendingFailsOnce) {
 }
 
 TEST(SyntaxTreeLinterTest, AscendingFailsTwice) {
-  constexpr std::string_view text("abcde");
+  constexpr document_view text("abcde");
   SymbolPtr root =
       Node(Leaf(1, text.substr(0, 1)), Leaf(4, text.substr(1, 1)),
            Node(Leaf(210, text.substr(2, 1)), Leaf(10, text.substr(3, 1))),
@@ -201,7 +201,7 @@ TEST(SyntaxTreeLinterTest, AscendingFailsTwice) {
 }
 
 TEST(SyntaxTreeLinterTest, HeterogenousTests) {
-  constexpr std::string_view text("abcde");
+  constexpr document_view text("abcde");
   SymbolPtr root =
       Node(Leaf(1, text.substr(0, 1)), Leaf(4, text.substr(1, 1)),
            Node(Leaf(210, text.substr(2, 1)), Leaf(10, text.substr(3, 1))),
@@ -246,7 +246,7 @@ std::unique_ptr<SyntaxTreeLintRule> MakeDepth() {
 }
 
 TEST(SyntaxTreeLinterTest, DepthFails) {
-  constexpr std::string_view text("abcde");
+  constexpr document_view text("abcde");
   SymbolPtr root =
       Node(Leaf(1, text.substr(0, 1)), Leaf(4, text.substr(1, 1)),
            Node(Leaf(210, text.substr(2, 1)), Leaf(10, text.substr(3, 1))),
@@ -263,7 +263,7 @@ TEST(SyntaxTreeLinterTest, DepthFails) {
 }
 
 TEST(SyntaxTreeLinterTest, DepthSuccess) {
-  constexpr std::string_view text("abcde");
+  constexpr document_view text("abcde");
   SymbolPtr root =
       Node(Leaf(1, text.substr(0, 1)), Leaf(1, text.substr(1, 1)),
            Node(Leaf(2, text.substr(2, 1)), Leaf(2, text.substr(3, 1))),

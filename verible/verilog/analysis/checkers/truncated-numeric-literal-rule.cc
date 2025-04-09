@@ -156,7 +156,7 @@ void TruncatedNumericLiteralRule::HandleSymbol(
   const auto *literal_node = manager.GetAs<SyntaxTreeNode>("literal");
   if (!width_leaf || !literal_node) return;
 
-  const auto width_text = width_leaf->get().text();
+  const auto width_text = width_leaf->get().text().to_string_view();
   size_t width;
   if (!absl::SimpleAtoi(width_text, &width)) return;
 
@@ -168,7 +168,7 @@ void TruncatedNumericLiteralRule::HandleSymbol(
   const auto base_text = base_leaf->get().text();
   const auto digits_text = digits_leaf->get().text();
 
-  const BasedNumber number(base_text, digits_text);
+  const BasedNumber number(base_text.to_string_view(), digits_text.to_string_view());
 
   bool is_lower_bound = false;
   const size_t actual_width = GetBitWidthOfNumber(number, &is_lower_bound);

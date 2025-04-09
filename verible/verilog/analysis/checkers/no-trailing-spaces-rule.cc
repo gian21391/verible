@@ -50,10 +50,10 @@ const LintRuleDescriptor &NoTrailingSpacesRule::GetDescriptor() {
   return d;
 }
 
-void NoTrailingSpacesRule::HandleLine(std::string_view line) {
+void NoTrailingSpacesRule::HandleLine(verible::document_view line) {
   // Lines may end with \n or \r\n. '\n' is already excluded.
   // Exclude '\r'
-  absl::ConsumeSuffix(&line, "\r");
+  line.consume_suffix("\r");
   // Now any line endings (either \n or \r\n) are excluded.
   // Searches each line in reverse for spaces.
   const auto rbegin = line.crbegin();

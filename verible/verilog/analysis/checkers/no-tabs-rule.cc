@@ -46,11 +46,11 @@ const LintRuleDescriptor &NoTabsRule::GetDescriptor() {
   return d;
 }
 
-void NoTabsRule::HandleLine(std::string_view line) {
+void NoTabsRule::HandleLine(verible::document_view line) {
   // Finds first tab in each line, if there is one.
   // This reports only the first violation on each line.
   const auto tab_pos = line.find('\t');
-  if (tab_pos != std::string_view::npos) {
+  if (tab_pos != verible::document_view::npos) {
     TokenInfo token(TK_SPACE, line.substr(tab_pos, 1));
     violations_.insert(LintViolation(token, kMessage));
   }

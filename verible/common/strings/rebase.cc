@@ -26,7 +26,7 @@ void RebaseDocumentView(document_view *src, document_view dest) {
 }
 
 void RebaseDocumentView(document_view *src, const char *dest) {
-  RebaseDocumentView(src, document_view(dest, src->length()));
+  RebaseDocumentView(src, document_view(dest, src->length(), dest));
 }
 
 }  // namespace verible

@@ -58,9 +58,9 @@ void BannedDeclaredNamePatternsRule::HandleNode(
     case NodeEnum::kModuleDeclaration: {
       const auto *module_match = GetModuleName(node);
       if (module_match) {
-        const std::string_view module_id = module_match->get().text();
+        const verible::document_view module_id = module_match->get().text();
 
-        if (absl::EqualsIgnoreCase(module_id, "ILLEGALNAME")) {
+        if (absl::EqualsIgnoreCase(module_id.to_string_view(), "ILLEGALNAME")) {
           violations_.insert(LintViolation(module_match->get(), kMessage));
         }
       }
@@ -69,8 +69,8 @@ void BannedDeclaredNamePatternsRule::HandleNode(
     case NodeEnum::kPackageDeclaration: {
       const verible::TokenInfo *pack_match = GetPackageNameToken(node);
       if (pack_match) {
-        std::string_view pack_id = pack_match->text();
-        if (absl::EqualsIgnoreCase(pack_id, "ILLEGALNAME")) {
+        verible::document_view pack_id = pack_match->text();
+        if (absl::EqualsIgnoreCase(pack_id.to_string_view(), "ILLEGALNAME")) {
           violations_.insert(LintViolation(*pack_match, kMessage));
         }
       }

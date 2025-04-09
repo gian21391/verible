@@ -277,7 +277,7 @@ TEST(DisjointIntervalMapTest, BeginEndRangeConstIterators) {
 // std::vector is moveable and guaranteed to transfer ownership over its
 // internal array, i.e. no small/inline-vector optimization.
 using VectorIntervalMap =
-    DisjointIntervalMap<std::vector<int>::const_iterator, std::vector<int>>;
+    DisjointIntervalMap<int*, std::vector<int>>;
 
 static VectorIntervalMap::iterator AllocateVectorBlock(VectorIntervalMap *vmap,
                                                        int min, int max) {
@@ -289,7 +289,7 @@ static VectorIntervalMap::iterator AllocateVectorBlock(VectorIntervalMap *vmap,
   }
   // Caution: do not reference v and move(v) in the same set of call parameters
   // [sequence-point].
-  const auto key(std::make_pair(v.cbegin(), v.cend()));
+  const auto key(std::make_pair(v.data(), v.data() + v.size()));
   const auto new_iter = vmap->must_emplace(key, std::move(v));
   EXPECT_EQ(new_iter->first, key);
   return new_iter;

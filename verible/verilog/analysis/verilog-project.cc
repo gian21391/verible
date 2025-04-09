@@ -62,8 +62,8 @@ absl::Status VerilogSourceFile::Open() {
   return status_;  // status_ is Ok here.
 }
 
-std::string_view VerilogSourceFile::GetContent() const {
-  return content_ ? content_->AsStringView() : "";
+verible::document_view VerilogSourceFile::GetContent() const {
+  return content_ ? content_->AsDocumentView() : "";
 }
 
 absl::Status VerilogSourceFile::Parse() {
@@ -121,7 +121,7 @@ std::ostream &operator<<(std::ostream &stream,
 void VerilogProject::ContentToFileIndex::Register(
     const VerilogSourceFile *file) {
   CHECK(file);
-  const std::string_view content = file->GetContent();
+  const verible::document_view content = file->GetContent();
   string_view_map_.must_emplace(content);
   const auto map_inserted =
       buffer_to_analyzer_map_.emplace(content.begin(), file);
@@ -131,7 +131,7 @@ void VerilogProject::ContentToFileIndex::Register(
 void VerilogProject::ContentToFileIndex::Unregister(
     const VerilogSourceFile *file) {
   CHECK(file);
-  const std::string_view content = file->GetContent();
+  const verible::document_view content = file->GetContent();
   auto full_content_found = string_view_map_.find(content);
   if (full_content_found != string_view_map_.end()) {
     string_view_map_.erase(full_content_found);
@@ -140,11 +140,11 @@ void VerilogProject::ContentToFileIndex::Unregister(
 }
 
 const VerilogSourceFile *VerilogProject::ContentToFileIndex::Lookup(
-    std::string_view content_substring) const {
+    verible::document_view content_substring) const {
   // Look for corresponding source text (superstring) buffer start.
   const auto found_superstring = string_view_map_.find(content_substring);
   if (found_superstring == string_view_map_.end()) return nullptr;
-  const std::string_view::const_iterator buffer_start =
+  const verible::document_view::const_iterator buffer_start =
       found_superstring->first;
 
   // Reverse-lookup originating file based on buffer start.
@@ -310,11 +310,11 @@ absl::Status VerilogProject::IncludeFileNotFoundError(
 }
 
 absl::StatusOr<VerilogSourceFile *> VerilogProject::OpenIncludedFile(
-    std::string_view referenced_filename) {
+    verible::document_view referenced_filename) {
   VLOG(2) << __FUNCTION__ << ", referenced: " << referenced_filename;
   // Check for a pre-existing entry to avoid duplicate files.
   {
-    const auto opened_file = FindOpenedFile(referenced_filename);
+    const auto opened_file = FindOpenedFile(referenced_filename.to_string_view());
     if (opened_file) {
       return *opened_file;
     }
@@ -323,7 +323,7 @@ absl::StatusOr<VerilogSourceFile *> VerilogProject::OpenIncludedFile(
   // Check if this is already opened include file
   for (const auto &include_path : include_paths_) {
     const std::string resolved_filename =
-        verible::file::JoinPath(include_path, referenced_filename);
+        verible::file::JoinPath(include_path, referenced_filename.to_string_view());
     const auto opened_file = FindOpenedFile(resolved_filename);
     if (opened_file) {
       return *opened_file;
@@ -333,10 +333,10 @@ absl::StatusOr<VerilogSourceFile *> VerilogProject::OpenIncludedFile(
   // Locate the file among the base paths.
   for (const auto &include_path : include_paths_) {
     const std::string resolved =
-        verible::file::JoinPath(include_path, referenced_filename);
+        verible::file::JoinPath(include_path, referenced_filename.to_string_view());
     if (verible::file::FileExists(resolved).ok()) {
       VLOG(2) << referenced_filename << " in incdir '" << resolved << "'";
-      return OpenFile(referenced_filename, resolved, Corpus());
+      return OpenFile(referenced_filename.to_string_view(), resolved, Corpus());
     }
     VLOG(2) << referenced_filename << " not in incdir '" << resolved << "'";
   }
@@ -344,15 +344,15 @@ absl::StatusOr<VerilogSourceFile *> VerilogProject::OpenIncludedFile(
   VLOG(1) << __FUNCTION__ << "': '" << referenced_filename << "' not found";
   // Not found in any path.  Cache this status.
   const auto inserted = files_.emplace(
-      referenced_filename,
+      referenced_filename.to_string_view(),
       std::make_unique<VerilogSourceFile>(
-          referenced_filename, IncludeFileNotFoundError(referenced_filename)));
+          referenced_filename.to_string_view(), IncludeFileNotFoundError(referenced_filename.to_string_view())));
   CHECK(inserted.second) << "Not-found file should have been recorded as such.";
   return inserted.first->second->Status();
 }
 
 void VerilogProject::AddVirtualFile(std::string_view resolved_filename,
-                                    std::string_view content) {
+                                    verible::document_view content) {
   const auto inserted = files_.emplace(
       resolved_filename,
       std::make_unique<InMemoryVerilogSourceFile>(
@@ -367,7 +367,7 @@ void VerilogProject::AddVirtualFile(std::string_view resolved_filename,
 }
 
 const VerilogSourceFile *VerilogProject::LookupFileOrigin(
-    std::string_view content_substring) const {
+    verible::document_view content_substring) const {
   CHECK(content_index_) << "LookupFileOrigin() not enabled in constructor";
   return content_index_->Lookup(content_substring);
 }

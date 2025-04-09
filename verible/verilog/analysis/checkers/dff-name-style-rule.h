@@ -111,12 +111,12 @@ class DffNameStyleRule : public verible::SyntaxTreeLintRule {
   // ExtractPipelineStage("data_q1") => {"data_q1", {})}
   // ExtractPipelineStage("data_q2") => {"data_q", 2)}
   // https://github.com/lowRISC/style-guides/blob/9b47bff75b19696e23a43f38ee7161112705e1e3/VerilogCodingStyle.md#suffixes-for-signals-and-types
-  static std::pair<std::string_view, std::optional<uint64_t>>
-  ExtractPipelineStage(std::string_view id);
+  static std::pair<verible::document_view, std::optional<uint64_t>>
+  ExtractPipelineStage(verible::document_view id);
 
  private:
-  std::string_view CheckSuffix(const verible::SyntaxTreeContext &context,
-                               const verible::Symbol &root, std::string_view id,
+  verible::document_view CheckSuffix(const verible::SyntaxTreeContext &context,
+                               const verible::Symbol &root, verible::document_view id,
                                const std::vector<std::string> &suffixes);
 
   void HandleBlockingAssignments(const verible::Symbol &symbol,

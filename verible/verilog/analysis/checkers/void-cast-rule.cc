@@ -17,6 +17,7 @@
 #include <set>
 #include <string>
 
+#include "absl/strings/str_cat.h"
 #include "verible/common/analysis/lint-rule-status.h"
 #include "verible/common/analysis/matcher/bound-symbol-manager.h"
 #include "verible/common/analysis/matcher/core-matchers.h"
@@ -101,7 +102,7 @@ void VoidCastRule::HandleSymbol(const verible::Symbol &symbol,
     if (const auto *function_id =
             manager.GetAs<verible::SyntaxTreeLeaf>("id")) {
       const auto &bfs = ForbiddenFunctionsSet();
-      if (bfs.find(std::string(function_id->get().text())) != bfs.end()) {
+      if (bfs.find(function_id->get().text().to_string()) != bfs.end()) {
         violations_.insert(LintViolation(function_id->get(),
                                          FormatReason(*function_id), context));
       }
@@ -127,8 +128,8 @@ LintRuleStatus VoidCastRule::Report() const {
 
 /* static */ std::string VoidCastRule::FormatReason(
     const verible::SyntaxTreeLeaf &leaf) {
-  return std::string(leaf.get().text()) +
-         " is an invalid call within this void cast";
+  return absl::StrCat(leaf.get().text(),
+         " is an invalid call within this void cast");
 }
 
 }  // namespace analysis

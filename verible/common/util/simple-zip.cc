@@ -24,7 +24,12 @@
 #include <utility>
 
 #include "third_party/portable_endian/portable_endian.h"
-#include "zlib/include/zlib.h"
+
+#if __has_include("zlib.h")
+# include "zlib.h"
+#else
+# include "zlib/include/zlib.h"
+#endif
 
 namespace verible {
 namespace zip {

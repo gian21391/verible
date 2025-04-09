@@ -84,7 +84,7 @@ absl::StatusOr<std::unique_ptr<MemBlock>> GetContentAsMemBlock(
     std::string_view filename);
 
 // Create file "filename" and store given content in it.
-absl::Status SetContents(std::string_view filename, std::string_view content);
+absl::Status SetContents(std::string_view filename, document_view content);
 
 // Join directory + filename and lightly canonicalize.
 // The canonicalization step unifies ./ and ../ path elements lexically
@@ -117,7 +117,7 @@ class ScopedTestFile {
   // 'base_dir' needs to already exist, and will not be automatically created.
   // If 'use_this_filename' is provided as a base name, that will be used,
   // otherwise, a file name will be randomly generated.
-  ScopedTestFile(std::string_view base_dir, std::string_view content,
+  ScopedTestFile(std::string_view base_dir, document_view content,
                  std::string_view use_this_filename = "");
   ~ScopedTestFile();
 

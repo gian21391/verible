@@ -15,7 +15,6 @@
 #include "verible/common/lexer/token-stream-adapter.h"
 
 #include <initializer_list>
-#include <string_view>
 
 #include "absl/status/status.h"
 #include "gtest/gtest.h"
@@ -24,6 +23,7 @@
 #include "verible/common/text/constants.h"
 #include "verible/common/text/token-info.h"
 #include "verible/common/text/token-stream-view.h"
+#include "verible/common/strings/document-view.h"
 
 namespace verible {
 namespace {
@@ -36,7 +36,7 @@ class FakeTokenSequenceLexer : public Lexer, public FakeLexer {
 
   const TokenInfo &DoNextToken() final { return FakeLexer::DoNextToken(); }
 
-  void Restart(std::string_view) final {}
+  void Restart(document_view) final {}
 
   bool TokenIsError(const TokenInfo &) const override {  // not yet final.
     return false;
@@ -44,8 +44,8 @@ class FakeTokenSequenceLexer : public Lexer, public FakeLexer {
 };
 
 TEST(MakeTokenGeneratorTest, Generate) {
-  static constexpr std::string_view abc("abc");
-  static constexpr std::string_view xyz("xyz");
+  static constexpr document_view abc("abc");
+  static constexpr document_view xyz("xyz");
   FakeTokenSequenceLexer lexer;
   std::initializer_list<TokenInfo> tokens = {
       {1, abc},
@@ -62,7 +62,7 @@ TEST(MakeTokenGeneratorTest, Generate) {
 
 TEST(MakeTokenSequenceTest, Sequencer) {
   FakeTokenSequenceLexer lexer;
-  constexpr std::string_view text("abcxyz");
+  constexpr document_view text("abcxyz");
   std::initializer_list<TokenInfo> tokens = {
       {1, text.substr(0, 3)},
       {2, text.substr(3, 3)},
@@ -84,7 +84,7 @@ class TheNumberTwoIsErrorLexer : public FakeTokenSequenceLexer {
 
 TEST(MakeTokenSequenceTest, SequencerWithError) {
   TheNumberTwoIsErrorLexer lexer;
-  constexpr std::string_view text("abcxyz");
+  constexpr document_view text("abcxyz");
   std::initializer_list<TokenInfo> tokens = {
       {1, text.substr(0, 3)},
       {2, text.substr(3, 3)},  // error token

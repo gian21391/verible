@@ -41,8 +41,8 @@ class RequireHelloRule : public TextStructureLintRule {
   void Lint(const TextStructureView &text_structure,
             std::string_view filename) final {
     const auto &lines = text_structure.Lines();
-    const std::string_view contents = text_structure.Contents();
-    if (!lines.empty() && !absl::StartsWith(contents, "Hello")) {
+    const document_view contents = text_structure.Contents();
+    if (!lines.empty() && !contents.starts_with("Hello")) {
       const TokenInfo token(1, lines[0]);
       violations_.emplace(token, "Text must begin with Hello");
     }

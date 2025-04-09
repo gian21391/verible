@@ -34,7 +34,7 @@
 namespace verilog {
 
 VerilogPrettyPrinter::VerilogPrettyPrinter(std::ostream *output_stream,
-                                           std::string_view base)
+                                           verible::document_view base)
     : verible::PrettyPrinter(
           output_stream,
           verible::TokenInfo::Context(base, [](std::ostream &stream, int e) {
@@ -65,7 +65,7 @@ void VerilogPrettyPrinter::Visit(const verible::SyntaxTreeNode &node) {
   auto_indent() << "}" << std::endl;
 }
 
-void PrettyPrintVerilogTree(const verible::Symbol &root, std::string_view base,
+void PrettyPrintVerilogTree(const verible::Symbol &root, verible::document_view base,
                             std::ostream *stream) {
   VerilogPrettyPrinter printer(stream, base);
   root.Accept(&printer);

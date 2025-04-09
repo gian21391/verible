@@ -86,7 +86,7 @@ void InterfaceNameStyleRule::HandleSymbol(const verible::Symbol &symbol,
   const verible::TokenInfo *identifier_token;
   if (InterfaceMatcher().Matches(symbol, &manager)) {
     identifier_token = GetInterfaceNameToken(symbol);
-    name = identifier_token->text();
+    name = identifier_token->text().to_string_view();
 
     if (!RE2::FullMatch(name, *style_regex_)) {
       violations_.insert(

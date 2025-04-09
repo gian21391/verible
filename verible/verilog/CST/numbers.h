@@ -19,6 +19,8 @@
 #include <string>
 #include <string_view>
 
+#include <verible/common/strings/document-view.h>
+
 namespace verilog {
 namespace analysis {
 
@@ -46,8 +48,8 @@ struct BasedNumber {
   // base_sign is lexed as one token, e.g. 'b, 'sb (signed).
   BasedNumber(std::string_view base_sign, std::string_view digits);
 
-  BasedNumber(char base_, bool sign_, std::string_view text)
-      : base(base_), signedness(sign_), literal(text), ok(true) {}
+  BasedNumber(char base_, bool sign_, verible::document_view text)
+      : base(base_), signedness(sign_), literal(text.to_string_view()), ok(true) {}
 
   bool operator==(const BasedNumber &rhs) const {
     return base == rhs.base && signedness == rhs.signedness &&

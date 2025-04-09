@@ -19,14 +19,15 @@
 
 #include "verible/common/text/token-info.h"
 #include "verible/verilog/parser/verilog-token-enum.h"
+#include "verible/common/strings/document-view.h"
 
 namespace verilog {
 
 using verible::TokenInfo;
 
-VerilogLexer::VerilogLexer(std::string_view code) : parent_lexer_type(code) {}
+VerilogLexer::VerilogLexer(verible::document_view code) : parent_lexer_type(code) {}
 
-void VerilogLexer::Restart(std::string_view code) {
+void VerilogLexer::Restart(verible::document_view code) {
   parent_lexer_type::Restart(code);
   balance_ = 0;
   macro_id_length_ = 0;
@@ -54,7 +55,7 @@ bool VerilogLexer::KeepSyntaxTreeTokens(const TokenInfo &t) {
   }
 }
 
-void RecursiveLexText(std::string_view text,
+void RecursiveLexText(verible::document_view text,
                       const std::function<void(const TokenInfo &)> &func) {
   VerilogLexer lexer(text);
   for (;;) {

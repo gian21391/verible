@@ -25,38 +25,38 @@ namespace verible {
 namespace {
 
 TEST(MakeStringViewRangeTest, Empty) {
-  std::string_view text;
-  auto copy_view = make_string_view_range(text.begin(), text.end());
+  document_view text;
+  auto copy_view = make_document_view_range(text.begin(), text.end());
   EXPECT_TRUE(BoundsEqual(copy_view, text));
 }
 
 TEST(MakeStringViewRangeTest, NonEmpty) {
-  std::string_view text("I'm not empty!!!!");
-  auto copy_view = make_string_view_range(text.begin(), text.end());
+  document_view text("I'm not empty!!!!");
+  auto copy_view = make_document_view_range(text.begin(), text.end());
   EXPECT_TRUE(BoundsEqual(copy_view, text));
 }
 
 TEST(MakeStringViewRangeTest, BadRange) {
-  std::string_view text("backwards");
-  EXPECT_DEATH(make_string_view_range(text.end(), text.begin()), "Malformed");
+  document_view text("backwards");
+  EXPECT_DEATH(make_document_view_range(text.end(), text.begin()), "Malformed");
 }
 
 using IntPair = std::pair<int, int>;
 
 TEST(ByteOffsetRangeTest, EmptyInEmpty) {
-  const std::string_view superstring("");  // NOLINT
+  const document_view superstring("");  // NOLINT
   const auto substring = superstring;
   EXPECT_EQ(SubstringOffsets(substring, superstring), IntPair(0, 0));
 }
 
 TEST(ByteOffsetRangeTest, EmptyInNullptrEmpty) {
-  const std::string_view superstring;  // default constructor init with nullptr
+  const document_view superstring;  // default constructor init with nullptr
   const auto substring = superstring;
   EXPECT_EQ(SubstringOffsets(substring, superstring), IntPair(0, 0));
 }
 
 TEST(ByteOffsetRangeTest, RangeInvariant) {
-  const std::string_view superstring("xxxxxxxx");
+  const document_view superstring("xxxxxxxx");
   for (size_t i = 0; i < superstring.length(); ++i) {
     for (size_t j = i; j < superstring.length(); ++j) {
       const auto substring = superstring.substr(i, j - i);
@@ -68,7 +68,7 @@ TEST(ByteOffsetRangeTest, RangeInvariant) {
 
 // Tests that swapping substring with superstring fails.
 TEST(ByteOffsetRangeTest, InsideOut) {
-  const std::string_view superstring("yyyyyyy");
+  const document_view superstring("yyyyyyy");
   for (size_t i = 0; i < superstring.length(); ++i) {
     for (size_t j = i; j < superstring.length(); ++j) {
       const auto substring = superstring.substr(i, j - i);
@@ -83,7 +83,7 @@ TEST(ByteOffsetRangeTest, InsideOut) {
 }
 
 TEST(ByteOffsetRangeTest, PartialOverlap) {
-  const std::string_view superstring("zzzz");
+  const document_view superstring("zzzz");
   for (size_t i = 0; i < superstring.length(); ++i) {
     for (size_t j = 1; j < superstring.length(); ++j) {
       const auto left = superstring.substr(0, i);

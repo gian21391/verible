@@ -45,7 +45,7 @@ struct ExpectedTokenInfo : public TokenInfo {
   // the token enum of the string.
   // Implicit construction intentional.
   ExpectedTokenInfo(  // NOLINT(google-explicit-constructor)
-      std::string_view token_text)
+      document_view token_text)
       : TokenInfo(kDontCare, token_text) {}
 
   // Arbitrary text constructor for cases where one does not care about
@@ -54,7 +54,7 @@ struct ExpectedTokenInfo : public TokenInfo {
   // Implicit construction intentional.
   ExpectedTokenInfo(  // NOLINT(google-explicit-constructor)
       const char *token_text)
-      : ExpectedTokenInfo(std::string_view(token_text)) {}  // delegating
+      : ExpectedTokenInfo(document_view(token_text)) {}  // delegating
 
   // Single-character token constructor, for the cases where the
   // only character of the text **is** the token enum.
@@ -66,7 +66,7 @@ struct ExpectedTokenInfo : public TokenInfo {
   ExpectedTokenInfo(  // NOLINT(google-explicit-constructor)
       char token_enum_and_text);
 
-  ExpectedTokenInfo(int expected_token_enum, std::string_view expected_text)
+  ExpectedTokenInfo(int expected_token_enum, document_view expected_text)
       : TokenInfo(expected_token_enum, expected_text) {}
 
   // Deleted interfaces.
@@ -111,12 +111,12 @@ struct TokenInfoTestData {
   // This variant rebases tokens to a copy of the same 'code' that lives
   // in a different buffer.  This combines FindImportantTokens() with
   // RebaseToCodeCopy().
-  std::vector<TokenInfo> FindImportantTokens(std::string_view base) const;
+  std::vector<TokenInfo> FindImportantTokens(document_view base) const;
 
   // Moves the locations of tokens into the range spanned by the 'base' buffer.
   // 'base' is another copy of (this) 'code' (content match is verified).
   void RebaseToCodeCopy(std::vector<TokenInfo> *tokens,
-                        std::string_view base) const;
+                        document_view base) const;
 };
 
 }  // namespace verible

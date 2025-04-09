@@ -21,6 +21,7 @@
 
 #include "external_libs/editscript.h"
 #include "verible/common/strings/position.h"
+#include "verible/common/strings/document-view.h"
 
 namespace verible {
 
@@ -33,14 +34,14 @@ namespace verible {
 //   LineDiffs diffs(old_text, new_text);
 //
 struct LineDiffs {
-  const std::string_view before_text;
-  const std::string_view after_text;
-  const std::vector<std::string_view> before_lines;  // lines
-  const std::vector<std::string_view> after_lines;   // lines
+  const document_view before_text;
+  const document_view after_text;
+  const std::vector<document_view> before_lines;  // lines
+  const std::vector<document_view> after_lines;   // lines
   const diff::Edits edits;  // line difference/edit-sequence between texts.
 
   // Computes the line-difference between before_text and after_text.
-  LineDiffs(std::string_view before_text, std::string_view after_text);
+  LineDiffs(document_view before_text, document_view after_text);
 
   std::ostream &PrintEdit(std::ostream &, const diff::Edit &) const;
 };

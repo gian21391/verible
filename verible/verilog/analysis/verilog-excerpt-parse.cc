@@ -48,7 +48,7 @@ using verible::container::FindOrNull;
 // The returned analyzer's text structure will discard parsed information
 // about the prolog and epilog, leaving only the substructure of interest.
 static std::unique_ptr<VerilogAnalyzer> AnalyzeVerilogConstruct(
-    std::string_view prolog, std::string_view text, std::string_view epilog,
+    verible::document_view prolog, verible::document_view text, verible::document_view epilog,
     std::string_view filename,
     const VerilogPreprocess::Config &preprocess_config) {
   VLOG(2) << __FUNCTION__;
@@ -79,7 +79,7 @@ static std::unique_ptr<VerilogAnalyzer> AnalyzeVerilogConstruct(
 }
 
 std::unique_ptr<VerilogAnalyzer> AnalyzeVerilogPropertySpec(
-    std::string_view text, std::string_view filename,
+    verible::document_view text, std::string_view filename,
     const VerilogPreprocess::Config &preprocess_config) {
   return AnalyzeVerilogConstruct("module foo;\nproperty p;\n", text,
                                  "\nendproperty;\nendmodule;\n", filename,
@@ -87,14 +87,14 @@ std::unique_ptr<VerilogAnalyzer> AnalyzeVerilogPropertySpec(
 }
 
 std::unique_ptr<VerilogAnalyzer> AnalyzeVerilogStatements(
-    std::string_view text, std::string_view filename,
+    verible::document_view text, std::string_view filename,
     const VerilogPreprocess::Config &preprocess_config) {
   return AnalyzeVerilogConstruct("function foo();\n", text, "\nendfunction\n",
                                  filename, preprocess_config);
 }
 
 std::unique_ptr<VerilogAnalyzer> AnalyzeVerilogExpression(
-    std::string_view text, std::string_view filename,
+    verible::document_view text, std::string_view filename,
     const VerilogPreprocess::Config &preprocess_config) {
   return AnalyzeVerilogConstruct("module foo;\nif (", text,
                                  " ) $error;\nendmodule\n", filename,
@@ -106,28 +106,28 @@ std::unique_ptr<VerilogAnalyzer> AnalyzeVerilogExpression(
 }
 
 std::unique_ptr<VerilogAnalyzer> AnalyzeVerilogModuleBody(
-    std::string_view text, std::string_view filename,
+    verible::document_view text, std::string_view filename,
     const VerilogPreprocess::Config &preprocess_config) {
   return AnalyzeVerilogConstruct("module foo;\n", text, "\nendmodule\n",
                                  filename, preprocess_config);
 }
 
 std::unique_ptr<VerilogAnalyzer> AnalyzeVerilogClassBody(
-    std::string_view text, std::string_view filename,
+    verible::document_view text, std::string_view filename,
     const VerilogPreprocess::Config &preprocess_config) {
   return AnalyzeVerilogConstruct("class foo;\n", text, "\nendclass\n", filename,
                                  preprocess_config);
 }
 
 std::unique_ptr<VerilogAnalyzer> AnalyzeVerilogPackageBody(
-    std::string_view text, std::string_view filename,
+    verible::document_view text, std::string_view filename,
     const VerilogPreprocess::Config &preprocess_config) {
   return AnalyzeVerilogConstruct("package foo;\n", text, "\nendpackage\n",
                                  filename, preprocess_config);
 }
 
 std::unique_ptr<VerilogAnalyzer> AnalyzeVerilogLibraryMap(
-    std::string_view text, std::string_view filename,
+    verible::document_view text, std::string_view filename,
     const VerilogPreprocess::Config &preprocess_config) {
   // The prolog/epilog strings come from verilog.lex as token enums:
   // PD_LIBRARY_SYNTAX_BEGIN and PD_LIBRARY_SYNTAX_END.
@@ -139,12 +139,12 @@ std::unique_ptr<VerilogAnalyzer> AnalyzeVerilogLibraryMap(
 }
 
 std::unique_ptr<VerilogAnalyzer> AnalyzeVerilogWithMode(
-    std::string_view text, std::string_view filename, std::string_view mode,
+    verible::document_view text, std::string_view filename, verible::document_view mode,
     const VerilogPreprocess::Config &preprocess_config) {
   static const auto *func_map =
-      new std::map<std::string_view,
+      new std::map<verible::document_view,
                    std::function<std::unique_ptr<VerilogAnalyzer>(
-                       std::string_view, std::string_view,
+                       verible::document_view, std::string_view,
                        const VerilogPreprocess::Config &)>>{
           {"parse-as-statements", &AnalyzeVerilogStatements},
           {"parse-as-expression", &AnalyzeVerilogExpression},

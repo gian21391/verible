@@ -37,7 +37,7 @@ class Lexer {
   virtual const TokenInfo &DoNextToken() = 0;
 
   // Reset lexer to new input.  Overrides should discard all previous state.
-  virtual void Restart(std::string_view) = 0;
+  virtual void Restart(document_view) = 0;
 
   // Return true if token is a lexical error.
   virtual bool TokenIsError(const TokenInfo &) const = 0;

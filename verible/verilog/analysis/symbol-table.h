@@ -44,7 +44,7 @@ struct SymbolInfo;  // forward declaration, defined below
 // substring owned by a VerilogSourceFile (which must outlive the symbol table),
 // and can be used to look up file origin and position within file.
 using SymbolTableNode =
-    verible::MapTree<std::string_view, SymbolInfo, verible::StringViewCompare>;
+    verible::MapTree<verible::document_view, SymbolInfo, verible::DocumentViewCompare>;
 
 std::ostream &SymbolTableNodeFullPath(std::ostream &, const SymbolTableNode &);
 
@@ -118,7 +118,7 @@ struct ReferenceComponent {
   // locate the originating VerilogSourceFile via
   // VerilogProject::LookupFileOrigin() and in-file position from the file's
   // LineColumnMap.
-  const std::string_view identifier;
+  const verible::document_view identifier;
 
   // What kind of reference is this, and how should it be resolved?
   // See enum definition above.
@@ -175,8 +175,8 @@ std::ostream &ReferenceNodeFullPath(std::ostream &,
 // arbitrarily chosen to be included in the map, while the others are dropped.
 // Primarily for debugging and visualization.
 using ReferenceComponentMap =
-    std::map<std::string_view, const ReferenceComponentNode *,
-             verible::StringViewCompare>;
+    std::map<verible::document_view, const ReferenceComponentNode *,
+             verible::DocumentViewCompare>;
 ReferenceComponentMap ReferenceComponentNodeMapView(
     const ReferenceComponentNode &);
 
@@ -241,7 +241,7 @@ struct DeclarationTypeInfo {
   const verible::Symbol *syntax_origin = nullptr;
 
   // holds optional string_view describing direction of the port
-  std::string_view direction;
+  verible::document_view direction;
 
   // holds additional type specifications, used mostly in multiline definitions
   // of ports
@@ -300,7 +300,7 @@ struct SymbolInfo {
   // TODO (glatosinski): I guess we should include more information here rather
   // than just string_view pointing to the symbol, or add string_view pointing
   // to the symbol in the Symbol class
-  std::vector<std::string_view> supplement_definitions;
+  std::vector<verible::document_view> supplement_definitions;
 
   // bool telling if the given symbol is a port identifier
   bool is_port_identifier = false;
@@ -365,7 +365,7 @@ struct SymbolInfo {
 
   // Generate a scope name whose string memory lives and moves with this object.
   // 'base' is used as part of the generated name.
-  std::string_view CreateAnonymousScope(std::string_view base);
+  verible::document_view CreateAnonymousScope(verible::document_view base);
 
   // Attempt to resolve all symbol references.
   void Resolve(const SymbolTableNode &context,
@@ -387,14 +387,14 @@ struct SymbolInfo {
   struct StringAddressCompare {
     using is_transparent = void;  // heterogeneous lookup
 
-    static std::string_view ToString(std::string_view s) { return s; }
-    static std::string_view ToString(const DependentReferences *ref) {
+    static verible::document_view ToString(verible::document_view s) { return s; }
+    static verible::document_view ToString(const DependentReferences *ref) {
       return ref->components->Value().identifier;
     }
 
     template <typename L, typename R>
     bool operator()(L l, R r) const {
-      static constexpr std::less<std::string_view::const_iterator>
+      static constexpr std::less<verible::document_view::const_iterator>
           compare_address;
       return compare_address(ToString(l).begin(), ToString(r).begin());
     }
@@ -404,8 +404,8 @@ struct SymbolInfo {
       std::set<const DependentReferences *, StringAddressCompare>;
 
   using references_map_view_type =
-      std::map<std::string_view, address_ordered_set_type,
-               verible::StringViewCompare>;
+      std::map<verible::document_view, address_ordered_set_type,
+               verible::DocumentViewCompare>;
 
   // For testing only, quickly find reference candidates by name, and positional
   // occurence.  The outer map is ordered by string contents, and the inner

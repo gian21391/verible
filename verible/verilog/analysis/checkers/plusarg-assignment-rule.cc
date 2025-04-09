@@ -62,7 +62,7 @@ void PlusargAssignmentRule::HandleSymbol(
   verible::matcher::BoundSymbolManager manager;
   if (IdMatcher().Matches(symbol, &manager)) {
     if (const auto *leaf = manager.GetAs<verible::SyntaxTreeLeaf>("name")) {
-      if (kForbiddenFunctionName == leaf->get().text()) {
+      if (kForbiddenFunctionName == leaf->get().text().to_string_view()) {
         violations_.insert(
             verible::LintViolation(leaf->get(), FormatReason(), context));
       }

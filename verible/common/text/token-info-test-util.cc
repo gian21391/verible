@@ -35,12 +35,19 @@ ExpectedTokenInfo::ExpectedTokenInfo(char token_enum_and_text)
                 // address) at offset 0 or sizeof(int) -1.
                 // Note: This constructor using a self-pointer makes this struct
                 // non-default-copy/move/assign-able.
-                std::string_view(reinterpret_cast<const char *>(&token_enum_)
+                document_view(reinterpret_cast<const char *>(&token_enum_)
 #ifdef IS_BIG_ENDIAN
                                      + (sizeof(typeid(token_enum_)) - 1)
 #endif
                                      ,
-                                 1)) {
+                                 1,
+                                 reinterpret_cast<const char *>(&token_enum_)
+#ifdef IS_BIG_ENDIAN
+                                    + (sizeof(typeid(token_enum_)) - 1)
+#endif
+                                    , reinterpret_cast<const char *>(&token_enum_)
+                                 )
+                                 ) {
 }
 
 static std::vector<TokenInfo> ComposeExpectedTokensFromFragments(
@@ -78,22 +85,22 @@ std::vector<TokenInfo> TokenInfoTestData::FindImportantTokens() const {
 }
 
 std::vector<TokenInfo> TokenInfoTestData::FindImportantTokens(
-    std::string_view base) const {
+    document_view base) const {
   std::vector<TokenInfo> return_tokens = FindImportantTokens();
   RebaseToCodeCopy(&return_tokens, base);
   return return_tokens;
 }
 
 void TokenInfoTestData::RebaseToCodeCopy(std::vector<TokenInfo> *tokens,
-                                         std::string_view base) const {
+                                         document_view base) const {
   CHECK_EQ(code, base);  // verify content match
   // Another analyzer object may have made its own copy of 'code', so
   // we need to translate the expected error token into a rebased version
   // before directly comparing against the rejected tokens.
   for (TokenInfo &token : *tokens) {
     const auto offset =
-        std::distance(std::string_view(code).begin(), token.text().begin());
-    token.RebaseDocumentView(base.begin() + offset);
+        std::distance(document_view(code).begin(), token.text().begin());
+    token.RebaseDocumentView(base.substr(offset));
   }
 }
 

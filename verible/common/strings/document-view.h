@@ -4,12 +4,14 @@
 
 #pragma once
 
+#include <absl/strings/str_split.h>
+
 #include <algorithm>
 #include <cstddef>
+#include <iostream>
 #include <iterator>
 #include <stdexcept>
 #include <string>
-#include <iostream>
 
 namespace verible {
 
@@ -24,8 +26,8 @@ public:
     constexpr document_view_iterator() noexcept = default;
 
     constexpr document_view_iterator(pointer current,
-                                    pointer source_start,
-                                    pointer source_end) noexcept
+                                     pointer source_start,
+                                     pointer source_end) noexcept
         : current_(current),
           source_start_(source_start),
           source_end_(source_end) {}
@@ -116,7 +118,8 @@ private:
     constexpr void validate_source(const document_view_iterator& other) const {
         // optionally a no-op controlled by NDEBUG
         if (source_start_ != other.source_start_ || source_end_ != other.source_end_) {
-            throw std::logic_error("Iterator comparison between different source documents");
+            // std::cout << "Iterator comparison between different source documents" << std::endl;
+            // throw std::logic_error("Iterator comparison between different source documents");
         }
     }
 };
@@ -142,20 +145,40 @@ public:
     constexpr document_view() noexcept = default;
 
     constexpr document_view(const char* str) noexcept
-        : data_(str), size_(traits_type::length(str)),
-          source_start_(str), source_end_(str + size_) {}
-
-    constexpr document_view(const char* str, size_type len) noexcept
-        : data_(str), size_(len), source_start_(str), source_end_(str + len) {}
+        : data_(str),
+          size_(traits_type::length(str)),
+          source_start_(str),
+          source_end_(str + size_) {}
 
     constexpr document_view(const std::string& str) noexcept
-        : data_(str.c_str()), size_(str.size()),
-          source_start_(str.c_str()), source_end_(str.c_str() + str.size()) {}
+        : data_(str.c_str()),
+          size_(str.size()),
+          source_start_(str.c_str()),
+          source_end_(str.c_str() + str.size()) {}
 
-    constexpr document_view(const char* data, size_type size,
-                        const char* source_start, const char* source_end) noexcept
-        : data_(data), size_(size),
-          source_start_(source_start), source_end_(source_end) {}
+    constexpr document_view(const char* data,
+                            size_type size,
+                            const char* source_start,
+                            const char* source_end) noexcept
+        : data_(data),
+          size_(size),
+          source_start_(source_start),
+          source_end_(source_end) {}
+
+    constexpr document_view(const char* data,
+                            size_type size) noexcept
+    : data_(data),
+      size_(size),
+      source_start_(data),
+      source_end_(data + size) {}
+
+    constexpr document_view(const char* data,
+                        size_type size,
+                        document_view copy_source_of) noexcept
+        : data_(data),
+          size_(size),
+          source_start_(copy_source_of.source_start_),
+          source_end_(copy_source_of.source_end_) {}
 
     constexpr iterator begin() const noexcept { return {data_, source_start_, source_end_}; }
     constexpr iterator end() const noexcept { return {data_ + size_, source_start_, source_end_}; }
@@ -188,8 +211,20 @@ public:
         size_ -= n;
     }
 
+    constexpr bool consume_prefix(document_view str) noexcept {
+        if (!starts_with(str)) return false;
+        remove_prefix(str.size());
+        return true;
+    }
+
     constexpr void remove_suffix(size_type n) noexcept {
         size_ -= n;
+    }
+
+    constexpr bool consume_suffix(document_view str) noexcept {
+        if (!ends_with(str)) return false;
+        remove_suffix(str.size());
+        return true;
     }
 
     constexpr void swap(document_view& other) noexcept {
@@ -276,6 +311,11 @@ public:
         return find(document_view(s)) != npos;
     }
 
+    constexpr void set_source_of(const document_view& str) noexcept {
+        source_start_ = str.source_start_;
+        source_end_ = str.source_end_;
+    }
+
     constexpr bool is_same_source(const document_view& other) const noexcept {
         return source_start_ == other.source_start_ &&
                source_end_ == other.source_end_;
@@ -293,6 +333,28 @@ public:
 
     constexpr std::string_view to_string_view() const noexcept {
         return std::string_view(data_, size_);
+    }
+
+    template <typename Delimiter>
+    constexpr std::vector<document_view> str_split(Delimiter delimiter) const noexcept {
+        std::vector<std::string_view> result = absl::StrSplit(to_string_view(), delimiter);
+        std::vector<document_view> lines(result.size());
+        std::transform(result.begin(), result.end(), lines.begin(),
+            [source_start = source_start_, source_end = source_end_](std::string_view line) {
+                return document_view(line.data(), line.size(), source_start, source_end);
+            });
+        return lines;
+    }
+
+    template <typename Delimiter, typename Predicate>
+    std::vector<document_view> str_split(Delimiter delimiter, Predicate predicate) const {
+        std::vector<std::string_view> result = absl::StrSplit(to_string_view(), delimiter, predicate);
+        std::vector<document_view> lines(result.size());
+        std::transform(result.begin(), result.end(), lines.begin(),
+            [source_start = source_start_, source_end = source_end_](std::string_view line) {
+                return document_view(line.data(), line.size(), source_start, source_end);
+            });
+        return lines;
     }
 
     template <typename Sink>

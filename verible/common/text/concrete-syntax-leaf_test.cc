@@ -25,7 +25,7 @@ namespace verible {
 namespace {
 
 TEST(ValueSymbolTest, EqualityArity1Args) {
-  constexpr std::string_view text("foo");
+  constexpr document_view text("foo");
   SyntaxTreeLeaf value1(10, text);
   TokenInfo info1(10, text);
   auto info2 = value1.get();
@@ -35,9 +35,9 @@ TEST(ValueSymbolTest, EqualityArity1Args) {
 TEST(ValueSymbolTest, InequalityDifferentStringLocations) {
   // Check that two tokens with the same text content but different
   // location are _not_ considered equal.
-  constexpr std::string_view longtext("foofoo");
-  constexpr std::string_view first = longtext.substr(0, 3);
-  constexpr std::string_view second = longtext.substr(3);
+  constexpr document_view longtext("foofoo");
+  constexpr document_view first = longtext.substr(0, 3);
+  constexpr document_view second = longtext.substr(3);
 
   SyntaxTreeLeaf value1(10, first);
   TokenInfo info1(10, second);

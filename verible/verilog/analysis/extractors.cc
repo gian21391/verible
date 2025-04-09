@@ -31,7 +31,7 @@ namespace analysis {
 
 // Find all modules and collect interface names
 absl::Status CollectInterfaceNames(
-    std::string_view content, std::set<std::string> *if_names,
+    verible::document_view content, std::set<std::string> *if_names,
     const VerilogPreprocess::Config &preprocess_config) {
   VLOG(1) << __FUNCTION__;
 
@@ -56,8 +56,8 @@ absl::Status CollectInterfaceNames(
     const auto if_leafs = FindAllSymbolIdentifierLeafs(*mod_header.match);
     for (const auto &if_leaf_match : if_leafs) {
       const auto &if_leaf = SymbolCastToLeaf(*if_leaf_match.match);
-      std::string_view if_name = if_leaf.get().text();
-      if_names->insert(std::string(if_name));  // TODO: use std::string_view
+      verible::document_view if_name = if_leaf.get().text();
+      if_names->insert(if_name.to_string());  // TODO: use std::string_view
     }
   }
   return absl::OkStatus();

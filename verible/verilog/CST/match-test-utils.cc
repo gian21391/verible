@@ -38,11 +38,11 @@ void TestVerilogSyntaxRangeMatches(
     std::string_view test_name, const SyntaxTreeSearchTestCase &test_case,
     const std::function<std::vector<TreeSearchMatch>(const TextStructureView &)>
         &match_collector) {
-  const std::string_view code(test_case.code);
+  const verible::document_view code(test_case.code);
   // Parse Verilog source code into syntax tree.
   VerilogAnalyzer analyzer(code, "test-file");
   const TextStructureView &text_structure(analyzer.Data());
-  const std::string_view code_copy = text_structure.Contents();
+  const verible::document_view code_copy = text_structure.Contents();
   ASSERT_OK(analyzer.Analyze()) << test_name << " failed on:\n" << code;
 
   // Run the match collector to gather results.

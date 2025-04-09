@@ -53,7 +53,7 @@ struct LintTestCase : public TokenInfoTestData {
   // TODO(b/141875806): Take a symbol translator function to produce a
   // human-readable, language-specific enum name.
   bool ExactMatchFindings(const std::set<LintViolation> &found_violations,
-                          std::string_view base,
+                          document_view base,
                           std::ostream *diffstream) const;
 };
 
@@ -83,7 +83,7 @@ void RunLintTestCase(const LintTestCase &test,
   const auto &violations(rule_status.violations);
 
   // Report detailed differences, if any.
-  const std::string_view base_text = analyzer.Data().Contents();
+  const document_view base_text = analyzer.Data().Contents();
   std::ostringstream diffs;
   EXPECT_TRUE(test.ExactMatchFindings(violations, base_text, &diffs))
       << absl::StrCat("code:\n", test.code, "\nDiffs:\n", diffs.str(), "\n");

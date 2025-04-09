@@ -20,9 +20,11 @@
 #include <string_view>
 #include <vector>
 
+#include "verible/common/strings/document-view.h"
+
 namespace verible {
 namespace internal {
-inline size_t DelimiterSize(std::string_view str) { return str.length(); }
+inline size_t DelimiterSize(document_view str) { return str.length(); }
 
 inline size_t DelimiterSize(char c) { return 1; }
 }  // namespace internal
@@ -44,7 +46,7 @@ inline size_t DelimiterSize(char c) { return 1; }
 // See also MakeStringSpliterator().
 class StringSpliterator {
  public:
-  explicit StringSpliterator(std::string_view original)
+  explicit StringSpliterator(document_view original)
       : remainder_(original) {}
 
   // Copy-able, movable, assignable.
@@ -67,13 +69,13 @@ class StringSpliterator {
   // std::function<std::string_view(std::string_view)> and
   // std::function<std::string_view(char)>.
   template <class D>
-  std::string_view operator()(const D delimiter) {
+  document_view operator()(const D delimiter) {
     const size_t pos = remainder_.find(delimiter);
     if (pos == std::string_view::npos) {
       // This is the last partition.
       // If the remainder_ was already empty, this will continue
       // to return empty strings.
-      const std::string_view result(remainder_);
+      const document_view result(remainder_);
       remainder_.remove_prefix(remainder_.length());  // empty
       end_ = true;
       return result;
@@ -81,19 +83,19 @@ class StringSpliterator {
     // More text follows after the next occurrence of the delimiter.
     // If the text ends with the delimiter, then the last string
     // returned before the end() will be empty.
-    const std::string_view result(remainder_.substr(0, pos));
+    const document_view result(remainder_.substr(0, pos));
     // Skip over the delimiter.
     remainder_.remove_prefix(pos + internal::DelimiterSize(delimiter));
     return result;
   }
 
   // Returns the un-scanned portion of text.
-  std::string_view Remainder() const { return remainder_; }
+  document_view Remainder() const { return remainder_; }
 
  private:
   // The remaining substring that has not been consumed.
   // With each call to operator(), this shrinks from the front.
-  std::string_view remainder_;
+  document_view remainder_;
 
   // A split that fails to find a delimiter still returns one element,
   // the original string, thus end_ should always be initialized to false.
@@ -103,8 +105,8 @@ class StringSpliterator {
 // Convenience function that returns a string_view generator using
 // StringSpliterator with the same delimiter on every split.
 template <class D>
-std::function<std::string_view()> MakeStringSpliterator(
-    std::string_view original, D delimiter) {
+std::function<document_view()> MakeStringSpliterator(
+    document_view original, D delimiter) {
   // note: in-lambda initializers require c++14
   auto splitter = StringSpliterator(original);
   return [=]() mutable /* splitter */ { return splitter(delimiter); };
@@ -114,14 +116,13 @@ std::function<std::string_view()> MakeStringSpliterator(
 // Each line in the returned vector excludes the trailing \n.
 // If original text did not terminate with a \n, interpret the final partial
 // line as a whole line.
-std::vector<std::string_view> SplitLines(std::string_view text);
+std::vector<document_view> SplitLines(document_view text);
 
 // Returns line-based view of original text. Keeps the trailing \n.
 // Lines in the returned vector include the trailing \n.
 // If original text did not terminate with a \n, interpret the final partial
 // line as a whole line.
-std::vector<std::string_view> SplitLinesKeepLineTerminator(
-    std::string_view text);
+std::vector<document_view> SplitLinesKeepLineTerminator(document_view text);
 
 }  // namespace verible
 

@@ -331,7 +331,7 @@ TEST(NextSiblingPathTest, Various) {
 }
 
 TEST(TreePathFormatterTest, Various) {
-  const std::pair<SyntaxTreePath, std::string_view> kTestCases[] = {
+  const std::pair<SyntaxTreePath, document_view> kTestCases[] = {
       {{}, "[]"},                        //
       {{0}, "[0]"},                      //
       {{1}, "[1]"},                      //

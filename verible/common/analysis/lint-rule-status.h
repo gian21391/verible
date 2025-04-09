@@ -42,7 +42,7 @@ namespace verible {
 // ReplacementEdit differs from editscript's Edit in that it stores a
 // replacement string, so it doesn't need the "after" text to be useful.
 struct ReplacementEdit {
-  ReplacementEdit(std::string_view fragment, const std::string &replacement)
+  ReplacementEdit(document_view fragment, const std::string &replacement)
       : fragment(fragment), replacement(replacement) {}
 
   ReplacementEdit(const TokenInfo &token, const std::string &replacement)
@@ -55,7 +55,7 @@ struct ReplacementEdit {
     return (fragment.data() + fragment.size()) <= other.fragment.data();
   }
 
-  std::string_view fragment;
+  document_view fragment;
   std::string replacement;
 };
 
@@ -76,7 +76,7 @@ class AutoFix {
       : AutoFix(description, {edit}) {}
 
   // Applies the fix on a `base` and returns modified text.
-  std::string Apply(std::string_view base) const;
+  std::string Apply(document_view base) const;
 
   bool AddEdits(const std::set<ReplacementEdit> &new_edits);
 
@@ -215,8 +215,8 @@ class LintStatusFormatter {
  public:
   // Constructor takes a reference to the original text in order to setup
   // line_column_map
-  explicit LintStatusFormatter(std::string_view text)
-      : line_column_map_(text) {}
+  explicit LintStatusFormatter(document_view text)
+      : line_column_map_(text.to_string()) {}
 
   // Formats and outputs status to stream.
   // Path is the file path of original file. This is needed because it is not
@@ -224,7 +224,7 @@ class LintStatusFormatter {
   // Base is the string_view of the entire contents, used only for byte offset
   // calculation.
   void FormatLintRuleStatus(std::ostream *stream, const LintRuleStatus &status,
-                            std::string_view base, std::string_view path) const;
+                            document_view base, std::string_view path) const;
 
   // Formats, sorts and outputs status to stream with additional vulnerable code
   // line printed when enabled.
@@ -236,8 +236,8 @@ class LintStatusFormatter {
   // calculation.
   void FormatLintRuleStatuses(std::ostream *stream,
                               const std::vector<LintRuleStatus> &statuses,
-                              std::string_view base, std::string_view path,
-                              const std::vector<std::string_view> &lines) const;
+                              document_view base, std::string_view path,
+                              const std::vector<document_view> &lines) const;
 
   // Formats and outputs violation on stream.
   // Path is file path of original file and url is a link to the ratified rule
@@ -245,7 +245,7 @@ class LintStatusFormatter {
   // Base is the string_view of the entire contents, used only for byte offset
   // calculation.
   void FormatViolation(std::ostream *stream, const LintViolation &violation,
-                       std::string_view base, std::string_view path,
+                       document_view base, std::string_view path,
                        std::string_view url, std::string_view rule_name) const;
 
   // Formats and outputs violation to a file stream in a syntax accepted by
@@ -254,7 +254,7 @@ class LintStatusFormatter {
   // byte offset calculation.
   void FormatViolationWaiver(std::ostream *stream,
                              const LintViolation &violation,
-                             std::string_view base, std::string_view path,
+                             document_view base, std::string_view path,
                              std::string_view rule_name) const;
   // Substitute the markers \@ with tokens location
   // this allows us to create custom reason msg
@@ -263,7 +263,7 @@ class LintStatusFormatter {
   // must come from the same file.
   std::string FormatWithRelatedTokens(
       const std::vector<verible::TokenInfo> &tokens, std::string_view message,
-      std::string_view path, std::string_view base) const;
+      std::string_view path, document_view base) const;
 
  private:
   // Translates byte offsets, which are supplied by LintViolations via

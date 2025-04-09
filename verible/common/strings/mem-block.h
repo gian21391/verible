@@ -18,6 +18,8 @@
 #include <string>
 #include <string_view>
 
+#include "verible/common/strings/document-view.h"
+
 namespace verible {
 // A representation of a block of (readonly) memory that is owned by MemBlock.
 // Recommended use is to create it somewhere and pass a pointer in a
@@ -26,7 +28,7 @@ namespace verible {
 class MemBlock {
  public:
   virtual ~MemBlock() = default;
-  virtual std::string_view AsStringView() const = 0;
+  virtual document_view AsDocumentView() const = 0;
 
  protected:
   MemBlock() = default;
@@ -43,14 +45,14 @@ class StringMemBlock final : public MemBlock {
  public:
   StringMemBlock() = default;
   explicit StringMemBlock(std::string &&move_from) : content_(move_from) {}
-  explicit StringMemBlock(std::string_view copy_from)
+  explicit StringMemBlock(document_view copy_from)
       : content_(copy_from.begin(), copy_from.end()) {}
 
   // Assign/modify content. Use sparingly, ideally only in initialization
   // as the expectation of the MemBlock is that it won't change later.
   std::string *mutable_content() { return &content_; }
 
-  std::string_view AsStringView() const final { return content_; }
+  document_view AsDocumentView() const final { return content_; }
 
  private:
   std::string content_;

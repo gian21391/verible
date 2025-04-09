@@ -37,7 +37,7 @@ TEST(ShowCodeStreamableTest, ContainsCode) {
 // For use with TestDriverTokenInfos only
 class TestDriverTokenInfosFakeLexer : public FakeLexer {
  public:
-  explicit TestDriverTokenInfosFakeLexer(std::string_view code)
+  explicit TestDriverTokenInfosFakeLexer(document_view code)
       : joined_text_(code) {
     static const std::initializer_list<TokenInfo> driver_data = {
         // TokenInfo: enum, text
@@ -49,7 +49,7 @@ class TestDriverTokenInfosFakeLexer : public FakeLexer {
   }
 
  private:
-  std::string_view joined_text_;
+  document_view joined_text_;
 };
 
 TEST(SynthesizedLexerTestDataTest, TestDriverTokenInfos) {
@@ -65,7 +65,7 @@ TEST(SynthesizedLexerTestDataTest, TestDriverTokenInfos) {
 // For use with TestDriverDontCares only
 class TestDriverDontCaresFakeLexer : public FakeLexer {
  public:
-  explicit TestDriverDontCaresFakeLexer(std::string_view code)
+  explicit TestDriverDontCaresFakeLexer(document_view code)
       : joined_text_(code) {
     static const std::initializer_list<TokenInfo> driver_data = {
         // TokenInfo: enum, left, text
@@ -81,7 +81,7 @@ class TestDriverDontCaresFakeLexer : public FakeLexer {
   }
 
  private:
-  std::string_view joined_text_;
+  document_view joined_text_;
 };
 
 TEST(SynthesizedLexerTestDataTest, TestDriverDontCares) {

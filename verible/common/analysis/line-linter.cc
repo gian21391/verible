@@ -24,7 +24,7 @@
 
 namespace verible {
 
-void LineLinter::Lint(const std::vector<std::string_view> &lines) {
+void LineLinter::Lint(const std::vector<document_view> &lines) {
   VLOG(1) << "LineLinter analyzing lines with " << rules_.size() << " rules.";
   for (const auto &line : lines) {
     for (const auto &rule : rules_) {

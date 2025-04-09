@@ -83,7 +83,7 @@ void ConstraintNameStyleRule::HandleSymbol(const verible::Symbol &symbol,
         GetSymbolIdentifierFromConstraintDeclaration(symbol);
     if (!identifier_token) return;
 
-    const std::string_view constraint_name = identifier_token->text();
+    const std::string_view constraint_name = identifier_token->text().to_string_view();
 
     if (!RE2::FullMatch(constraint_name, *regex)) {
       violations_.insert(

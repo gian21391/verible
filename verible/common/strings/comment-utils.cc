@@ -86,10 +86,11 @@ document_view StripComment(document_view text) {
 
 document_view StripCommentAndSpacePadding(document_view text) {
   const auto stripped_text = StripComment(text);
-  CHECK(verible::IsSubRange(stripped_text, text));
-  const auto return_text = absl::StripAsciiWhitespace(stripped_text.to_string_view());
-  CHECK(verible::IsSubRange(document_view(return_text.data(), return_text.size()), stripped_text));
-  return document_view(return_text.data(), return_text.size());
+  CHECK(stripped_text.is_subview_of(text));
+  const auto no_space_text = absl::StripAsciiWhitespace(stripped_text.to_string_view());
+  const document_view return_text{no_space_text.data(), no_space_text.size(), text};
+  CHECK(return_text.is_subview_of(stripped_text));
+  return return_text;
 }
 
 }  // namespace verible

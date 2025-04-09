@@ -75,8 +75,8 @@ void ForbidLineContinuationsRule::HandleSymbol(
                                        return p->Tag().tag == TK_StringLiteral;
                                      });
   const auto &string_literal = SymbolCastToLeaf(**literal);
-  if (absl::StrContains(string_literal.get().text(), "\\\n") ||
-      absl::StrContains(string_literal.get().text(), "\\\r")) {
+  if (string_literal.get().text().contains("\\\n") ||
+      string_literal.get().text().contains("\\\r")) {
     violations_.insert(LintViolation(string_literal, kMessage, context));
   }
 }

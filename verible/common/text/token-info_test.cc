@@ -279,7 +279,7 @@ TEST(RebaseDocumentViewTest, UsingCharPointer) {
   const document_view text = "hello";
   const document_view new_base = "xxxhelloyyy";
   TokenInfo token(1, text);
-  token.RebaseDocumentView(new_base.begin() + 3);  // assume original length
+  token.RebaseDocumentView(new_base.substr(3));  // assume original length
   EXPECT_EQ(token.left(new_base), 3);
   EXPECT_EQ(token.right(new_base), 8);
   EXPECT_EQ(token.text(), text);

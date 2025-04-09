@@ -100,7 +100,8 @@ document_view StringSpanOfSymbol(const Symbol &lsym, const Symbol &rsym) {
     const auto range_begin = left->get().text().begin();
     const auto range_end = right->get().text().end();
     return document_view(&*range_begin,
-                            std::distance(range_begin, range_end));
+                            std::distance(range_begin, range_end),
+                            left->get().text());
   }
   return "";
 }

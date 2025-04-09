@@ -35,7 +35,7 @@ using verible::TokenInfo;
 // Removes non-essential tokens from token output stream, such as spaces.
 class FilteredVerilogLexer : public VerilogLexer {
  public:
-  explicit FilteredVerilogLexer(std::string_view code) : VerilogLexer(code) {}
+  explicit FilteredVerilogLexer(verible::document_view code) : VerilogLexer(code) {}
 
   const TokenInfo &DoNextToken() final {
     do {
@@ -2355,7 +2355,7 @@ TEST(VerilogLexerTest, DirectivesUnfiltered) {
 TEST(VerilogLexerTest, Library) { TestLexer(kLibraryTests); }
 
 TEST(RecursiveLexTextTest, Basic) {
-  constexpr std::string_view text("hello;");
+  constexpr verible::document_view text("hello;");
   std::vector<TokenInfo> tokens;
   RecursiveLexText(text,
                    [&tokens](const TokenInfo &t) { tokens.push_back(t); });
@@ -2366,8 +2366,8 @@ TEST(RecursiveLexTextTest, Basic) {
 
 TEST(VerilogLexerTest, StrayNulCharacterHandledCorrectly) {
   {  // baseline
-    FilteredVerilogLexer lexer(std::string_view("foo bar baz", 11));
-    for (std::string_view expected : {"foo", "bar", "baz"}) {
+    FilteredVerilogLexer lexer(verible::document_view("foo bar baz", 11));
+    for (verible::document_view expected : {"foo", "bar", "baz"}) {
       auto token = lexer.DoNextToken();
       EXPECT_EQ(token.text(), expected);
       EXPECT_EQ(token.token_enum(), SymbolIdentifier);
@@ -2375,8 +2375,8 @@ TEST(VerilogLexerTest, StrayNulCharacterHandledCorrectly) {
     EXPECT_TRUE(lexer.DoNextToken().isEOF());
   }
   {  // Stray nul character in text should just be skipped as space
-    FilteredVerilogLexer lexer(std::string_view("foo bar\0baz", 11));
-    for (std::string_view expected : {"foo", "bar", "baz"}) {
+    FilteredVerilogLexer lexer(verible::document_view("foo bar\0baz", 11));
+    for (verible::document_view expected : {"foo", "bar", "baz"}) {
       auto token = lexer.DoNextToken();
       EXPECT_EQ(token.text(), expected);
       EXPECT_EQ(token.token_enum(), SymbolIdentifier);

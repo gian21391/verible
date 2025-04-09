@@ -23,15 +23,15 @@
 
 namespace verible {
 
-std::string_view make_string_view_range(std::string_view::const_iterator begin,
-                                        std::string_view::const_iterator end) {
+document_view make_document_view_range(document_view::const_iterator begin,
+                                     document_view::const_iterator end) {
   const int length = std::distance(begin, end);
   CHECK_GE(length, 0) << "Malformed string bounds.";
-  return std::string_view(&*begin, length);
+  return document_view(&*begin, length);
 }
 
-std::pair<int, int> SubstringOffsets(std::string_view substring,
-                                     std::string_view superstring) {
+std::pair<int, int> SubstringOffsets(document_view substring,
+                                     document_view superstring) {
   return SubRangeIndices(substring, superstring);
 }
 

@@ -387,7 +387,7 @@ static void DeterminePartitionExpansion(
   const auto PreserveSpaces = [&ftoken_range, &full_text,
                                preformatted_tokens]() {
     const ByteOffsetSet new_disable_range{{DisableByteOffsetRange(
-        verible::make_string_view_range(ftoken_range.front().Text().begin(),
+        verible::make_document_view_range(ftoken_range.front().Text().begin(),
                                         ftoken_range.back().Text().end()),
         full_text)}};
     verible::PreserveSpacesOnDisabledTokenRanges(preformatted_tokens,

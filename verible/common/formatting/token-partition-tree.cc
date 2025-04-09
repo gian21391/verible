@@ -193,7 +193,7 @@ class BlankLineSeparatorDetector {
     if (range.empty()) return false;
     const auto begin = range.front().token->text().begin();
     const auto end = range.back().token->text().end();
-    const auto gap = make_string_view_range(previous_end_, begin);
+    const auto gap = make_document_view_range(previous_end_, begin);
     // A blank line between partitions contains 2+ newlines.
     const bool new_bound = std::count(gap.begin(), gap.end(), '\n') >= 2;
     previous_end_ = end;
@@ -252,7 +252,7 @@ static std::string_view StringSpanOfPartitionRange(
   const auto back_range = range.back().Value().TokensRange();
   CHECK(!front_range.empty());
   CHECK(!back_range.empty());
-  return make_string_view_range(front_range.front().Text().begin(),
+  return make_document_view_range(front_range.front().Text().begin(),
                                 back_range.back().Text().end());
 }
 
@@ -285,7 +285,7 @@ void AdjustIndentationAbsolute(TokenPartitionTree *tree, int amount) {
 
 std::string_view StringSpanOfTokenRange(const FormatTokenRange &range) {
   if (range.empty()) return {};
-  return make_string_view_range(range.front().Text().begin(),
+  return make_document_view_range(range.front().Text().begin(),
                                 range.back().Text().end());
 }
 

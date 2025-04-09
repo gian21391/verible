@@ -46,11 +46,11 @@
 
 namespace verible {
 
-static bool LineMarksOldFile(std::string_view line) {
-  return absl::StartsWith(line, "--- ");
+static bool LineMarksOldFile(document_view line) {
+  return line.starts_with("--- ");
 }
 
-static bool IsValidMarkedLine(std::string_view line) {
+static bool IsValidMarkedLine(document_view line) {
   if (line.empty()) return false;
   switch (line.front()) {
     case ' ':
@@ -77,7 +77,7 @@ static std::vector<RangeT> IteratorsToRanges(const std::vector<Iter> &iters) {
   return result;
 }
 
-absl::Status MarkedLine::Parse(std::string_view text) {
+absl::Status MarkedLine::Parse(document_view text) {
   // text is already a whole line
   if (!IsValidMarkedLine(text)) {
     return absl::InvalidArgumentError(absl::StrCat(
@@ -98,13 +98,13 @@ std::string HunkIndices::FormatToString() const {
   return absl::StrCat(start, ",", count);
 }
 
-absl::Status HunkIndices::Parse(std::string_view text) {
+absl::Status HunkIndices::Parse(document_view text) {
   // text is expected to look like "int,int"
   StringSpliterator splitter(text);
-  const std::string_view start_text = splitter(',');
-  const std::string_view count_text = splitter(',');
-  if (!absl::SimpleAtoi(start_text, &start) ||  //
-      !absl::SimpleAtoi(count_text, &count) ||  //
+  const document_view start_text = splitter(',');
+  const document_view count_text = splitter(',');
+  if (!absl::SimpleAtoi(start_text.to_string_view(), &start) ||  //
+      !absl::SimpleAtoi(count_text.to_string_view(), &count) ||  //
       splitter /* unexpected second ',' */) {
     return absl::InvalidArgumentError(
         absl::StrCat("HunkIndices expects int,int, but got: ", text, "\"."));
@@ -116,11 +116,11 @@ std::ostream &operator<<(std::ostream &stream, const HunkIndices &indices) {
   return stream << indices.FormatToString();
 }
 
-absl::Status HunkHeader::Parse(std::string_view text) {
-  constexpr std::string_view kDelimiter("@@");
+absl::Status HunkHeader::Parse(document_view text) {
+  constexpr document_view kDelimiter("@@");
   StringSpliterator tokenizer(text);
   {
-    std::string_view first = tokenizer(kDelimiter);
+    document_view first = tokenizer(kDelimiter);
     // first token should be empty
     if (!first.empty() || !tokenizer) {
       return absl::InvalidArgumentError(absl::StrCat(
@@ -130,22 +130,24 @@ absl::Status HunkHeader::Parse(std::string_view text) {
 
   // Parse ranges between the "@@"s.
   {
-    const std::string_view ranges =
-        absl::StripAsciiWhitespace(tokenizer(kDelimiter));
+    const std::string_view ranges_sv =
+        absl::StripAsciiWhitespace(tokenizer(kDelimiter).to_string_view());
+    const document_view ranges(ranges_sv.data(), ranges_sv.size());
+
     if (!tokenizer) {
       return absl::InvalidArgumentError(absl::StrCat(
           "HunkHeader expects ranges in @@...@@, but got: ", text, "\"."));
     }
 
     auto splitter = MakeStringSpliterator(ranges, ' ');
-    std::string_view old_range_str(splitter());
-    if (!absl::ConsumePrefix(&old_range_str, "-")) {
+    document_view old_range_str(splitter());
+    if (!old_range_str.consume_prefix("-")) {
       return absl::InvalidArgumentError(absl::StrCat(
           "old-file range should start with '-', but got: ", old_range_str,
           "\"."));
     }
-    std::string_view new_range_str(splitter());
-    if (!absl::ConsumePrefix(&new_range_str, "+")) {
+    document_view new_range_str(splitter());
+    if (!new_range_str.consume_prefix("+")) {
       return absl::InvalidArgumentError(absl::StrCat(
           "new-file range should start with '+', but got: ", new_range_str,
           "\"."));
@@ -155,7 +157,7 @@ absl::Status HunkHeader::Parse(std::string_view text) {
   }
 
   // Text that follows the last "@@" provides context and is optional.
-  const std::string_view trailing_text = tokenizer(kDelimiter);
+  const document_view trailing_text = tokenizer(kDelimiter);
   context.assign(trailing_text.begin(), trailing_text.end());
 
   return absl::OkStatus();
@@ -225,7 +227,7 @@ LineNumberSet Hunk::AddedLines() const {
 }
 
 absl::Status Hunk::VerifyAgainstOriginalLines(
-    const std::vector<std::string_view> &original_lines) const {
+    const std::vector<document_view> &original_lines) const {
   int line_number = header_.old_range.start;  // 1-indexed
   for (const MarkedLine &line : lines_) {
     if (line.IsAdded()) continue;  // ignore added lines
@@ -234,7 +236,7 @@ absl::Status Hunk::VerifyAgainstOriginalLines(
           "Patch hunk references line ", line_number, " in a file with only ",
           original_lines.size(), " lines"));
     }
-    const std::string_view original_line = original_lines[line_number - 1];
+    const document_view original_line = original_lines[line_number - 1];
     if (line.Text() != original_line) {
       return absl::DataLossError(absl::StrCat(
           "Patch is inconsistent with original file!\nHunk at line ",
@@ -332,10 +334,10 @@ std::ostream &operator<<(std::ostream &stream, const Hunk &hunk) {
   return hunk.Print(stream);
 }
 
-absl::Status SourceInfo::Parse(std::string_view text) {
+absl::Status SourceInfo::Parse(document_view text) {
   StringSpliterator splitter(text);
 
-  std::string_view token = splitter('\t');
+  document_view token = splitter('\t');
   path.assign(token.begin(), token.end());
   if (path.empty()) {
     return absl::InvalidArgumentError(absl::StrCat(
@@ -357,9 +359,9 @@ std::ostream &operator<<(std::ostream &stream, const SourceInfo &info) {
 }
 
 static absl::Status ParseSourceInfoWithMarker(
-    SourceInfo *info, std::string_view line, std::string_view expected_marker) {
+    SourceInfo *info, document_view line, document_view expected_marker) {
   StringSpliterator splitter(line);
-  std::string_view marker = splitter(' ');
+  document_view marker = splitter(' ');
   if (marker != expected_marker) {
     return absl::InvalidArgumentError(
         absl::StrCat("Expected old-file marker \"", expected_marker,
@@ -395,7 +397,7 @@ static char PromptHunkAction(std::istream &ins, std::ostream &outs) {
 }
 
 absl::Status FilePatch::VerifyAgainstOriginalLines(
-    const std::vector<std::string_view> &original_lines) const {
+    const std::vector<document_view> &original_lines) const {
   for (const Hunk &hunk : hunks_) {
     RETURN_IF_ERROR(hunk.VerifyAgainstOriginalLines(original_lines));
   }
@@ -429,7 +431,7 @@ absl::Status FilePatch::PickApply(std::istream &ins, std::ostream &outs,
                   term::Color::kCyan);
   }
 
-  const std::vector<std::string_view> orig_lines(SplitLines(*orig_file_or));
+  const std::vector<document_view> orig_lines(SplitLines(*orig_file_or));
   RETURN_IF_ERROR(VerifyAgainstOriginalLines(orig_lines));
 
   // Accumulate lines to write here.
@@ -452,7 +454,7 @@ absl::Status FilePatch::PickApply(std::istream &ins, std::ostream &outs,
     }
     for (; last_consumed_line < old_range.start - 1; ++last_consumed_line) {
       CHECK_LT(last_consumed_line, static_cast<int>(orig_lines.size()));
-      const std::string_view &line(orig_lines[last_consumed_line]);
+      const document_view &line(orig_lines[last_consumed_line]);
       output_lines.emplace_back(line.begin(), line.end());  // copy string
     }
     VLOG(1) << "copied up to (!including) line[" << last_consumed_line << "].";
@@ -474,7 +476,7 @@ absl::Status FilePatch::PickApply(std::istream &ins, std::ostream &outs,
         // accept this hunk, copy lines over
         for (const MarkedLine &marked_line : hunk.MarkedLines()) {
           if (!marked_line.IsDeleted()) {
-            const std::string_view line(marked_line.Text());
+            const document_view line(marked_line.Text());
             output_lines.emplace_back(line.begin(), line.end());  // copy string
           }
         }
@@ -521,7 +523,7 @@ absl::Status FilePatch::PickApply(std::istream &ins, std::ostream &outs,
   // Copy over remaining lines after the last hunk.
   for (; last_consumed_line < static_cast<int>(orig_lines.size());
        ++last_consumed_line) {
-    const std::string_view &line(orig_lines[last_consumed_line]);
+    const document_view &line(orig_lines[last_consumed_line]);
     output_lines.emplace_back(line.begin(), line.end());  // copy string
   }
   VLOG(1) << "copied reamining lines up to [" << last_consumed_line << "].";
@@ -540,7 +542,7 @@ absl::Status FilePatch::Parse(const LineRange &lines) {
   }
   // Lines leading up to the old file marker "---" are metadata.
   for (const auto &line : make_range(lines.begin(), line_iter)) {
-    metadata_.emplace_back(line);
+    metadata_.emplace_back(line.to_string());
   }
 
   RETURN_IF_ERROR(ParseSourceInfoWithMarker(&old_file_, *line_iter, "---"));
@@ -556,7 +558,7 @@ absl::Status FilePatch::Parse(const LineRange &lines) {
   // find hunk starts, and parse ranges of hunk texts
   std::vector<LineIterator> hunk_starts;
   find_all(line_iter, lines.end(), std::back_inserter(hunk_starts),
-           [](std::string_view line) { return absl::StartsWith(line, "@@ "); });
+           [](document_view line) { return line.starts_with("@@ "); });
 
   if (hunk_starts.empty()) {
     // Unusual, but degenerate case of no hunks is parseable and valid.
@@ -594,15 +596,14 @@ std::ostream &operator<<(std::ostream &stream, const FilePatch &patch) {
 
 }  // namespace internal
 
-static bool LineBelongsToPreviousSection(std::string_view line) {
+static bool LineBelongsToPreviousSection(document_view line) {
   if (line.empty()) return true;
   return IsValidMarkedLine(line);
 }
 
-absl::Status PatchSet::Parse(std::string_view patch_contents) {
+absl::Status PatchSet::Parse(document_view patch_contents) {
   // Split lines.  The resulting lines will not include the \n delimiters.
-  std::vector<std::string_view> lines(
-      absl::StrSplit(patch_contents, absl::ByChar('\n')));
+  std::vector<document_view> lines = patch_contents.str_split(absl::ByChar('\n'));
 
   // Consider an empty patch file valid.
   if (lines.empty()) return absl::OkStatus();
@@ -623,7 +624,7 @@ absl::Status PatchSet::Parse(std::string_view patch_contents) {
     for (auto &iter : file_patch_begins) {
       while (iter != lines_range.begin()) {
         const auto prev = std::prev(iter);
-        const std::string_view &peek(*prev);
+        const document_view &peek(*prev);
         if (LineBelongsToPreviousSection(peek)) break;
         iter = prev;
       }
@@ -636,7 +637,7 @@ absl::Status PatchSet::Parse(std::string_view patch_contents) {
   // Record metadata lines, if there are any.
   for (const auto &line :
        make_range(lines_range.begin(), file_patch_begins.front())) {
-    metadata_.emplace_back(line);
+    metadata_.emplace_back(line.to_string());
   }
 
   // Parse individual file patches.

@@ -6416,7 +6416,7 @@ TEST(VerilogParserTest, InternalStackRealloc) {
 
 // Tests that Tokenize() properly sets the range of the EOF token.
 TEST(VerilogParserTest, TokenizeTerimnatesEOFRange) {
-  constexpr std::string_view kCode[] = {
+  constexpr verible::document_view kCode[] = {
       "",       "\t",       "\n",          "\n\n",
       "module", "module\n", "module foo;", "module foo;\n",
   };

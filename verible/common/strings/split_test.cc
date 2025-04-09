@@ -30,9 +30,9 @@ namespace {
 using ::testing::ElementsAre;
 
 static void AcceptFunctionChar(
-    const std::function<std::string_view(char)> &func) {}
+    const std::function<document_view(char)> &func) {}
 static void AcceptFunctionStringView(
-    const std::function<std::string_view(std::string_view)> &func) {}
+    const std::function<document_view(document_view)> &func) {}
 
 // This tests that StringSpliterator can be passed to a std::function.
 TEST(StringSpliteratorTest, CompileTimeAsFunction) {
@@ -42,7 +42,7 @@ TEST(StringSpliteratorTest, CompileTimeAsFunction) {
 }
 
 TEST(StringSpliteratorTest, EmptyOriginal) {
-  constexpr std::string_view empty;
+  constexpr document_view empty;
   StringSpliterator splitter(empty);
   EXPECT_TRUE(splitter);
   EXPECT_TRUE(BoundsEqual(splitter.Remainder(), empty));
@@ -56,7 +56,7 @@ TEST(StringSpliteratorTest, EmptyOriginal) {
 }
 
 TEST(StringSpliteratorTest, MyGodItsFullOfStars) {
-  constexpr std::string_view stars("***");
+  constexpr document_view stars("***");
   const auto gen = MakeStringSpliterator(stars, '*');  // char delimiter
   EXPECT_TRUE(BoundsEqual(gen(), stars.substr(0, 0)));
   EXPECT_TRUE(BoundsEqual(gen(), stars.substr(1, 0)));
@@ -65,7 +65,7 @@ TEST(StringSpliteratorTest, MyGodItsFullOfStars) {
 }
 
 TEST(StringSpliteratorTest, StringDelimiter) {
-  constexpr std::string_view stars("xxx");
+  constexpr document_view stars("xxx");
   const auto gen = MakeStringSpliterator(stars, "x");  // string delimiter
   EXPECT_TRUE(BoundsEqual(gen(), stars.substr(0, 0)));
   EXPECT_TRUE(BoundsEqual(gen(), stars.substr(1, 0)));
@@ -74,12 +74,12 @@ TEST(StringSpliteratorTest, StringDelimiter) {
 }
 
 TEST(StringSpliteratorTest, StarsAndStripes) {
-  constexpr std::string_view space("==*===*=*====");
+  constexpr document_view space("==*===*=*====");
   StringSpliterator splitter(space);
   EXPECT_TRUE(splitter);
   EXPECT_TRUE(BoundsEqual(splitter.Remainder(), space));
 
-  std::string_view token = splitter('*');
+  document_view token = splitter('*');
   EXPECT_TRUE(splitter);
   EXPECT_TRUE(BoundsEqual(token, space.substr(0, 2)))
       << " got \"" << token << '"';
@@ -105,7 +105,7 @@ TEST(StringSpliteratorTest, StarsAndStripes) {
 }
 
 TEST(StringSpliteratorTest, InSpaceNoOneCanHearYouScream) {
-  constexpr std::string_view space("  *   * *    ");
+  constexpr document_view space("  *   * *    ");
   const auto gen = MakeStringSpliterator(space, '*');  // char delimiter
   // expect to match the spaces between the stars
   EXPECT_TRUE(BoundsEqual(gen(), space.substr(0, 2)));
@@ -115,7 +115,7 @@ TEST(StringSpliteratorTest, InSpaceNoOneCanHearYouScream) {
 }
 
 TEST(StringSpliteratorTest, CommaBabyCommaOverBaby) {
-  constexpr std::string_view csv_row("abcd,,efg,hi");
+  constexpr document_view csv_row("abcd,,efg,hi");
   const auto gen = MakeStringSpliterator(csv_row, ",");  // string delimiter
   // expect to match the spaces between the stars
   EXPECT_TRUE(BoundsEqual(gen(), csv_row.substr(0, 4)));
@@ -128,7 +128,7 @@ using IntPair = std::pair<int, int>;
 
 // For testing purposes, directly compare the substring indices,
 // which is a stronger check than string contents comparison.
-static std::vector<IntPair> SplitLinesToOffsets(std::string_view text) {
+static std::vector<IntPair> SplitLinesToOffsets(document_view text) {
   std::vector<IntPair> offsets;
   for (const auto &line : SplitLines(text)) {
     offsets.push_back(SubstringOffsets(line, text));
@@ -137,46 +137,46 @@ static std::vector<IntPair> SplitLinesToOffsets(std::string_view text) {
 }
 
 TEST(SplitLinesTest, Empty) {
-  constexpr std::string_view text;
+  constexpr document_view text;
   const auto lines = SplitLines(text);
   EXPECT_TRUE(lines.empty());
 }
 
 TEST(SplitLinesTest, OneSpace) {
-  constexpr std::string_view text(" ");
+  constexpr document_view text(" ");
   EXPECT_THAT(SplitLines(text), ElementsAre(" "));
   EXPECT_THAT(SplitLinesToOffsets(text), ElementsAre(IntPair(0, 1)));
 }
 
 TEST(SplitLinesTest, OneBlankLine) {
-  constexpr std::string_view text("\n");
+  constexpr document_view text("\n");
   EXPECT_THAT(SplitLines(text), ElementsAre(""));
   EXPECT_THAT(SplitLinesToOffsets(text), ElementsAre(IntPair(0, 0)));
 }
 
 TEST(SplitLinesTest, BlankLines) {
-  constexpr std::string_view text("\n\n\n");
+  constexpr document_view text("\n\n\n");
   EXPECT_THAT(SplitLines(text), ElementsAre("", "", ""));
   EXPECT_THAT(SplitLinesToOffsets(text),
               ElementsAre(IntPair(0, 0), IntPair(1, 1), IntPair(2, 2)));
 }
 
 TEST(SplitLinesTest, NonBlankLines) {
-  constexpr std::string_view text("a\nbc\ndef\n");
+  constexpr document_view text("a\nbc\ndef\n");
   EXPECT_THAT(SplitLines(text), ElementsAre("a", "bc", "def"));
   EXPECT_THAT(SplitLinesToOffsets(text),
               ElementsAre(IntPair(0, 1), IntPair(2, 4), IntPair(5, 8)));
 }
 
 TEST(SplitLinesTest, NonBlankLinesUnterminated) {
-  constexpr std::string_view text("abc\nde\nf");  // no \n at the end
+  constexpr document_view text("abc\nde\nf");  // no \n at the end
   EXPECT_THAT(SplitLines(text), ElementsAre("abc", "de", "f"));
   EXPECT_THAT(SplitLinesToOffsets(text),
               ElementsAre(IntPair(0, 3), IntPair(4, 6), IntPair(7, 8)));
 }
 
 static std::vector<IntPair> SplitLinesKeepLineTerminatorToOffsets(
-    std::string_view text) {
+    document_view text) {
   std::vector<IntPair> offsets;
   for (const auto &line : SplitLinesKeepLineTerminator(text)) {
     offsets.push_back(SubstringOffsets(line, text));
@@ -185,27 +185,27 @@ static std::vector<IntPair> SplitLinesKeepLineTerminatorToOffsets(
 }
 
 TEST(SplitLinesKeepLineTerminatorTest, Empty) {
-  constexpr std::string_view text;
+  constexpr document_view text;
   const auto lines = SplitLinesKeepLineTerminator(text);
   EXPECT_TRUE(lines.empty());
 }
 
 TEST(SplitLinesKeepLineTerminatorTest, OneSpace) {
-  constexpr std::string_view text(" ");
+  constexpr document_view text(" ");
   EXPECT_THAT(SplitLinesKeepLineTerminator(text), ElementsAre(" "));
   EXPECT_THAT(SplitLinesKeepLineTerminatorToOffsets(text),
               ElementsAre(IntPair(0, 1)));
 }
 
 TEST(SplitLinesKeepLineTerminatorTest, OneBlankLine) {
-  constexpr std::string_view text("\n");
+  constexpr document_view text("\n");
   EXPECT_THAT(SplitLinesKeepLineTerminator(text), ElementsAre("\n"));
   EXPECT_THAT(SplitLinesKeepLineTerminatorToOffsets(text),
               ElementsAre(IntPair(0, 1)));
 }
 
 TEST(SplitLinesKeepLineTerminatorTest, BlankLines) {
-  constexpr std::string_view text("\n\n\n");
+  constexpr document_view text("\n\n\n");
   EXPECT_THAT(SplitLinesKeepLineTerminator(text),
               ElementsAre("\n", "\n", "\n"));
   EXPECT_THAT(SplitLinesKeepLineTerminatorToOffsets(text),
@@ -213,7 +213,7 @@ TEST(SplitLinesKeepLineTerminatorTest, BlankLines) {
 }
 
 TEST(SplitLinesKeepLineTerminatorTest, NonBlankLines) {
-  constexpr std::string_view text("a\nbc\ndef\n");
+  constexpr document_view text("a\nbc\ndef\n");
   EXPECT_THAT(SplitLinesKeepLineTerminator(text),
               ElementsAre("a\n", "bc\n", "def\n"));
   EXPECT_THAT(SplitLinesKeepLineTerminatorToOffsets(text),
@@ -221,7 +221,7 @@ TEST(SplitLinesKeepLineTerminatorTest, NonBlankLines) {
 }
 
 TEST(SplitLinesKeepLineTerminatorTest, NonBlankLinesUnterminated) {
-  constexpr std::string_view text("abc\nde\nf");  // no \n at the end
+  constexpr document_view text("abc\nde\nf");  // no \n at the end
   EXPECT_THAT(SplitLinesKeepLineTerminator(text),
               ElementsAre("abc\n", "de\n", "f"));
   EXPECT_THAT(SplitLinesKeepLineTerminatorToOffsets(text),

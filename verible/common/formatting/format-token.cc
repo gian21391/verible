@@ -148,12 +148,12 @@ static std::string_view OriginalLeadingSpacesRange(
     std::string_view::const_iterator end) {
   if (begin == string_view_null_iterator()) {
     VLOG(4) << "no original space range";
-    return make_string_view_range(end, end);  // empty range
+    return make_document_view_range(end, end);  // empty range
   }
   // The original spacing points into the original string buffer, and may span
   // multiple whitespace tokens.
   VLOG(4) << "non-null original space range";
-  return make_string_view_range(begin, end);
+  return make_document_view_range(begin, end);
 }
 
 std::string_view FormattedToken::OriginalLeadingSpaces() const {

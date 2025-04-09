@@ -24,6 +24,7 @@
 #include "verible/verilog/analysis/descriptions.h"
 #include "verible/verilog/analysis/lint-rule-registry.h"
 #include "verible/verilog/parser/verilog-token-enum.h"
+#include "verible/common/strings/document-view.h"
 
 namespace verilog {
 namespace analysis {

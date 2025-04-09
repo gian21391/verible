@@ -62,7 +62,7 @@ void FilterTokenStreamViewInPlace(const TokenFilterPredicate &keep,
 // Returns iterator range of TokenSequence iterators that span the given file
 // offsets. The second iterator points 1-past-the-end of the range.
 TokenViewRange TokenViewRangeSpanningOffsets(const TokenStreamView &view,
-                                             std::string_view range);
+                                             document_view range);
 
 }  // namespace verible
 

@@ -18,19 +18,21 @@
 #include <string_view>
 #include <utility>
 
+#include "verible/common/strings/document-view.h"
+
 namespace verible {
 
 // Construct a string_view from two end-points.
 // string_view lacks the two-iterator constructor that (iterator) ranges and
 // containers do.
 // Note, this can go with c++20 built-in string_view constructor.
-std::string_view make_string_view_range(std::string_view::const_iterator begin,
-                                        std::string_view::const_iterator end);
+document_view make_document_view_range(document_view::const_iterator begin,
+                                       document_view::const_iterator end);
 
 // Returns [x,y] where superstring.substr(x, y-x) == substring.
 // Precondition: substring must be a sub-range of superstring.
-std::pair<int, int> SubstringOffsets(std::string_view substring,
-                                     std::string_view superstring);
+std::pair<int, int> SubstringOffsets(document_view substring,
+                                     document_view superstring);
 
 }  // namespace verible
 

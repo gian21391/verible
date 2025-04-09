@@ -46,7 +46,7 @@ struct SyntaxTreeSearchTestCase : public SynthesizedLexerTestData {
   // TODO(b/141875806): Take a symbol translator function to produce a
   // human-readable, language-specific enum name.
   bool ExactMatchFindings(const std::vector<TreeSearchMatch> &actual_findings,
-                          std::string_view base,
+                          document_view base,
                           std::ostream *diffstream) const;
 };
 

@@ -18,6 +18,7 @@
 #include <string_view>
 #include <utility>
 
+#include "verible/common/strings/document-view.h"
 #include "verible/common/strings/range.h"
 #include "verible/common/util/interval-map.h"
 #include "verible/common/util/interval-set.h"
@@ -26,9 +27,9 @@
 namespace verible {
 
 namespace internal {
-inline std::pair<std::string_view::const_iterator,
-                 std::string_view::const_iterator>
-string_view_to_pair(std::string_view sv) {
+inline std::pair<document_view::const_iterator,
+                 document_view::const_iterator>
+string_view_to_pair(document_view sv) {
   return std::make_pair(sv.begin(), sv.end());
 }
 }  // namespace internal
@@ -40,7 +41,7 @@ string_view_to_pair(std::string_view sv) {
 // any of the referenced memory -- the user is responsible for maintaining
 // proper string lifetime, owning strings must outlive these objects.
 class StringViewSuperRangeMap {
-  using impl_type = DisjointIntervalSet<std::string_view::const_iterator>;
+  using impl_type = DisjointIntervalSet<document_view::const_iterator>;
 
  public:
   // This iterator dereferences to a std::pair of
@@ -61,7 +62,7 @@ class StringViewSuperRangeMap {
 
   // Given a substring, return an iterator pointing to the superstring that
   // fully contains the substring, if it exists, else return end().
-  const_iterator find(std::string_view substring) const {
+  const_iterator find(document_view substring) const {
     return string_map_.find({substring.begin(), substring.end()});
   }
 
@@ -70,17 +71,17 @@ class StringViewSuperRangeMap {
 
   // Similar to find(), but asserts that a superstring range is found,
   // and converts the result directly to a string_view.
-  std::string_view must_find(std::string_view substring) const {
+  document_view must_find(document_view substring) const {
     const auto found(find(substring));
     CHECK(found != string_map_.end());
-    return make_string_view_range(found->first, found->second);  // superstring
+    return make_document_view_range(found->first, found->second);  // superstring
   }
 
   // Insert a superstring (range) that does not overlap with any previously
   // inserted string range.  This is suitable for string ranges that correspond
   // to allocated memory, because allocators only return non-overlapping memory
   // blocks.
-  const_iterator must_emplace(std::string_view superstring) {
+  const_iterator must_emplace(document_view superstring) {
     return string_map_.must_emplace(superstring.begin(), superstring.end());
   }
 
@@ -105,9 +106,9 @@ class StringViewSuperRangeMap {
 // always return the same range for the same object.  One way to ensure this is
 // to make the underlying storage a 'const std::string'.
 //
-template <class T, std::string_view RangeOf(const T &)>
+template <class T, document_view RangeOf(const T &)>
 class StringMemoryMap {
-  using key_type = std::string_view::const_iterator;
+  using key_type = document_view::const_iterator;
   using map_type = DisjointIntervalMap<key_type, T>;
 
  public:
@@ -123,7 +124,7 @@ class StringMemoryMap {
   // Returns reference to the object in the set that owns the memory range of
   // string 's', or else nullptr if 's' does not fall entirely within one of the
   // intervals in the map.
-  const T *find(std::string_view sv) const {
+  const T *find(document_view sv) const {
     const auto iter = memory_map_.find(internal::string_view_to_pair(sv));
     if (iter == memory_map_.end()) return nullptr;
     return &iter->second;
@@ -132,7 +133,7 @@ class StringMemoryMap {
   // Move-inserts an element into the set, keyed on the memory range owned
   // by the object.
   iterator insert(T &&t) {
-    const std::string_view key = RangeOf(t);
+    const document_view key = RangeOf(t);
     return memory_map_.must_emplace(internal::string_view_to_pair(key),
                                     std::move(t));
   }

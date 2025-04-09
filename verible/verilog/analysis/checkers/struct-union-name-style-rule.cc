@@ -81,7 +81,7 @@ void StructUnionNameStyleRule::HandleSymbol(const verible::Symbol &symbol,
     const auto *identifier_leaf = GetIdentifierFromTypeDeclaration(symbol);
     const auto name = ABSL_DIE_IF_NULL(identifier_leaf)->get().text();
 
-    if (!absl::EndsWith(name, "_t")) {
+    if (!name.ends_with("_t")) {
       violations_.insert(
           LintViolation(*identifier_leaf,
                         absl::StrCat(msg, " have to end with _t"), context));
@@ -93,7 +93,7 @@ void StructUnionNameStyleRule::HandleSymbol(const verible::Symbol &symbol,
       return;
     }
 
-    for (const auto &ns : absl::StrSplit(name, '_')) {
+    for (const auto &ns : absl::StrSplit(name.to_string_view(), '_')) {
       if (std::all_of(ns.begin(), ns.end(), [](char c) {
             return absl::ascii_islower(c) || absl::ascii_isdigit(c);
           })) {

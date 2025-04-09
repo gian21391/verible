@@ -140,7 +140,7 @@ struct SynthesizedLexerTestData : public TokenInfoTestData {
   // A single expected_text can span multiple tokens, when we're only checking
   // string contents, and not checking *how* this excerpt is tokenized.
   template <class Lexer>
-  void DontCareMultiTokens(Lexer *lexer, std::string_view expected_text) const {
+  void DontCareMultiTokens(Lexer *lexer, document_view expected_text) const {
     // Consume tokens and compare string fragments against the
     // expected_text until the text is fully matched.
     while (!expected_text.empty()) {

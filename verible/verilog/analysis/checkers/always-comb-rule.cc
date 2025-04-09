@@ -109,7 +109,7 @@ void AlwaysCombRule::HandleSymbol(const verible::Symbol &symbol,
 
   // always_str will cover the 'always @(*)' (or similar), which we'll
   // substitute for plain 'always_comb'
-  std::string_view always_str =
+  verible::document_view always_str =
       verible::StringSpanOfSymbol(*always_leaf, *event_ctrl);
 
   std::vector<AutoFix> autofixes{

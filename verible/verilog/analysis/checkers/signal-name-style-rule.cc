@@ -96,7 +96,7 @@ void SignalNameStyleRule::HandleSymbol(const verible::Symbol &symbol,
   verible::matcher::BoundSymbolManager manager;
   if (PortMatcher().Matches(symbol, &manager)) {
     const auto *identifier_leaf = GetIdentifierFromPortDeclaration(symbol);
-    const auto name = ABSL_DIE_IF_NULL(identifier_leaf)->get().text();
+    const auto name = ABSL_DIE_IF_NULL(identifier_leaf)->get().text().to_string_view();
     if (!RE2::FullMatch(name, *style_regex_)) {
       violations_.insert(LintViolation(identifier_leaf->get(),
                                        CreateViolationMessage(), context));
@@ -104,7 +104,7 @@ void SignalNameStyleRule::HandleSymbol(const verible::Symbol &symbol,
   } else if (NetMatcher().Matches(symbol, &manager)) {
     const auto identifier_leaves = GetIdentifiersFromNetDeclaration(symbol);
     for (const auto *leaf : identifier_leaves) {
-      const auto name = leaf->text();
+      const auto name = leaf->text().to_string_view();
       if (!RE2::FullMatch(name, *style_regex_)) {
         violations_.insert(
             LintViolation(*leaf, CreateViolationMessage(), context));
@@ -113,7 +113,7 @@ void SignalNameStyleRule::HandleSymbol(const verible::Symbol &symbol,
   } else if (DataMatcher().Matches(symbol, &manager)) {
     const auto identifier_leaves = GetIdentifiersFromDataDeclaration(symbol);
     for (const auto *leaf : identifier_leaves) {
-      const auto name = leaf->text();
+      const auto name = leaf->text().to_string_view();
       if (!RE2::FullMatch(name, *style_regex_)) {
         violations_.insert(
             LintViolation(*leaf, CreateViolationMessage(), context));

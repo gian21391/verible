@@ -30,7 +30,7 @@ class LineLintRule : public LintRule {
   ~LineLintRule() override = default;  // not yet final
 
   // Scans a single line during analysis.
-  virtual void HandleLine(std::string_view line) = 0;
+  virtual void HandleLine(document_view line) = 0;
 
   // Analyze the final state of the rule, after the last line has been read.
   virtual void Finalize() {}

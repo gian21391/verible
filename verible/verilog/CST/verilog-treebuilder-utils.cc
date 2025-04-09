@@ -29,24 +29,24 @@ namespace verilog {
 using verible::down_cast;
 
 // Set of utility functions for embedded a statement into a certain context.
-std::string EmbedInClass(std::string_view text) {
+std::string EmbedInClass(verible::document_view text) {
   return absl::StrCat("class test_class;\n", text, "\nendclass\n");
 }
 
-std::string EmbedInModule(std::string_view text) {
+std::string EmbedInModule(verible::document_view text) {
   return absl::StrCat("module test_module;\n", text, "\nendmodule\n");
 }
 
-std::string EmbedInFunction(std::string_view text) {
+std::string EmbedInFunction(verible::document_view text) {
   return absl::StrCat("function integer test_function;\n", text,
                       "\nendfunction\n");
 }
 
-std::string EmbedInClassMethod(std::string_view text) {
+std::string EmbedInClassMethod(verible::document_view text) {
   return EmbedInClass(EmbedInFunction(text));
 }
 
-void ExpectString(const verible::SymbolPtr &symbol, std::string_view expected) {
+void ExpectString(const verible::SymbolPtr &symbol, verible::document_view expected) {
   const auto *leaf = down_cast<const verible::SyntaxTreeLeaf *>(symbol.get());
   CHECK(leaf != nullptr) << "expected: " << expected;
   CHECK_EQ(leaf->get().text(), expected);

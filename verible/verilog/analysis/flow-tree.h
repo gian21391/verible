@@ -147,7 +147,7 @@ class FlowTree {
 
   // Mapping each conditional macro to an integer ID,
   // to use it later as a bit offset.
-  std::map<std::string_view, int> conditional_macro_id_;
+  std::map<verible::document_view, int> conditional_macro_id_;
 
   // A vector containing all the macros used placed by their given ID.
   std::vector<TokenSequenceConstIterator> conditional_macros_;

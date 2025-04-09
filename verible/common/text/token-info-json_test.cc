@@ -26,7 +26,7 @@ namespace verible {
 namespace {
 
 TEST(TokenInfoToJsonTest, ToJsonEOF) {
-  constexpr std::string_view base;  // empty
+  constexpr document_view base;  // empty
   const TokenInfo::Context context(base);
   const TokenInfo token_info(TK_EOF, base);
 
@@ -45,7 +45,7 @@ TEST(TokenInfoToJsonTest, ToJsonEOF) {
 }
 
 TEST(TokenInfoToJsonTest, ToJsonWithBase) {
-  constexpr std::string_view base("basement cat");
+  constexpr document_view base("basement cat");
   const TokenInfo::Context context(base);
   const TokenInfo token_info(7, base.substr(9, 3));
 
@@ -64,7 +64,7 @@ TEST(TokenInfoToJsonTest, ToJsonWithBase) {
 }
 
 TEST(TokenInfoToJsonTest, ToJsonWithTokenEnumTranslator) {
-  constexpr std::string_view text("string of length 19");
+  constexpr document_view text("string of length 19");
   const TokenInfo token_info(143, text);
 
   const verible::TokenInfo::Context context(

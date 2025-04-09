@@ -68,7 +68,7 @@ const LintRuleDescriptor &ModuleFilenameRule::GetDescriptor() {
   return d;
 }
 
-static bool ModuleNameMatches(const verible::Symbol &s, std::string_view name) {
+static bool ModuleNameMatches(const verible::Symbol &s, verible::document_view name) {
   const auto *module_leaf = GetModuleName(s);
   return module_leaf && module_leaf->get().text() == name;
 }

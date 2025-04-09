@@ -15,8 +15,6 @@
 #ifndef VERIBLE_COMMON_TEXT_TOKEN_INFO_H_
 #define VERIBLE_COMMON_TEXT_TOKEN_INFO_H_
 
-#include <verible/common/strings/document-view.h>
-
 #include <algorithm>  // for std::distance, std::copy
 #include <cstddef>
 #include <functional>  // for std::function
@@ -29,6 +27,7 @@
 
 #include "verible/common/text/constants.h"
 #include "verible/common/util/iterator-range.h"
+#include <verible/common/strings/document-view.h>
 
 namespace verible {
 
@@ -97,7 +96,7 @@ class TokenInfo {
   // a series of abutting substring ranges.  Useful for lexer operation.
   void AdvanceText(int token_length) {
     // The end of the previous token is the beginning of the next.
-    text_ = document_view(text_.data() + text_.length(), token_length);
+    text_ = document_view(text_.data() + text_.length(), token_length, text_);
   }
 
   // Writes a human-readable string representation of the token.
@@ -125,8 +124,8 @@ class TokenInfo {
   // same length as the current string_view.
   // string_view::iterator happens to be const char*, but don't rely on that
   // fact as it can be implementation-dependent.
-  void RebaseDocumentView(document_view::const_iterator new_text) {
-    RebaseDocumentView(document_view(&*new_text, text_.length()));
+  void RebaseDocumentView(document_view::const_iterator new_text, document_view new_base) {
+    RebaseDocumentView(document_view(&*new_text, text_.length(), new_base));
   }
 
   // Joins the text from a sequence of (text-disjoint) tokens, and also

@@ -25,9 +25,9 @@ namespace verible {
 namespace {
 
 struct TruncateTestCase {
-  std::string_view input;
+  document_view input;
   int max_chars;
-  std::string_view expected;
+  document_view expected;
 };
 
 TEST(AutoTruncateTest, Various) {

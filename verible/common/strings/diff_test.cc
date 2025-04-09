@@ -56,9 +56,9 @@ using diff::Operation;
 using ::testing::ElementsAreArray;
 
 struct DiffTestCase {
-  std::string_view before;
-  std::string_view after;
-  std::string_view expected;
+  document_view before;
+  document_view after;
+  document_view expected;
 };
 
 TEST(LineDiffsTest, Various) {
@@ -512,12 +512,12 @@ TEST(DiffEditsToPatchHunksTest, Various) {
 }
 
 struct LineDiffsToUnifiedDiffTestCase {
-  std::string_view before_text;
-  std::string_view after_text;
+  document_view before_text;
+  document_view after_text;
   std::string_view file_a;
   std::string_view file_b;
   int common_context;
-  std::string_view expected_diff_text;
+  document_view expected_diff_text;
 };
 
 TEST(LineDiffsToUnifiedDiffTest, Various) {

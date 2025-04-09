@@ -29,6 +29,7 @@
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_replace.h"
 #include "verible/common/strings/line-column-map.h"
+#include "verible/common/strings/document-view.h"
 #include "verible/common/text/concrete-syntax-leaf.h"
 #include "verible/common/text/symbol.h"
 #include "verible/common/text/syntax-tree-context.h"
@@ -39,21 +40,21 @@
 
 namespace verible {
 
-std::string AutoFix::Apply(std::string_view base) const {
+std::string AutoFix::Apply(document_view base) const {
   std::string result;
   auto prev_start = base.cbegin();
   for (const auto &edit : edits_) {
     CHECK(base.cbegin() <= edit.fragment.cbegin());
     CHECK(base.cend() >= edit.fragment.cend());
 
-    const std::string_view text_before(
-        &*prev_start, std::distance(prev_start, edit.fragment.cbegin()));
+    const document_view text_before(
+        &*prev_start, std::distance(prev_start, edit.fragment.cbegin()), base);
     absl::StrAppend(&result, text_before, edit.replacement);
 
     prev_start = edit.fragment.cend();
   }
-  const std::string_view text_after(&*prev_start,
-                                    std::distance(prev_start, base.cend()));
+  const document_view text_after(&*prev_start,
+                                    std::distance(prev_start, base.cend()), base);
   return absl::StrCat(result, text_after);
 }
 
@@ -90,7 +91,7 @@ LintViolation::LintViolation(const Symbol &root, std::string_view reason,
 
 void LintStatusFormatter::FormatLintRuleStatus(std::ostream *stream,
                                                const LintRuleStatus &status,
-                                               std::string_view base,
+                                               document_view base,
                                                std::string_view path) const {
   for (const auto &violation : status.violations) {
     FormatViolation(stream, violation, base, path, status.url,
@@ -101,7 +102,7 @@ void LintStatusFormatter::FormatLintRuleStatus(std::ostream *stream,
 
 std::string LintStatusFormatter::FormatWithRelatedTokens(
     const std::vector<verible::TokenInfo> &tokens, std::string_view message,
-    std::string_view path, std::string_view base) const {
+    std::string_view path, document_view base) const {
   if (tokens.empty()) {
     return std::string(message);
   }
@@ -130,8 +131,8 @@ std::string LintStatusFormatter::FormatWithRelatedTokens(
 
 void LintStatusFormatter::FormatLintRuleStatuses(
     std::ostream *stream, const std::vector<LintRuleStatus> &statuses,
-    std::string_view base, std::string_view path,
-    const std::vector<std::string_view> &lines) const {
+    document_view base, std::string_view path,
+    const std::vector<document_view> &lines) const {
   std::set<LintViolationWithStatus> violations;
 
   // TODO(fangism): rewrite as a linear time merge of pre-ordered sub-sequences
@@ -161,7 +162,7 @@ void LintStatusFormatter::FormatLintRuleStatuses(
 // Path is file path of original file and url is a link to violated rule
 void LintStatusFormatter::FormatViolation(std::ostream *stream,
                                           const LintViolation &violation,
-                                          std::string_view base,
+                                          document_view base,
                                           std::string_view path,
                                           std::string_view url,
                                           std::string_view rule_name) const {
@@ -180,7 +181,7 @@ void LintStatusFormatter::FormatViolation(std::ostream *stream,
 // Formats and outputs violation to a file stream in a syntax accepted by
 // --waiver_files flag. Path is file path of original file
 void LintStatusFormatter::FormatViolationWaiver(
-    std::ostream *stream, const LintViolation &violation, std::string_view base,
+    std::ostream *stream, const LintViolation &violation, document_view base,
     std::string_view path, std::string_view rule_name) const {
   const verible::LineColumnRange range{
       line_column_map_.GetLineColAtOffset(base, violation.token.left(base)),

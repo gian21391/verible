@@ -69,10 +69,10 @@ void ParameterTypeNameStyleRule::HandleSymbol(
     if (!IsParamTypeDeclaration(symbol)) return;
 
     param_name_token = GetSymbolIdentifierFromParamDeclaration(symbol);
-    const auto param_name = param_name_token->text();
+    const verible::document_view param_name = param_name_token->text();
 
     if (!verible::IsLowerSnakeCaseWithDigits(param_name) ||
-        !absl::EndsWith(param_name, "_t")) {
+        !param_name.ends_with("_t")) {
       violations_.insert(LintViolation(*param_name_token, kMessage, context));
     }
   }

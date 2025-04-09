@@ -84,7 +84,7 @@ class VerilogLinter {
 
   // Reports lint findings.
   std::vector<verible::LintRuleStatus> ReportStatus(
-      const verible::LineColumnMap &, std::string_view text_base);
+      const verible::LineColumnMap &, verible::document_view text_base);
 
  private:
   // Line based linter.

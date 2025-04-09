@@ -21,6 +21,7 @@ target_link_libraries(verible-verilog-syntax PRIVATE
         verible::verilog::parser::verilog-token-classifications
         verible::verilog::parser::verilog-token-enum
         absl::base
+        absl::die_if_null
         nlohmann_json::nlohmann_json
 )
 target_include_directories(verible-verilog-syntax PRIVATE ${CMAKE_SOURCE_DIR})

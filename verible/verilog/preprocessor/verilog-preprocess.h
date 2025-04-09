@@ -69,7 +69,7 @@ struct VerilogPreprocessError {
 // Information that results from preprocessing.
 struct VerilogPreprocessData {
   using MacroDefinition = verible::MacroDefinition;
-  using MacroDefinitionRegistry = std::map<std::string_view, MacroDefinition>;
+  using MacroDefinitionRegistry = std::map<verible::document_view, MacroDefinition>;
   using TokenSequence = std::vector<verible::TokenInfo>;
 
   // Resulting token stream after preprocessing
@@ -98,7 +98,7 @@ class VerilogPreprocess {
 
  public:
   using FileOpener =
-      std::function<absl::StatusOr<std::string_view>(std::string_view)>;
+      std::function<absl::StatusOr<verible::document_view>(std::string_view)>;
   struct Config {
     // Filter out non-matching `ifdef and `ifndef branches depending on
     // which defines are set.
@@ -179,7 +179,7 @@ class VerilogPreprocess {
       TokenStreamView::const_iterator *, MacroParameterInfo *);
 
   void RegisterMacroDefinition(const MacroDefinition &);
-  absl::Status ExpandText(const std::string_view &);
+  absl::Status ExpandText(const verible::document_view &);
   absl::Status ExpandMacro(const verible::MacroCall &,
                            const verible::MacroDefinition *);
   absl::Status HandleInclude(TokenStreamView::const_iterator,

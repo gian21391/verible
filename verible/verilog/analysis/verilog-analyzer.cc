@@ -68,15 +68,15 @@ absl::Status VerilogAnalyzer::Tokenize() {
   return lex_status_;
 }
 
-std::string_view VerilogAnalyzer::ScanParsingModeDirective(
+verible::document_view VerilogAnalyzer::ScanParsingModeDirective(
     const TokenSequence &raw_tokens) {
   for (const auto &token : raw_tokens) {
     const auto vtoken_enum = verilog_tokentype(token.token_enum());
     if (IsComment(vtoken_enum)) {
-      const std::string_view comment_text =
+      const verible::document_view comment_text =
           verible::StripCommentAndSpacePadding(token.text());
-      const std::vector<std::string_view> comment_tokens =
-          absl::StrSplit(comment_text, ' ', absl::SkipEmpty());
+      const std::vector<verible::document_view> comment_tokens =
+          comment_text.str_split(' ', absl::SkipEmpty());
       if (comment_tokens.size() >= 2 &&
           comment_tokens[0] == kParseDirectiveName) {
         // First directive wins.
@@ -94,7 +94,7 @@ std::string_view VerilogAnalyzer::ScanParsingModeDirective(
 
 // Return a secondary parsing mode to attempt, depending on the token type of
 // the first rejected token from parsing as top-level.
-static std::string_view FailingTokenKeywordToParsingMode(
+static verible::document_view FailingTokenKeywordToParsingMode(
     verilog_tokentype token_type) {
   switch (token_type) {
     // For starting keywords that uniquely identify a parsing context,
@@ -138,18 +138,18 @@ std::unique_ptr<VerilogAnalyzer> VerilogAnalyzer::AnalyzeAutomaticMode(
   auto analyzer =
       std::make_unique<VerilogAnalyzer>(text, name, preprocess_config);
   if (analyzer == nullptr) return analyzer;
-  const std::string_view text_base = analyzer->Data().Contents();
+  const verible::document_view text_base = analyzer->Data().Contents();
   // If there is any lexical error, stop right away.
   const auto lex_status = analyzer->Tokenize();
   if (!lex_status.ok()) return analyzer;
-  const std::string_view parse_mode =
+  const verible::document_view parse_mode =
       ScanParsingModeDirective(analyzer->Data().TokenStream());
   if (!parse_mode.empty()) {
     // Invoke alternate parser, and use its results.
     // Slightly inefficient to lex text all over again, but this is
     // acceptable for an exceptional code path (also see: #1519)
     VLOG(1) << "Analyzing using parse mode directive: " << parse_mode;
-    auto mode_analyzer = AnalyzeVerilogWithMode(text->AsStringView(), name,
+    auto mode_analyzer = AnalyzeVerilogWithMode(text->AsDocumentView(), name,
                                                 parse_mode, preprocess_config);
     if (mode_analyzer != nullptr) return mode_analyzer;
     // Silently ignore any unknown parsing modes.
@@ -166,14 +166,14 @@ std::unique_ptr<VerilogAnalyzer> VerilogAnalyzer::AnalyzeAutomaticMode(
     const auto &rejected_tokens = analyzer->GetRejectedTokens();
     if (!rejected_tokens.empty()) {
       const auto &first_reject = rejected_tokens.front();
-      const std::string_view retry_parse_mode =
+      const verible::document_view retry_parse_mode =
           FailingTokenKeywordToParsingMode(
               verilog_tokentype(first_reject.token_info.token_enum()));
       VLOG(1) << "Retrying parsing in mode: \"" << retry_parse_mode << "\".";
       if (!retry_parse_mode.empty()) {
         auto retry_analyzer = AnalyzeVerilogWithMode(
-            text->AsStringView(), name, retry_parse_mode, preprocess_config);
-        const std::string_view retry_text_base =
+            text->AsDocumentView(), name, retry_parse_mode, preprocess_config);
+        const verible::document_view retry_text_base =
             retry_analyzer->Data().Contents();
         VLOG(1) << "Retrying to parse:\n" << retry_text_base;
         if (retry_analyzer->ParseStatus().ok()) {
@@ -207,14 +207,14 @@ std::unique_ptr<VerilogAnalyzer> VerilogAnalyzer::AnalyzeAutomaticMode(
 }
 
 std::unique_ptr<VerilogAnalyzer> VerilogAnalyzer::AnalyzeAutomaticMode(
-    std::string_view text, std::string_view name,
+    verible::document_view text, std::string_view name,
     const VerilogPreprocess::Config &preprocess_config) {
   return AnalyzeAutomaticMode(std::make_shared<verible::StringMemBlock>(text),
                               name, preprocess_config);
 }
 
 std::unique_ptr<VerilogAnalyzer>
-VerilogAnalyzer::AnalyzeAutomaticPreprocessFallback(std::string_view text,
+VerilogAnalyzer::AnalyzeAutomaticPreprocessFallback(verible::document_view text,
                                                     std::string_view name) {
   std::unique_ptr<verilog::VerilogAnalyzer> parser;
   for (bool preprocess_expand_macros : {false, true}) {
@@ -317,7 +317,7 @@ using verible::TokenInfo;
 // Helper class to replace macro call argument nodes with expression trees.
 class MacroCallArgExpander : public MutableTreeVisitorRecursive {
  public:
-  MacroCallArgExpander(std::string_view outer_filename, std::string_view text,
+  MacroCallArgExpander(std::string_view outer_filename, verible::document_view text,
                        const VerilogPreprocess::Config &pre_config)
       : outer_filename_(outer_filename),
         full_text_(text),
@@ -400,7 +400,7 @@ class MacroCallArgExpander : public MutableTreeVisitorRecursive {
   const std::string_view outer_filename_;
 
   // Full text from which tokens were lexed, for calculating byte offsets.
-  const std::string_view full_text_;
+  const verible::document_view full_text_;
   const VerilogPreprocess::Config &preprocess_config_;
 };
 

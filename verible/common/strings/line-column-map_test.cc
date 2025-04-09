@@ -125,7 +125,7 @@ TEST(LineColumnMapTest, Offsets) {
 TEST(LineColumnMapTest, OffsetsFromLines) {
   for (const auto &test_case : map_test_data) {
     const LineColumnMap line_map(test_case.text);
-    std::vector<std::string_view> lines = absl::StrSplit(test_case.text, '\n');
+    std::vector<document_view> lines = document_view(test_case.text).str_split('\n');
     const LineColumnMap alt_line_map(lines);
     EXPECT_EQ(line_map.GetBeginningOfLineOffsets(),
               alt_line_map.GetBeginningOfLineOffsets())
@@ -134,13 +134,13 @@ TEST(LineColumnMapTest, OffsetsFromLines) {
 }
 
 TEST(LineColumnMapTest, EndOffsetNoLines) {
-  const std::vector<std::string_view> lines;
+  const std::vector<document_view> lines;
   const LineColumnMap map(lines);
   EXPECT_EQ(map.LastLineOffset(), 0);
 }
 
 struct EndOffsetTestCase {
-  std::string_view text;
+  document_view text;
   int expected_offset;
 };
 

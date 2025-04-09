@@ -65,7 +65,7 @@ class VerilogSourceFile {
   virtual absl::Status Open();
 
   // After successful Open(), the content is filled; empty otherwise.
-  virtual std::string_view GetContent() const;
+  virtual verible::document_view GetContent() const;
 
   // Attempts to lex and parse the file.
   // Will Open() if the file is not already opened.
@@ -184,7 +184,7 @@ class InMemoryVerilogSourceFile final : public VerilogSourceFile {
 
   // Legacy
   InMemoryVerilogSourceFile(std::string_view filename,
-                            std::string_view contents,
+                            verible::document_view contents,
                             std::string_view corpus = "")
       : InMemoryVerilogSourceFile(
             filename, std::make_shared<verible::StringMemBlock>(contents),
@@ -225,7 +225,7 @@ class ParsedVerilogSourceFile final : public VerilogSourceFile {
   }
 
   // Return string-view content range of text structure.
-  std::string_view GetContent() const final {
+  verible::document_view GetContent() const final {
     return not_owned_analyzer_->Data().Contents();
   }
 
@@ -290,12 +290,12 @@ class VerilogProject {
   // Opens a file that was `included.
   // If the file was previously opened, that data is returned.
   absl::StatusOr<VerilogSourceFile *> OpenIncludedFile(
-      std::string_view referenced_filename);
+      verible::document_view referenced_filename);
 
   // Adds an already opened file by directly passing its content.
   // This is needed in external kythe backends.
   void AddVirtualFile(std::string_view resolved_filename,
-                      std::string_view content);
+                      verible::document_view content);
 
   // Returns a previously referenced file, or else nullptr.
   VerilogSourceFile *LookupRegisteredFile(
@@ -316,7 +316,7 @@ class VerilogProject {
   // Find the source file that a particular string_view came from.
   // Returns nullptr if lookup failed for any reason.
   const VerilogSourceFile *LookupFileOrigin(
-      std::string_view content_substring) const;
+      verible::document_view content_substring) const;
 
   // Returns relative path to the VerilogProject
   std::string GetRelativePathToSource(std::string_view absolute_filepath);
@@ -389,7 +389,7 @@ class VerilogProject {
 
     // Given a memory subrange of any of the indexed files, return the
     // corresponding file or nullptr if none of the files contains that range.
-    const VerilogSourceFile *Lookup(std::string_view content_substring) const;
+    const VerilogSourceFile *Lookup(verible::document_view content_substring) const;
 
    private:
     // Maps any string_view (substring) to its full source file text
@@ -399,7 +399,7 @@ class VerilogProject {
     // Maps start of text buffer to its corresponding analyzer object.
     // key: the starting address of a string buffer belonging to an opened file.
     //   This can come from the .begin() of any entry in string_view_map_.
-    std::map<std::string_view::const_iterator, const VerilogSourceFile *>
+    std::map<verible::document_view::const_iterator, const VerilogSourceFile *>
         buffer_to_analyzer_map_;
   };
 

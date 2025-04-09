@@ -201,7 +201,7 @@ TEST_F(LastSemicolonStateMachineTest, LifeCycleOneSemicolon) {
 
   // Purely synthesized token sequence for testing:
   // Only enums matter, not text.
-  constexpr std::string_view text("don't care");
+  constexpr verible::document_view text("don't care");
   TokenInfo tokens[] = {
       TokenInfo(TK_module, text),
       TokenInfo(SymbolIdentifier, text),
@@ -254,7 +254,7 @@ TEST_F(LastSemicolonStateMachineTest, LifeCycleFinalSemicolon) {
 
   // Purely synthesized token sequence for testing:
   // Only enums matter, not text.
-  constexpr std::string_view text("don't care");
+  constexpr verible::document_view text("don't care");
   TokenInfo tokens[] = {
       TokenInfo(TK_module, text),
       TokenInfo(SymbolIdentifier, text),

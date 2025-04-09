@@ -66,7 +66,7 @@ bool ConstantIntegerValue(const verible::Symbol &expr, int *value) {
   const auto &term = down_cast<const SyntaxTreeLeaf &>(*child);
   // Don't even need to check the leaf token's enumeration type.
   auto text = term.get().text();
-  return absl::SimpleAtoi(text, value);
+  return absl::SimpleAtoi(text.to_string_view(), value);
 }
 
 const verible::Symbol *UnwrapExpression(const verible::Symbol &expr) {

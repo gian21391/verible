@@ -113,7 +113,7 @@ void ParameterNameStyleRule::HandleSymbol(const verible::Symbol &symbol,
     auto identifiers = GetAllParameterNameTokens(symbol);
 
     for (const auto *id : identifiers) {
-      const auto name = id->text();
+      const auto name = id->text().to_string_view();
       switch (param_decl_token) {
         case TK_localparam:
           if (!RE2::FullMatch(name, *localparam_style_regex_)) {

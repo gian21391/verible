@@ -136,7 +136,7 @@ static std::unique_ptr<VerilogAnalyzer> ParseWithLanguageMode(
       return analyzer;
     }
     case LanguageMode::kVerilogLibraryMap:
-      return verilog::AnalyzeVerilogLibraryMap(content->AsStringView(),
+      return verilog::AnalyzeVerilogLibraryMap(content->AsDocumentView(),
                                                filename, preprocess_config);
   }
   return nullptr;
@@ -163,7 +163,7 @@ static void VerifyParseTree(const TextStructureView &text_structure) {
 static bool ShouldIncludeTokenText(const verible::TokenInfo &token) {
   const verilog_tokentype tokentype =
       static_cast<verilog_tokentype>(token.token_enum());
-  std::string_view type_str = verilog::TokenTypeToString(tokentype);
+  verible::document_view type_str = verilog::TokenTypeToString(tokentype);
   // Don't include token's text for operators, keywords, or anything that is a
   // part of Verilog syntax. For such types, TokenTypeToString() is equal to
   // token's text. Exception has to be made for identifiers, because things like

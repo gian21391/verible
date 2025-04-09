@@ -30,6 +30,8 @@
 #include <string_view>
 #include <vector>
 
+#include "verible/common/strings/document-view.h"
+
 namespace verible {
 
 // Pair: line number and column number.
@@ -71,13 +73,13 @@ class LineColumnMap {
   // Build line column map from pre-split contiguous blob of content.
   // The distance between consecutive string_views is expected to have
   // a gap of one character (the splitting '\n' character).
-  explicit LineColumnMap(const std::vector<std::string_view> &lines);
+  explicit LineColumnMap(const std::vector<document_view> &lines);
 
   // This constructor is only used in LintStatusFormatter and
   // LintWaiverBuilder.
   // TODO: If these already have access to pre-split lines, then this
   // constructor is not needed.
-  explicit LineColumnMap(std::string_view);
+  explicit LineColumnMap(document_view);
 
   bool empty() const { return beginning_of_line_offsets_.empty(); }
 
@@ -99,7 +101,7 @@ class LineColumnMap {
   // TODO(hzeller): technically, we don't need the base as we already got it
   // in the constructor, but change separately after lifetime questions have
   // been considered.
-  LineColumn GetLineColAtOffset(std::string_view base, int bytes_offset) const;
+  LineColumn GetLineColAtOffset(document_view base, int bytes_offset) const;
 
   const std::vector<int> &GetBeginningOfLineOffsets() const {
     return beginning_of_line_offsets_;

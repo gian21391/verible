@@ -143,7 +143,7 @@ void FileAnalyzer::ExtractLinterTokenErrorDetail(
     const RejectedToken &error_token,
     const ReportLinterErrorFunction &error_report) const {
   const LineColumnRange range = Data().GetRangeForToken(error_token.token_info);
-  std::string_view context_line;
+  document_view context_line;
   const auto &lines = Data().Lines();
   if (range.start.line < static_cast<int>(lines.size())) {
     context_line = lines[range.start.line];
@@ -162,7 +162,7 @@ std::string FileAnalyzer::LinterTokenErrorMessage(
       error_token,
       [&](const std::string &filename, LineColumnRange range,
           ErrorSeverity severity, AnalysisPhase phase,
-          std::string_view token_text, std::string_view context_line,
+          document_view token_text, document_view context_line,
           const std::string &message) {
         out << filename_ << ':' << range << " " << phase << " " << severity;
         if (error_token.token_info.isEOF()) {

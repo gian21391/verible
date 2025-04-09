@@ -17,21 +17,23 @@
 
 #include <string_view>
 
+#include "verible/common/strings/document-view.h"
+
 namespace verible {
 
 // Returns true if the string contains only capital letters, digits, and
 // underscores.
-bool IsNameAllCapsUnderscoresDigits(std::string_view);
+bool IsNameAllCapsUnderscoresDigits(document_view);
 
 // Returns true if the all the underscores in the string are followed by digits.
-bool AllUnderscoresFollowedByDigits(std::string_view);
+bool AllUnderscoresFollowedByDigits(document_view);
 
 // Returns true if the string follows UpperCamelCase naming convention, where
 // underscores are allowed when separating a digit.
-bool IsUpperCamelCaseWithDigits(std::string_view);
+bool IsUpperCamelCaseWithDigits(document_view);
 
 // Returns true if the string follows lower_snake_case naming convention.
-bool IsLowerSnakeCaseWithDigits(std::string_view);
+bool IsLowerSnakeCaseWithDigits(document_view);
 
 }  // namespace verible
 

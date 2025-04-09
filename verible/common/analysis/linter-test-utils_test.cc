@@ -30,7 +30,7 @@ namespace {
 TEST(LintTestCaseExactMatchFindingsTest, AllEmpty) {
   const LintTestCase test{};
   const std::set<LintViolation> found_violations;
-  const std::string_view text;
+  const document_view text;
   std::ostringstream diffstream;
   EXPECT_TRUE(test.ExactMatchFindings(found_violations, text, &diffstream));
 }
@@ -43,12 +43,12 @@ TEST(LintTestCaseExactMatchFindingsTest, OneMatchingViolation) {
       "ghi",
   };
   const std::string text_copy(test.code);
-  const std::string_view text_view(text_copy);
+  const document_view text_view(text_copy);
 
   // string buffers are in different memory
-  EXPECT_FALSE(BoundsEqual(std::string_view(test.code), text_view));
+  EXPECT_FALSE(BoundsEqual(document_view(test.code), text_view));
 
-  const std::string_view bad_text = text_view.substr(3, 3);
+  const document_view bad_text = text_view.substr(3, 3);
   const std::set<LintViolation> found_violations{
       {{kToken, bad_text}, "some reason"},
   };
@@ -67,13 +67,13 @@ TEST(LintTestCaseExactMatchFindingsTest, MultipleMatchingViolations) {
       {kToken, "jkl"},
   };
   const std::string text_copy(test.code);
-  const std::string_view text_view(text_copy);
+  const document_view text_view(text_copy);
 
   // string buffers are in different memory
-  EXPECT_FALSE(BoundsEqual(std::string_view(test.code), text_view));
+  EXPECT_FALSE(BoundsEqual(document_view(test.code), text_view));
 
-  const std::string_view bad_text1 = text_view.substr(3, 3);
-  const std::string_view bad_text2 = text_view.substr(9, 3);
+  const document_view bad_text1 = text_view.substr(3, 3);
+  const document_view bad_text2 = text_view.substr(9, 3);
   const std::set<LintViolation> found_violations{
       // must be sorted on location
       {{kToken, bad_text1}, "some reason"},
@@ -94,12 +94,12 @@ TEST(LintTestCaseExactMatchFindingsTest, OneFoundNotExpected) {
   constexpr int kToken = 42;
   const LintTestCase test{"abcdefghi"};  // no expected violations
   const std::string text_copy(test.code);
-  const std::string_view text_view(text_copy);
+  const document_view text_view(text_copy);
 
   // string buffers are in different memory
-  EXPECT_FALSE(BoundsEqual(std::string_view(test.code), text_view));
+  EXPECT_FALSE(BoundsEqual(document_view(test.code), text_view));
 
-  const std::string_view bad_text = text_view.substr(3, 3);
+  const document_view bad_text = text_view.substr(3, 3);
   const std::set<LintViolation> found_violations{
       {{kToken, bad_text}, "some reason"},
   };
@@ -107,7 +107,7 @@ TEST(LintTestCaseExactMatchFindingsTest, OneFoundNotExpected) {
   EXPECT_FALSE(
       test.ExactMatchFindings(found_violations, text_view, &diffstream));
   EXPECT_TRUE(absl::StrContains(diffstream.str(), kFoundNotExpectedMessage));
-  EXPECT_TRUE(absl::StrContains(diffstream.str(), bad_text));
+  EXPECT_TRUE(absl::StrContains(diffstream.str(), bad_text.to_string_view()));
   EXPECT_FALSE(absl::StrContains(diffstream.str(), kExpectedNotFoundMessage));
 }
 
@@ -115,18 +115,18 @@ TEST(LintTestCaseExactMatchFindingsTest, OneExpectedNotFound) {
   constexpr int kToken = 42;
   const LintTestCase test{"abc", {kToken, "def"}, "ghi"};
   const std::string text_copy(test.code);
-  const std::string_view text_view(text_copy);
+  const document_view text_view(text_copy);
 
   // string buffers are in different memory
-  EXPECT_FALSE(BoundsEqual(std::string_view(test.code), text_view));
+  EXPECT_FALSE(BoundsEqual(document_view(test.code), text_view));
 
-  const std::string_view bad_text = text_view.substr(3, 3);
+  const document_view bad_text = text_view.substr(3, 3);
   const std::set<LintViolation> found_violations;  // none expected
   std::ostringstream diffstream;
   EXPECT_FALSE(
       test.ExactMatchFindings(found_violations, text_view, &diffstream));
   EXPECT_FALSE(absl::StrContains(diffstream.str(), kFoundNotExpectedMessage));
-  EXPECT_TRUE(absl::StrContains(diffstream.str(), bad_text));
+  EXPECT_TRUE(absl::StrContains(diffstream.str(), bad_text.to_string_view()));
   EXPECT_TRUE(absl::StrContains(diffstream.str(), kExpectedNotFoundMessage));
 }
 
@@ -134,12 +134,12 @@ TEST(LintTestCaseExactMatchFindingsTest, OneMismatchEach) {
   constexpr int kToken = 42;
   const LintTestCase test{"abc", {kToken, "def"}, "ghi"};
   const std::string text_copy(test.code);
-  const std::string_view text_view(text_copy);
+  const document_view text_view(text_copy);
 
   // string buffers are in different memory
-  EXPECT_FALSE(BoundsEqual(std::string_view(test.code), text_view));
+  EXPECT_FALSE(BoundsEqual(document_view(test.code), text_view));
 
-  const std::string_view bad_text = text_view.substr(4, 3);  // "efg"
+  const document_view bad_text = text_view.substr(4, 3);  // "efg"
   const std::set<LintViolation> found_violations{
       {{kToken, bad_text}, "some reason"},
   };
@@ -147,9 +147,9 @@ TEST(LintTestCaseExactMatchFindingsTest, OneMismatchEach) {
   EXPECT_FALSE(
       test.ExactMatchFindings(found_violations, text_view, &diffstream));
   EXPECT_TRUE(absl::StrContains(diffstream.str(), kFoundNotExpectedMessage));
-  EXPECT_TRUE(absl::StrContains(diffstream.str(), bad_text));
+  EXPECT_TRUE(absl::StrContains(diffstream.str(), bad_text.to_string_view()));
   EXPECT_TRUE(absl::StrContains(diffstream.str(), kExpectedNotFoundMessage));
-  EXPECT_TRUE(absl::StrContains(diffstream.str(), text_view.substr(3, 3)));
+  EXPECT_TRUE(absl::StrContains(diffstream.str(), text_view.to_string_view().substr(3, 3)));
 }
 
 }  // namespace

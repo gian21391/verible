@@ -38,14 +38,14 @@ class VerilogAnalyzer : public verible::FileAnalyzer {
         preprocess_config_(preprocess_config) {}
 
   // Legacy constructor.
-  VerilogAnalyzer(std::string_view text, std::string_view name,
+  VerilogAnalyzer(verible::document_view text, std::string_view name,
                   const VerilogPreprocess::Config &preprocess_config)
       : verible::FileAnalyzer(text, name),
         preprocess_config_(preprocess_config) {}
 
   // Legacy constructor.
   // TODO(hzeller): Remove once every instantiation sets preprocessor config.
-  VerilogAnalyzer(std::string_view text, std::string_view name)
+  VerilogAnalyzer(verible::document_view text, std::string_view name)
       : VerilogAnalyzer(text, name, VerilogPreprocess::Config()) {}
 
   VerilogAnalyzer(const VerilogAnalyzer &) = delete;
@@ -76,7 +76,7 @@ class VerilogAnalyzer : public verible::FileAnalyzer {
       const VerilogPreprocess::Config &preprocess_config);
 
   static std::unique_ptr<VerilogAnalyzer> AnalyzeAutomaticMode(
-      std::string_view text, std::string_view name,
+      verible::document_view text, std::string_view name,
       const VerilogPreprocess::Config &preprocess_config);
 
   // Automatically analyze with correct parsing mode like AnalyzeAutomaticMode()
@@ -84,7 +84,7 @@ class VerilogAnalyzer : public verible::FileAnalyzer {
   // possible parse tree; if this yields to syntax errors, fall back to
   // enabling preprocess branches.
   static std::unique_ptr<VerilogAnalyzer> AnalyzeAutomaticPreprocessFallback(
-      std::string_view text, std::string_view name);
+      verible::document_view text, std::string_view name);
 
   const VerilogPreprocessData &PreprocessorData() const {
     return preprocessor_data_;
@@ -102,11 +102,11 @@ class VerilogAnalyzer : public verible::FileAnalyzer {
   // Returns a string that is first argument of the directive, e.g.:
   //     // verilog_syntax: mode-x
   // results in "mode-x".
-  static std::string_view ScanParsingModeDirective(
+  static verible::document_view ScanParsingModeDirective(
       const verible::TokenSequence &raw_tokens);
 
   // Special string inside a comment that triggers setting parsing mode.
-  static constexpr std::string_view kParseDirectiveName = "verilog_syntax:";
+  static constexpr verible::document_view kParseDirectiveName = "verilog_syntax:";
 
  private:
   // Attempt to parse all macro arguments as expressions.  Where parsing as an

@@ -25,6 +25,7 @@
 #include "absl/strings/match.h"
 #include "gtest/gtest.h"
 #include "re2/re2.h"
+#include <verible/common/strings/document-view.h>
 
 namespace verible {
 namespace config {
@@ -137,7 +138,7 @@ TEST(ConfigUtilsTest, ParseString) {
 
 TEST(ConfigUtilsTest, ParseNamedBitmap) {
   const std::vector<std::string_view> kBitNames = {"ZERO", "ONE", "TWO"};
-  const std::pair<std::string_view, uint32_t> kTestCases[] = {
+  const std::pair<document_view, uint32_t> kTestCases[] = {
       {"baz:ONE", 1 << 1},
       {"baz:", 0},
       {"baz:ZERO|TWO", (1 << 0) | (1 << 2)},
@@ -152,7 +153,7 @@ TEST(ConfigUtilsTest, ParseNamedBitmap) {
   absl::Status s;
   for (const auto &testcase : kTestCases) {
     uint32_t bitmap = 0x12345678;
-    s = ParseNameValues(testcase.first,
+    s = ParseNameValues(testcase.first.to_string_view(),
                         {{"baz", SetNamedBits(&bitmap, kBitNames)}});
     EXPECT_TRUE(s.ok()) << "case: '" << testcase.first << "' ->" << s.message();
     EXPECT_EQ(bitmap, testcase.second);

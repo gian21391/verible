@@ -43,7 +43,7 @@ static char EditOperationToLineMarker(Operation op) {
   }
 }
 
-LineDiffs::LineDiffs(std::string_view before, std::string_view after)
+LineDiffs::LineDiffs(document_view before, document_view after)
     : before_text(before),
       after_text(after),
       before_lines(SplitLinesKeepLineTerminator(before_text)),

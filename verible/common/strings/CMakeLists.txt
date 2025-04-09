@@ -222,7 +222,7 @@ target_link_libraries(verible_common_strings_range_test PRIVATE
         GTest::gtest
         GTest::gtest_main
 )
-add_test(NAME range_test COMMAND range_test)
+add_test(NAME verible_common_strings_range_test COMMAND verible_common_strings_range_test)
 
 add_executable(split_test split_test.cc)
 target_link_libraries(split_test PRIVATE

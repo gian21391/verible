@@ -60,12 +60,12 @@ json GetLinterTokenErrorsAsJson(const verilog::VerilogAnalyzer *analyzer,
         rejected_token,
         [&error](const std::string &filename, LineColumnRange range,
                  ErrorSeverity severity, AnalysisPhase phase,
-                 std::string_view token_text, std::string_view context_line,
+                 verible::document_view token_text, verible::document_view context_line,
                  const std::string &message) {
           // TODO: should this do something different for severity = kWarning ?
           error["line"] = range.start.line;  // NB: zero based index
           error["column"] = range.start.column;
-          error["text"] = std::string(token_text);
+          error["text"] = token_text.to_string();
           error["phase"] = analysis_phase_to_json(phase);
           if (!message.empty()) error["message"] = message;
         });

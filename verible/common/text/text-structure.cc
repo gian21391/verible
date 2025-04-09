@@ -44,7 +44,7 @@
 
 namespace verible {
 
-TextStructureView::TextStructureView(std::string_view contents)
+TextStructureView::TextStructureView(document_view contents)
     : contents_(contents) {
   // more than sufficient memory as number-of-tokens <= bytes-in-file,
   // push_back() should never re-alloc because size <= initial capacity.
@@ -72,7 +72,7 @@ void TextStructureView::Clear() {
 }
 
 static bool TokenLocationLess(const TokenInfo &token,
-                              const std::string_view::const_iterator offset) {
+                              const document_view::const_iterator offset) {
   return token.text().begin() < offset;
 }
 
@@ -148,7 +148,7 @@ LineColumnRange TextStructureView::GetRangeForToken(
 }
 
 LineColumnRange TextStructureView::GetRangeForText(
-    std::string_view text) const {
+    document_view text) const {
   const auto from = std::distance(Contents().begin(), text.begin());
   const auto to = std::distance(Contents().begin(), text.end());
   CHECK_GE(from, 0) << '"' << text << '"';
@@ -156,7 +156,7 @@ LineColumnRange TextStructureView::GetRangeForText(
   return {GetLineColAtOffset(from), GetLineColAtOffset(to)};
 }
 
-bool TextStructureView::ContainsText(std::string_view text) const {
+bool TextStructureView::ContainsText(document_view text) const {
   return IsSubRange(text, Contents());
 }
 
@@ -222,7 +222,7 @@ void TextStructureView::FocusOnSubtreeSpanningSubstring(int left_offset,
 // Discards nodes outside of the referenced subtree.
 void TextStructureView::TrimSyntaxTree(int first_token_offset,
                                        int last_token_offset) {
-  const std::string_view text_range(Contents().substr(
+  const document_view text_range(Contents().substr(
       first_token_offset, last_token_offset - first_token_offset));
   verible::TrimSyntaxTree(&syntax_tree_, text_range);
 }
@@ -253,13 +253,13 @@ void TextStructureView::TrimTokensToSubstring(int left_offset,
   // If the last token straddles the end-of-range, (possibly due to lexical
   // error), then trim its tail, bounded by right_offset.
   if (!trimmed_stream.empty()) {
-    const std::string_view substr(
+    const document_view substr(
         contents_.substr(left_offset, right_offset - left_offset));
     TokenInfo &last(trimmed_stream.back());
     const int overhang = std::distance(substr.end(), last.text().end());
     if (!IsSubRange(last.text(), substr)) {
       VLOG(2) << "last token overhangs end by " << overhang << ": " << last;
-      std::string_view trimmed_tail_token(last.text());
+      document_view trimmed_tail_token(last.text());
       trimmed_tail_token.remove_suffix(overhang);
       last.set_text(trimmed_tail_token);
       // TODO(fangism): Should the token enum be set to some error value,
@@ -291,23 +291,23 @@ void TextStructureView::TrimContents(int left_offset, int length) {
 }
 
 const TextStructureView::LinesInfo &TextStructureView::LinesInfo::Get(
-    std::string_view contents) {
+    document_view contents) {
   if (valid) return *this;
 
-  lines = absl::StrSplit(contents, '\n');
+  lines = contents.str_split('\n');
   line_column_map.reset(new LineColumnMap(lines));
   valid = true;
 
   return *this;
 }
 
-void TextStructureView::RebaseTokensToSuperstring(std::string_view superstring,
-                                                  std::string_view src_base,
+void TextStructureView::RebaseTokensToSuperstring(document_view superstring,
+                                                  document_view src_base,
                                                   int offset) {
   MutateTokens([&](TokenInfo *token) {
     const int delta = token->left(src_base);
     // Superstring must point to separate memory space.
-    token->RebaseDocumentView(superstring.begin() + offset + delta);
+    token->RebaseDocumentView(superstring.begin() + offset + delta, superstring);
   });
   // Assigning superstring for the sake of maintaining range invariants.
   contents_ = superstring;
@@ -409,8 +409,8 @@ absl::Status TextStructureView::SyntaxTreeConsistencyCheck() const {
   VLOG(2) << __FUNCTION__;
   // Check that first and last token in syntax_tree_ point to text
   // inside contents_.
-  const std::string_view::const_iterator lower_bound = contents_.begin();
-  const std::string_view::const_iterator upper_bound =
+  const document_view::const_iterator lower_bound = contents_.begin();
+  const document_view::const_iterator upper_bound =
       lower_bound + contents_.length();
   if (syntax_tree_ != nullptr) {
     const SyntaxTreeLeaf *left = GetLeftmostLeaf(*syntax_tree_);
@@ -473,20 +473,20 @@ void TextStructureView::ConsumeDeferredExpansion(
     TokenStreamView::const_iterator *next_token_view_iter,
     DeferredExpansion *expansion, TokenSequence *combined_tokens,
     std::vector<int> *token_view_indices,
-    std::string_view::const_iterator offset) {
+    document_view::const_iterator offset) {
   auto token_iter = *next_token_iter;
   auto token_view_iter = *next_token_view_iter;
   // Find the position up to each expansion point.
   *next_token_iter = std::lower_bound(
       token_iter, tokens_.cend(), offset,
-      [](const TokenInfo &token, std::string_view::const_iterator target) {
+      [](const TokenInfo &token, document_view::const_iterator target) {
         return std::distance(target, token.text().begin()) < 0;
       });
   CHECK(*next_token_iter != tokens_.cend());
   *next_token_view_iter = std::lower_bound(
       token_view_iter, tokens_view_.cend(), offset,
       [](TokenStreamView::const_reference token_ref,
-         std::string_view::const_iterator target) {
+         document_view::const_iterator target) {
         return std::distance(target, token_ref->text().begin()) < 0;
       });
   CHECK(*next_token_view_iter != tokens_view_.cend());
@@ -500,9 +500,9 @@ void TextStructureView::ConsumeDeferredExpansion(
   // into the original text (contents_).
   std::unique_ptr<TextStructure> &subanalysis = expansion->subanalysis;
   TextStructureView &sub_data = ABSL_DIE_IF_NULL(subanalysis)->MutableData();
-  const std::string_view sub_data_text(sub_data.Contents());
+  const document_view sub_data_text(sub_data.Contents());
   CHECK(!IsSubRange(sub_data_text, contents_));
-  CHECK_EQ(sub_data_text, std::string_view(&*offset, sub_data_text.length()));
+  CHECK_EQ(sub_data_text, document_view(&*offset, sub_data_text.length(), sub_data_text));
   CHECK(offset >= contents_.begin());
   sub_data.RebaseTokensToSuperstring(contents_, sub_data_text,
                                      std::distance(contents_.begin(), offset));
@@ -526,13 +526,13 @@ void TextStructureView::ConsumeDeferredExpansion(
 }
 
 TextStructure::TextStructure(std::shared_ptr<MemBlock> contents)
-    : contents_(std::move(contents)), data_(contents_->AsStringView()) {
+    : contents_(std::move(contents)), data_(contents_->AsDocumentView()) {
   // Internal string_view must point to memory owned by contents_.
   const absl::Status status = InternalConsistencyCheck();
   CHECK(status.ok()) << status.message() << " (in ctor)";
 }
 
-TextStructure::TextStructure(std::string_view contents)
+TextStructure::TextStructure(document_view contents)
     : TextStructure(std::make_shared<StringMemBlock>(contents)) {}
 
 TextStructure::~TextStructure() {
@@ -576,8 +576,8 @@ void TextStructureView::ExpandSubtrees(NodeExpansionMap *expansions) {
 }
 
 absl::Status TextStructure::StringViewConsistencyCheck() const {
-  const std::string_view contents = data_.Contents();
-  if (!contents.empty() && !IsSubRange(contents, contents_->AsStringView())) {
+  const document_view contents = data_.Contents();
+  if (!contents.empty() && !contents.is_subview_of(contents_->AsDocumentView())) {
     return absl::InternalError(
         "string_view contents_ is not a substring of contents_, "
         "contents_ might reference deallocated memory!");

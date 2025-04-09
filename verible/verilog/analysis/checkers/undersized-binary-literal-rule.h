@@ -49,7 +49,7 @@ class UndersizedBinaryLiteralRule : public verible::SyntaxTreeLintRule {
  private:
   // Generate string representation of why lint error occurred at leaf
   static std::string FormatReason(std::string_view width,
-                                  std::string_view base_text, char base,
+                                  verible::document_view base_text, char base,
                                   std::string_view literal);
 
   bool check_bin_numbers_ = true;

@@ -41,7 +41,7 @@ class MockLexer : public Lexer {
 
   const TokenInfo &DoNextToken() final { return token_; }
 
-  void Restart(std::string_view) final {}
+  void Restart(document_view) final {}
 
   bool TokenIsError(const TokenInfo &) const final { return false; }
 

@@ -145,13 +145,13 @@ static bool AllowLongLineException(TokenSequence::const_iterator token_begin,
 
   if (IsComment(verilog_tokentype(last_token->token_enum()))) {
     // Check for end-of-line comment that contain lint waivers.
-    const std::string_view text =
+    const verible::document_view text =
         verible::StripCommentAndSpacePadding(last_token->text());
-    if (absl::StartsWith(text, "ri lint_check_waive")) {
+    if (text.starts_with( "ri lint_check_waive")) {
       // TODO(fangism): Could make this pattern more space-insensitive
       return true;
     }
-    if (absl::StartsWith(text, kLinterTrigger)) {
+    if (text.starts_with(kLinterTrigger)) {
       // This is the waiver for this linter tool.
       // verible/verilog/tools/lint/README.md
       return true;

@@ -165,7 +165,7 @@ int LintOneFile(std::ostream *stream, std::string_view filename,
   } else {
     VLOG(1) << "Lint Violations (" << total_violations << "): " << std::endl;
 
-    std::string_view text_base = text_structure.Contents();
+    verible::document_view text_base = text_structure.Contents();
 
     const std::set<LintViolationWithStatus> violations =
         GetSortedViolations(linter_statuses);
@@ -257,7 +257,7 @@ void VerilogLinter::Lint(const TextStructureView &text_structure,
 static void AppendLintRuleStatuses(
     const std::vector<LintRuleStatus> &new_statuses,
     const verible::LintWaiver &waivers, const LineColumnMap &line_map,
-    std::string_view text_base,
+    verible::document_view text_base,
     std::vector<LintRuleStatus> *cumulative_statuses) {
   for (const auto &status : new_statuses) {
     cumulative_statuses->push_back(status);
@@ -282,7 +282,7 @@ static void AppendLintRuleStatuses(
 }
 
 std::vector<LintRuleStatus> VerilogLinter::ReportStatus(
-    const LineColumnMap &line_map, std::string_view text_base) {
+    const LineColumnMap &line_map, verible::document_view text_base) {
   std::vector<LintRuleStatus> statuses;
   const verible::LintWaiver &waivers = lint_waiver_.GetLintWaiver();
   AppendLintRuleStatuses(line_linter_.ReportStatus(), waivers, line_map,
@@ -325,7 +325,7 @@ absl::StatusOr<std::vector<LintRuleStatus>> VerilogLintTextStructure(
 
   linter.Lint(text_structure, filename);
 
-  std::string_view text_base = text_structure.Contents();
+  verible::document_view text_base = text_structure.Contents();
   // Each enabled lint rule yields a collection of violations.
   return linter.ReportStatus(text_structure.GetLineColumnMap(), text_base);
 }

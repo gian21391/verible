@@ -81,18 +81,19 @@ absl::Status LintWaiver::WaiveWithRegex(std::string_view rule_name,
   return absl::OkStatus();
 }
 
-void LintWaiver::RegexToLines(std::string_view contents,
+void LintWaiver::RegexToLines(document_view contents,
                               const LineColumnMap &line_map) {
   for (const auto &rule : waiver_re_map_) {
     for (const RE2 *re : rule.second) {
-      std::string_view walk = contents;
+      std::string_view walk = contents.to_string_view();
       std::string_view match;
       while (RE2::FindAndConsume(&walk, *re, &match)) {
-        const size_t pos = match.begin() - contents.begin();
+        document_view match_dv = document_view(match.data(), match.size(), contents);
+        const size_t pos = match_dv.begin() - contents.begin();
         WaiveOneLine(rule.first, line_map.LineAtOffset(pos));
-        if (match.empty()) {
-          if (match.end() == contents.end()) break;
-          walk = contents.substr(pos + 1);
+        if (match_dv.empty()) {
+          if (match_dv.end() == contents.end()) break;
+          walk = contents.substr(pos + 1).to_string_view();
         }
       }
     }
@@ -115,22 +116,22 @@ bool LintWaiver::Empty() const {
 }
 
 std::string_view LintWaiverBuilder::ExtractWaivedRuleFromComment(
-    std::string_view comment_text,
-    std::vector<std::string_view> *comment_tokens) const {
+    document_view comment_text,
+    std::vector<document_view> *comment_tokens) const {
   // Look for directives of the form: <tool_name> <directive> <rule_name>
   // Addition text beyond the last argument is ignored, so it could
   // contain more comment text.
   auto &tokens = *comment_tokens;
   // TODO(fangism): Stop splitting after 3 tokens, everything after that is
   // ignored.  Use something like absl::MaxSplits, but works with multi-spaces.
-  tokens = absl::StrSplit(comment_text, ' ', absl::SkipEmpty());
+  tokens = comment_text.str_split(' ', absl::SkipEmpty());
   if (tokens.size() >= 3) {
     if (tokens[0] == waiver_trigger_keyword_) {
       if (tokens[1] == waive_one_line_keyword_ ||
           tokens[1] == waive_range_start_keyword_ ||
           tokens[1] == waive_range_stop_keyword_) {
         // TODO(b/73512873): Support waiving multiple rules in one command.
-        return tokens[2];  // name of waived rule
+        return tokens[2].to_string_view();  // name of waived rule
       }
     }
   }
@@ -166,13 +167,13 @@ void LintWaiverBuilder::ProcessLine(const TokenRange &tokens, int line_number) {
   }
 
   // Find all directives on this line.
-  std::vector<std::string_view> comment_tokens;  // Re-use in loop.
+  std::vector<document_view> comment_tokens;  // Re-use in loop.
   for (const auto &token : tokens) {
     if (is_token_comment_(token)) {
       // Lex the comment text.
-      const std::string_view comment_text =
+      const document_view comment_text =
           StripCommentAndSpacePadding(token.text());
-      comment_tokens = absl::StrSplit(comment_text, ' ', absl::SkipEmpty());
+      comment_tokens = comment_text.str_split(' ', absl::SkipEmpty());
       // TODO(fangism): Support different waiver lexers.
       const std::string_view waived_rule =
           ExtractWaivedRuleFromComment(comment_text, &comment_tokens);
@@ -254,7 +255,7 @@ static absl::Status WaiveCommandError(LineColumn pos, std::string_view filename,
 
 static absl::Status WaiveCommandHandler(
     const TokenRange &tokens, std::string_view waive_file,
-    std::string_view waive_content, std::string_view lintee_filename,
+    document_view waive_content, std::string_view lintee_filename,
     const LineColumnMap &line_map, LintWaiver *waiver,
     const std::set<std::string_view> &active_rules) {
   std::string_view rule;
@@ -291,11 +292,11 @@ static absl::Status WaiveCommandHandler(
         return WaiveCommandError(token_pos, waive_file,
                                  "Unsupported argument: ", token.text());
       case CommandFileLexer::ConfigToken::kFlagWithArg:
-        option = token.text();
+        option = token.text().to_string_view();
         break;
       case CommandFileLexer::ConfigToken::kArg:
 
-        val = token.text();
+        val = token.text().to_string_view();
 
         if (option == "rule") {
           for (auto r : active_rules) {
@@ -420,7 +421,7 @@ static absl::Status WaiveCommandHandler(
 
 using HandlerFun = std::function<absl::Status(
     const TokenRange &, std::string_view waive_file,
-    std::string_view waive_content, std::string_view lintee_filename,
+    document_view waive_content, std::string_view lintee_filename,
     const LineColumnMap &, LintWaiver *, const std::set<std::string_view> &)>;
 static const std::map<std::string_view, HandlerFun> &GetCommandHandlers() {
   // allocated once, never freed
@@ -434,7 +435,7 @@ static const std::map<std::string_view, HandlerFun> &GetCommandHandlers() {
 absl::Status LintWaiverBuilder::ApplyExternalWaivers(
     const std::set<std::string_view> &active_rules,
     std::string_view lintee_filename, std::string_view waiver_filename,
-    std::string_view waivers_config_content) {
+    document_view waivers_config_content) {
   if (waivers_config_content.empty()) {
     return {absl::StatusCode::kInternal, "Broken waiver config handle"};
   }
@@ -468,7 +469,7 @@ absl::Status LintWaiverBuilder::ApplyExternalWaivers(
     }
 
     // Check if command is supported
-    auto handler_iter = handlers.find(command[0].text());
+    auto handler_iter = handlers.find(command[0].text().to_string_view());
     if (handler_iter == handlers.end()) {
       LOG(ERROR) << WaiveCommandErrorFmt(
           command_pos, waiver_filename,

@@ -19,6 +19,7 @@
 #include <string_view>
 
 #include "absl/strings/str_join.h"
+#include "verible/common/strings/document-view.h"
 
 namespace verible {
 
@@ -30,7 +31,7 @@ namespace verible {
 //
 // example output (limit: 9): "abc...xyz"
 struct AutoTruncate {
-  const std::string_view text;
+  const document_view text;
   // Maximum number of characters to show, including "..."
   const int max_chars;
 };

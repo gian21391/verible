@@ -34,7 +34,7 @@ class NoTabsRule : public verible::LineLintRule {
 
   NoTabsRule() = default;
 
-  void HandleLine(std::string_view line) final;
+  void HandleLine(verible::document_view line) final;
 
   verible::LintRuleStatus Report() const final;
 

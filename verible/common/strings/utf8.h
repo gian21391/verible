@@ -19,9 +19,11 @@
 #include <cstddef>
 #include <string_view>
 
+#include "verible/common/strings/document-view.h"
+
 namespace verible {
 // Determine length in characters of an UTF8-encoded string.
-inline int utf8_len(std::string_view str) {
+inline int utf8_len(document_view str) {
   return std::count_if(str.begin(), str.end(),
                        [](char c) { return (c & 0xc0) != 0x80; });
 }

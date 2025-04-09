@@ -40,7 +40,7 @@ namespace internal {
 namespace {
 
 static std::vector<MarkedLine> MakeMarkedLines(
-    const std::vector<std::string_view> &lines) {
+    const std::vector<document_view> &lines) {
   std::vector<MarkedLine> result;
   result.reserve(lines.size());
   for (const auto &line : lines) {
@@ -63,7 +63,7 @@ TEST(MarkedLineEquality, EqualityTests) {
 }
 
 TEST(MarkedLineParseTest, InvalidInputs) {
-  constexpr std::string_view kTestCases[] = {
+  constexpr document_view kTestCases[] = {
       "", "x", "x213", "abc", "diff", "====",
   };
   for (const auto &test : kTestCases) {
@@ -73,9 +73,9 @@ TEST(MarkedLineParseTest, InvalidInputs) {
 }
 
 struct MarkedLineTestCase {
-  std::string_view input;
+  document_view input;
   char expected_mark;
-  std::string_view expected_text;
+  document_view expected_text;
 };
 
 TEST(MarkedLineParseTest, ValidInputs) {
@@ -94,7 +94,7 @@ TEST(MarkedLineParseTest, ValidInputs) {
 }
 
 TEST(MarkedLinePrintTest, Print) {
-  constexpr std::string_view kTestCases[] = {
+  constexpr document_view kTestCases[] = {
       " ", "+", "-", " 1 2 3", "-xyz", "+\tabc",
   };
   for (const auto &test : kTestCases) {
@@ -116,7 +116,7 @@ TEST(HunkIndicesEqualityTest, Comparisons) {
 }
 
 TEST(HunkIndicesParseTest, InvalidInputs) {
-  constexpr std::string_view kTestCases[] = {
+  constexpr document_view kTestCases[] = {
       "", ",", "4,", ",5", "2,b", "x,2", "4,5,", "1,2,3",
   };
   for (const auto &test : kTestCases) {
@@ -126,7 +126,7 @@ TEST(HunkIndicesParseTest, InvalidInputs) {
 }
 
 struct HunkIndicesTestCase {
-  std::string_view input;
+  document_view input;
   int expected_start;
   int expected_count;
 };
@@ -161,30 +161,30 @@ TEST(HunkHeaderEqualityTest, Comparisons) {
 
 TEST(HunkHeaderParseTest, InvalidInputs) {
   // If any one character is deleted from this example, it becomes invalid.
-  constexpr std::string_view kValidText = "@@ -4,8 +5,6 @@";
+  constexpr document_view kValidText = "@@ -4,8 +5,6 @@";
 
   for (size_t i = 0; i < kValidText.length(); ++i) {
-    std::string deleted(kValidText);
+    std::string deleted(kValidText.to_string());
     deleted.erase(i);
     HunkHeader h;
     EXPECT_FALSE(h.Parse(deleted).ok()) << " input: \"" << deleted << '"';
   }
 
   for (size_t i = 0; i < kValidText.length(); ++i) {
-    std::string_view deleted(kValidText.substr(0, i));
+    document_view deleted(kValidText.substr(0, i));
     HunkHeader h;
     EXPECT_FALSE(h.Parse(deleted).ok()) << " input: \"" << deleted << '"';
   }
 
   for (size_t i = 1; i < kValidText.length(); ++i) {
-    std::string_view deleted(kValidText.substr(i));
+    document_view deleted(kValidText.substr(i));
     HunkHeader h;
     EXPECT_FALSE(h.Parse(deleted).ok()) << " input: \"" << deleted << '"';
   }
 }
 
 TEST(HunkHeaderParseTest, MalformedOldRange) {
-  constexpr std::string_view kInvalidText = "@@ 4,8 +5,6 @@";
+  constexpr document_view kInvalidText = "@@ 4,8 +5,6 @@";
   HunkHeader h;
   const auto status = h.Parse(kInvalidText);
   EXPECT_FALSE(status.ok()) << " input: \"" << kInvalidText << '"';
@@ -194,7 +194,7 @@ TEST(HunkHeaderParseTest, MalformedOldRange) {
 }
 
 TEST(HunkHeaderParseTest, MalformedNewRange) {
-  constexpr std::string_view kInvalidText = "@@ -4,8 5,6 @@";
+  constexpr document_view kInvalidText = "@@ -4,8 5,6 @@";
   HunkHeader h;
   const auto status = h.Parse(kInvalidText);
   EXPECT_FALSE(status.ok()) << " input: \"" << kInvalidText << '"';
@@ -204,7 +204,7 @@ TEST(HunkHeaderParseTest, MalformedNewRange) {
 }
 
 TEST(HunkHeaderParseAndPrintTest, ValidInput) {
-  constexpr std::string_view kValidText = "@@ -14,8 +5,16 @@";
+  constexpr document_view kValidText = "@@ -14,8 +5,16 @@";
   HunkHeader h;
   EXPECT_TRUE(h.Parse(kValidText).ok()) << " input: \"" << kValidText << '"';
   EXPECT_EQ(h.old_range.start, 14);
@@ -220,7 +220,7 @@ TEST(HunkHeaderParseAndPrintTest, ValidInput) {
 }
 
 TEST(HunkHeaderParseAndPrintTest, ValidInputWithContext) {
-  constexpr std::string_view kValidText("@@ -4,28 +51,6 @@ void foo::bar() {");
+  constexpr document_view kValidText("@@ -4,28 +51,6 @@ void foo::bar() {");
   HunkHeader h;
   EXPECT_TRUE(h.Parse(kValidText).ok()) << " input: \"" << kValidText << '"';
   EXPECT_EQ(h.old_range.start, 4);
@@ -236,7 +236,7 @@ TEST(HunkHeaderParseAndPrintTest, ValidInputWithContext) {
 }
 
 TEST(SourceInfoParseTest, InvalidInputs) {
-  constexpr std::string_view kTestCases[] = {
+  constexpr document_view kTestCases[] = {
       "",  // path must be non-empty
   };
   for (const auto &test : kTestCases) {
@@ -246,7 +246,7 @@ TEST(SourceInfoParseTest, InvalidInputs) {
 }
 
 TEST(SourceInfoParseAndPrintTest, ValidInputsPathOnly) {
-  constexpr std::string_view kPaths[] = {
+  constexpr document_view kPaths[] = {
       "a.txt",
       "p/q/a.txt",
       "/p/q/a.txt",
@@ -293,7 +293,7 @@ TEST(SourceInfoParseAndPrintTest, ValidInputsWithTimestamps) {
 }
 
 TEST(HunkEqualityTest, Comparisons) {
-  const std::vector<std::string_view> lines{
+  const std::vector<document_view> lines{
       " a",
       "-b",
       "+c",
@@ -312,7 +312,7 @@ TEST(HunkEqualityTest, Comparisons) {
 }
 
 TEST(HunkParseTest, InvalidInputs) {
-  const std::vector<std::string_view> kTestCases[] = {
+  const std::vector<document_view> kTestCases[] = {
       // malformed headers:
       {"@@ -1,0 +2,0 @"},
       {"@ -1,0 +2,0 @@"},
@@ -345,12 +345,12 @@ TEST(HunkParseTest, InvalidInputs) {
 }
 
 struct UpdateHeaderTestCase {
-  std::string_view fixed_header;
-  std::vector<std::string_view> payload;
+  document_view fixed_header;
+  std::vector<document_view> payload;
 };
 
 TEST(HunkUpdateHeaderTest, Various) {
-  constexpr std::string_view kNonsenseHeader = "@@ -222,999 +333,999 @@";
+  constexpr document_view kNonsenseHeader = "@@ -222,999 +333,999 @@";
   const UpdateHeaderTestCase kTestCases[] = {
       {"@@ -222,0 +333,0 @@", {/* empty lines */}},
       {"@@ -222,1 +333,0 @@",
@@ -369,7 +369,7 @@ TEST(HunkUpdateHeaderTest, Various) {
        {" common", "-removed", "-removed2", "+added", " common again"}},
   };
   for (const auto &test : kTestCases) {
-    std::vector<std::string_view> lines;
+    std::vector<document_view> lines;
     lines.push_back(kNonsenseHeader);
     lines.insert(lines.end(), test.payload.begin(), test.payload.end());
     const LineRange range(lines.begin(), lines.end());
@@ -387,7 +387,7 @@ TEST(HunkUpdateHeaderTest, Various) {
 }
 
 struct AddedLinesTestCase {
-  std::vector<std::string_view> hunk_text;
+  std::vector<document_view> hunk_text;
   LineNumberSet expected_added_lines;
 };
 
@@ -498,7 +498,7 @@ TEST(HunkAddedLinesTest, Various) {
 }
 
 TEST(HunkSplitTest, ExpectedSingletons) {
-  const std::vector<std::string_view> kTestCases[] = {
+  const std::vector<document_view> kTestCases[] = {
       {" no-change"},
       {"+one addition"},
       {"-one deletion"},
@@ -577,7 +577,7 @@ struct HunkSplitTestCase {
   std::vector<Hunk> expected_sub_hunks;
 
   HunkSplitTestCase(int old_starting_line, int new_starting_line,
-                    const std::vector<std::string_view> &lines,
+                    const std::vector<document_view> &lines,
                     const std::vector<ExpectedHunk> &sub_hunks)
       : marked_lines(MakeMarkedLines(lines)),
         original_hunk(old_starting_line, new_starting_line,
@@ -690,7 +690,7 @@ TEST(HunkSplitTest, MultipleSubHunks) {
 }
 
 TEST(HunkParseAndPrintTest, ValidInputs) {
-  const std::vector<std::string_view> kTestCases[] = {
+  const std::vector<document_view> kTestCases[] = {
       {"@@ -1,0 +2,0 @@"},  // 0 line counts, technically consistent
       {"@@ -1,2 +2,2 @@",   // 2 lines of context, common to before/after
        " same1",            //
@@ -728,7 +728,7 @@ TEST(HunkParseAndPrintTest, ValidInputs) {
 }
 
 TEST(HunkVerifyAgainstOriginalLinesTest, LineNumberOutOfBounds) {
-  const std::vector<std::string_view> kHunkText = {
+  const std::vector<document_view> kHunkText = {
       {
           "@@ -2,3 +4,3 @@",  // dont' care about position in new-file
           " line2",           //
@@ -737,7 +737,7 @@ TEST(HunkVerifyAgainstOriginalLinesTest, LineNumberOutOfBounds) {
           " line4",           // this line doesn't exist in original
       },
   };
-  const std::vector<std::string_view> kOriginal = {
+  const std::vector<document_view> kOriginal = {
       "line1", "line2", "line3",
       // no line4
   };
@@ -756,7 +756,7 @@ TEST(HunkVerifyAgainstOriginalLinesTest, LineNumberOutOfBounds) {
 }
 
 TEST(HunkVerifyAgainstOriginalLinesTest, InconsistentRetainedLine) {
-  const std::vector<std::string_view> kHunkText = {
+  const std::vector<document_view> kHunkText = {
       {
           "@@ -2,2 +4,2 @@",
           " line2",    //
@@ -764,7 +764,7 @@ TEST(HunkVerifyAgainstOriginalLinesTest, InconsistentRetainedLine) {
           "+line pi",  //
       },
   };
-  const std::vector<std::string_view> kOriginal = {
+  const std::vector<document_view> kOriginal = {
       "line1",
       "line2 different",
       "line3",
@@ -784,7 +784,7 @@ TEST(HunkVerifyAgainstOriginalLinesTest, InconsistentRetainedLine) {
 }
 
 TEST(HunkVerifyAgainstOriginalLinesTest, InconsistentDeletedLine) {
-  const std::vector<std::string_view> kHunkText = {
+  const std::vector<document_view> kHunkText = {
       {
           "@@ -2,2 +4,2 @@",
           " line2",    //
@@ -792,7 +792,7 @@ TEST(HunkVerifyAgainstOriginalLinesTest, InconsistentDeletedLine) {
           "+line pi",  //
       },
   };
-  const std::vector<std::string_view> kOriginal = {
+  const std::vector<document_view> kOriginal = {
       "line1",
       "line2",
       "line3 different",
@@ -812,7 +812,7 @@ TEST(HunkVerifyAgainstOriginalLinesTest, InconsistentDeletedLine) {
 }
 
 TEST(FilePatchParseTest, InvalidInputs) {
-  const std::vector<std::string_view> kTestCases[] = {
+  const std::vector<document_view> kTestCases[] = {
       {},    // empty range is invalid
       {""},  // no "---" marker for source info
       {
@@ -846,7 +846,7 @@ TEST(FilePatchParseTest, InvalidInputs) {
 }
 
 TEST(FilePatchParseAndPrintTest, ValidInputs) {
-  const std::vector<std::string_view> kTestCases[] = {
+  const std::vector<document_view> kTestCases[] = {
       {
           "--- /path/to/file.txt\t2020-03-30",
           "+++ /path/to/file.txt\t2020-03-30",
@@ -923,7 +923,7 @@ TEST(FilePatchParseAndPrintTest, ValidInputs) {
 }
 
 TEST(FilePatchIsNewFileTest, NewFile) {
-  const std::vector<std::string_view> kInput = {
+  const std::vector<document_view> kInput = {
       "--- /dev/null\t2020-03-30",
       "+++ /path/to/file.txt\t2020-03-30",
       "@@ -0,0 +1,2 @@",
@@ -939,7 +939,7 @@ TEST(FilePatchIsNewFileTest, NewFile) {
 }
 
 TEST(FilePatchIsNewFileTest, ExistingFile) {
-  const std::vector<std::string_view> kInput = {
+  const std::vector<document_view> kInput = {
       "--- /path/to/file.txt\t2020-03-30",
       "+++ /path/to/file.txt\t2020-03-30",
       "@@ -12,1 +13,1 @@",
@@ -954,7 +954,7 @@ TEST(FilePatchIsNewFileTest, ExistingFile) {
 }
 
 TEST(FilePatchIsDeletedFileTest, DeletedFile) {
-  const std::vector<std::string_view> kInput = {
+  const std::vector<document_view> kInput = {
       "--- /path/to/file.txt\t2020-03-30",
       "+++ /dev/null\t2020-03-30",
       "@@ -1,2 +0,0 @@",
@@ -970,7 +970,7 @@ TEST(FilePatchIsDeletedFileTest, DeletedFile) {
 }
 
 TEST(FilePatchIsDeletedFileTest, ExistingFile) {
-  const std::vector<std::string_view> kInput = {
+  const std::vector<document_view> kInput = {
       "--- /path/to/file.txt\t2020-03-30",
       "+++ /path/to/file.txt\t2020-03-30",
       "@@ -12,2 +13,2 @@",
@@ -1032,7 +1032,7 @@ TEST(FilePatchAddedLinesTest, Various) {
 
 class FilePatchPickApplyTest : public FilePatch, public ::testing::Test {
  protected:
-  absl::Status ParseLines(const std::vector<std::string_view> &lines) {
+  absl::Status ParseLines(const std::vector<document_view> &lines) {
     const LineRange range(lines.begin(), lines.end());
     return Parse(range);
   }
@@ -1042,7 +1042,7 @@ class FilePatchPickApplyTest : public FilePatch, public ::testing::Test {
   }
 
   static absl::Status NullFileWriter(std::string_view filename,
-                                     std::string_view contents) {
+                                     document_view contents) {
     return absl::OkStatus();
   }
 };
@@ -1051,7 +1051,7 @@ class FilePatchPickApplyTest : public FilePatch, public ::testing::Test {
 // TODO(fangism): move this to a "file_test_util" library.
 struct StringFile {
   const std::string_view path;
-  const std::string_view contents;
+  const document_view contents;
 };
 
 class StringFileSequence {
@@ -1085,7 +1085,7 @@ struct ReadStringFileSequence : public StringFileSequence {
     const auto &file = files_[index_];
     EXPECT_EQ(filename, file.path) << " at index " << index_;
     ++index_;
-    return std::string{file.contents};
+    return std::string{file.contents.to_string()};
   }
 };
 
@@ -1099,7 +1099,7 @@ struct ExpectStringFileSequence : public StringFileSequence {
       : StringFileSequence(files) {}
 
   // like file::SetContents()
-  absl::Status operator()(std::string_view filename, std::string_view src) {
+  absl::Status operator()(std::string_view filename, document_view src) {
     // ASSERT_LT(i, files_.size());  // can't use ASSERT_* which returns void
     if (index_ >= files_.size()) {
       return absl::OutOfRangeError(
@@ -1128,7 +1128,7 @@ TEST_F(FilePatchPickApplyTest, ErrorReadingFile) {
 
 TEST_F(FilePatchPickApplyTest, IgnoreNewFile) {
   {
-    const std::vector<std::string_view> kHunkText{
+    const std::vector<document_view> kHunkText{
         "--- /dev/null\t2012-01-01",
         "+++ foo.txt\t2012-01-01",
     };
@@ -1144,7 +1144,7 @@ TEST_F(FilePatchPickApplyTest, IgnoreNewFile) {
 
 TEST_F(FilePatchPickApplyTest, IgnoreDeletedFile) {
   {
-    const std::vector<std::string_view> kHunkText{
+    const std::vector<document_view> kHunkText{
         "--- bar.txt\t2012-01-01",
         "+++ /dev/null\t2012-01-01",
     };
@@ -1160,7 +1160,7 @@ TEST_F(FilePatchPickApplyTest, IgnoreDeletedFile) {
 
 TEST_F(FilePatchPickApplyTest, EmptyPatchNoPrompt) {
   {
-    const std::vector<std::string_view> kHunkText{
+    const std::vector<document_view> kHunkText{
         "--- foo.txt\t2012-01-01",
         "+++ foo-formatted.txt\t2012-01-01",
     };
@@ -1171,8 +1171,8 @@ TEST_F(FilePatchPickApplyTest, EmptyPatchNoPrompt) {
   std::istringstream ins;
   std::ostringstream outs;
 
-  constexpr std::string_view kOriginal = "aaa\nbbb\nccc\n";
-  constexpr std::string_view kExpected = kOriginal;  // no change
+  constexpr document_view kOriginal = "aaa\nbbb\nccc\n";
+  constexpr document_view kExpected = kOriginal;  // no change
 
   const auto status =
       PickApply(ins, outs,  //
@@ -1184,7 +1184,7 @@ TEST_F(FilePatchPickApplyTest, EmptyPatchNoPrompt) {
 
 TEST_F(FilePatchPickApplyTest, ErrorWritingFileInPlace) {
   {
-    const std::vector<std::string_view> kHunkText{
+    const std::vector<document_view> kHunkText{
         "--- foo.txt\t2012-01-01",
         "+++ foo-formatted.txt\t2012-01-01",
     };
@@ -1195,10 +1195,10 @@ TEST_F(FilePatchPickApplyTest, ErrorWritingFileInPlace) {
   std::istringstream ins;
   std::ostringstream outs;
 
-  constexpr std::string_view kOriginal = "aaa\nbbb\nccc\n";
+  constexpr document_view kOriginal = "aaa\nbbb\nccc\n";
   constexpr std::string_view kErrorMessage = "Cannot write file.";
 
-  auto error_file_writer = [=](std::string_view, std::string_view) {
+  auto error_file_writer = [=](std::string_view, document_view) {
     return absl::PermissionDeniedError(kErrorMessage);
   };
 
@@ -1212,7 +1212,7 @@ TEST_F(FilePatchPickApplyTest, ErrorWritingFileInPlace) {
 
 TEST_F(FilePatchPickApplyTest, OneHunkNotApplied) {
   {
-    const std::vector<std::string_view> kHunkText{
+    const std::vector<document_view> kHunkText{
         "--- foo.txt\t2012-01-01",
         "+++ foo-formatted.txt\t2012-01-01",
         "@@ -2,3 +2,2 @@",
@@ -1227,13 +1227,13 @@ TEST_F(FilePatchPickApplyTest, OneHunkNotApplied) {
   std::istringstream ins("n\n");  // user declines patch hunk
   std::ostringstream outs;
 
-  constexpr std::string_view kOriginal =
+  constexpr document_view kOriginal =
       "aaa\n"
       "bbb\n"
       "ccc\n"
       "ddd\n"
       "eee\n";
-  constexpr std::string_view kExpected = kOriginal;
+  constexpr document_view kExpected = kOriginal;
 
   const auto status =
       PickApply(ins, outs,  //
@@ -1245,7 +1245,7 @@ TEST_F(FilePatchPickApplyTest, OneHunkNotApplied) {
 
 TEST_F(FilePatchPickApplyTest, PatchInconsistentWithOriginalText) {
   {
-    const std::vector<std::string_view> kHunkText{
+    const std::vector<document_view> kHunkText{
         "--- foo.txt\t2012-01-01",
         "+++ foo-formatted.txt\t2012-01-01",
         "@@ -2,3 +2,2 @@",
@@ -1260,13 +1260,13 @@ TEST_F(FilePatchPickApplyTest, PatchInconsistentWithOriginalText) {
   std::istringstream ins("y\n");  // user accepts hunk
   std::ostringstream outs;
 
-  constexpr std::string_view kOriginal =
+  constexpr document_view kOriginal =
       "aaa\n"
       "bbb-different\n"  // inconsistent with patch
       "ccc\n"            // deleted by hunk
       "ddd\n"
       "eee\n";
-  constexpr std::string_view kExpected =
+  constexpr document_view kExpected =
       "aaa\n"
       "bbb\n"
       "ddd\n"
@@ -1281,7 +1281,7 @@ TEST_F(FilePatchPickApplyTest, PatchInconsistentWithOriginalText) {
 
 TEST_F(FilePatchPickApplyTest, OneDeletionAccepted) {
   {
-    const std::vector<std::string_view> kHunkText{
+    const std::vector<document_view> kHunkText{
         "--- foo.txt\t2012-01-01",
         "+++ foo-formatted.txt\t2012-01-01",
         "@@ -2,3 +2,2 @@",
@@ -1296,13 +1296,13 @@ TEST_F(FilePatchPickApplyTest, OneDeletionAccepted) {
   std::istringstream ins("y\n");  // user accepts hunk
   std::ostringstream outs;
 
-  constexpr std::string_view kOriginal =
+  constexpr document_view kOriginal =
       "aaa\n"
       "bbb\n"
       "ccc\n"  // deleted by hunk
       "ddd\n"
       "eee\n";
-  constexpr std::string_view kExpected =
+  constexpr document_view kExpected =
       "aaa\n"
       "bbb\n"
       "ddd\n"
@@ -1318,7 +1318,7 @@ TEST_F(FilePatchPickApplyTest, OneDeletionAccepted) {
 
 TEST_F(FilePatchPickApplyTest, OneInsertionAccepted) {
   {
-    const std::vector<std::string_view> kHunkText{
+    const std::vector<document_view> kHunkText{
         "--- foo.txt\t2012-01-01",
         "+++ foo-formatted.txt\t2012-01-01",
         "@@ -2,2 +2,3 @@",
@@ -1333,13 +1333,13 @@ TEST_F(FilePatchPickApplyTest, OneInsertionAccepted) {
   std::istringstream ins("y\n");  // user accepts hunk
   std::ostringstream outs;
 
-  constexpr std::string_view kOriginal =
+  constexpr document_view kOriginal =
       "aaa\n"
       "bbb\n"
       "ccc\n"
       "ddd\n"
       "eee\n";
-  constexpr std::string_view kExpected =
+  constexpr document_view kExpected =
       "aaa\n"
       "bbb\n"
       "bbb.5\n"  // inserted
@@ -1357,7 +1357,7 @@ TEST_F(FilePatchPickApplyTest, OneInsertionAccepted) {
 
 TEST_F(FilePatchPickApplyTest, OneReplacementAccepted) {
   {
-    const std::vector<std::string_view> kHunkText{
+    const std::vector<document_view> kHunkText{
         "--- foo.txt\t2012-01-01",
         "+++ foo-formatted.txt\t2012-01-01",
         "@@ -2,3 +2,3 @@",
@@ -1373,13 +1373,13 @@ TEST_F(FilePatchPickApplyTest, OneReplacementAccepted) {
   std::istringstream ins("y\n");  // user accepts hunk
   std::ostringstream outs;
 
-  constexpr std::string_view kOriginal =
+  constexpr document_view kOriginal =
       "aaa\n"
       "bbb\n"
       "ccc\n"  // replaced
       "ddd\n"
       "eee\n";
-  constexpr std::string_view kExpected =
+  constexpr document_view kExpected =
       "aaa\n"
       "bbb\n"
       "C++\n"  // replaced
@@ -1396,7 +1396,7 @@ TEST_F(FilePatchPickApplyTest, OneReplacementAccepted) {
 
 TEST_F(FilePatchPickApplyTest, HelpFirstThenAcceptHunk) {
   {
-    const std::vector<std::string_view> kHunkText{
+    const std::vector<document_view> kHunkText{
         "--- foo.txt\t2012-01-01",
         "+++ foo-formatted.txt\t2012-01-01",
         "@@ -2,3 +2,3 @@",
@@ -1412,13 +1412,13 @@ TEST_F(FilePatchPickApplyTest, HelpFirstThenAcceptHunk) {
   std::istringstream ins("?\ny\n");  // help, accept
   std::ostringstream outs;
 
-  constexpr std::string_view kOriginal =
+  constexpr document_view kOriginal =
       "aaa\n"
       "bbb\n"
       "ccc\n"  // replaced
       "ddd\n"
       "eee\n";
-  constexpr std::string_view kExpected =
+  constexpr document_view kExpected =
       "aaa\n"
       "bbb\n"
       "C++\n"  // replaced
@@ -1436,7 +1436,7 @@ TEST_F(FilePatchPickApplyTest, HelpFirstThenAcceptHunk) {
 
 TEST_F(FilePatchPickApplyTest, HunksOutOfOrder) {
   {
-    const std::vector<std::string_view> kHunkText{
+    const std::vector<document_view> kHunkText{
         "--- foo.txt\t2012-01-01",
         "+++ foo-formatted.txt\t2012-01-01",
         "@@ -5,3 +5,3 @@",
@@ -1457,7 +1457,7 @@ TEST_F(FilePatchPickApplyTest, HunksOutOfOrder) {
   std::istringstream ins("y\nn\n");  // accept, reject
   std::ostringstream outs;
 
-  constexpr std::string_view kOriginal =
+  constexpr document_view kOriginal =
       "aaa\n"
       "bbb\n"
       "ccc\n"  // replaced
@@ -1465,7 +1465,7 @@ TEST_F(FilePatchPickApplyTest, HunksOutOfOrder) {
       "eee\n"
       "fff\n"
       "ggg\n";
-  constexpr std::string_view kExpected =
+  constexpr document_view kExpected =
       "aaa\n"
       "bbb\n"
       "C++\n"  // replaced
@@ -1484,7 +1484,7 @@ TEST_F(FilePatchPickApplyTest, HunksOutOfOrder) {
 
 TEST_F(FilePatchPickApplyTest, AcceptOnlyFirstOfTwoHunks) {
   {
-    const std::vector<std::string_view> kHunkText{
+    const std::vector<document_view> kHunkText{
         "--- foo.txt\t2012-01-01",
         "+++ foo-formatted.txt\t2012-01-01",
         "@@ -2,3 +2,3 @@",
@@ -1505,7 +1505,7 @@ TEST_F(FilePatchPickApplyTest, AcceptOnlyFirstOfTwoHunks) {
   std::istringstream ins("y\nn\n");  // accept, reject
   std::ostringstream outs;
 
-  constexpr std::string_view kOriginal =
+  constexpr document_view kOriginal =
       "aaa\n"
       "bbb\n"
       "ccc\n"  // replaced
@@ -1513,7 +1513,7 @@ TEST_F(FilePatchPickApplyTest, AcceptOnlyFirstOfTwoHunks) {
       "eee\n"
       "fff\n"
       "ggg\n";
-  constexpr std::string_view kExpected =
+  constexpr document_view kExpected =
       "aaa\n"
       "bbb\n"
       "C++\n"  // replaced
@@ -1532,7 +1532,7 @@ TEST_F(FilePatchPickApplyTest, AcceptOnlyFirstOfTwoHunks) {
 
 TEST_F(FilePatchPickApplyTest, AcceptOnlySecondOfTwoHunks) {
   {
-    const std::vector<std::string_view> kHunkText{
+    const std::vector<document_view> kHunkText{
         "--- foo.txt\t2012-01-01",
         "+++ foo-formatted.txt\t2012-01-01",
         "@@ -2,3 +2,3 @@",
@@ -1553,7 +1553,7 @@ TEST_F(FilePatchPickApplyTest, AcceptOnlySecondOfTwoHunks) {
   std::istringstream ins("n\ny\n");  // reject, accept
   std::ostringstream outs;
 
-  constexpr std::string_view kOriginal =
+  constexpr document_view kOriginal =
       "aaa\n"
       "bbb\n"
       "ccc\n"  // kept
@@ -1561,7 +1561,7 @@ TEST_F(FilePatchPickApplyTest, AcceptOnlySecondOfTwoHunks) {
       "eee\n"
       "fff\n"  // changed
       "ggg\n";
-  constexpr std::string_view kExpected =
+  constexpr document_view kExpected =
       "aaa\n"
       "bbb\n"
       "ccc\n"  // kept
@@ -1580,7 +1580,7 @@ TEST_F(FilePatchPickApplyTest, AcceptOnlySecondOfTwoHunks) {
 
 TEST_F(FilePatchPickApplyTest, SplitThenAcceptOnlyFirstOfTwoHunks) {
   {
-    const std::vector<std::string_view> kHunkText{
+    const std::vector<document_view> kHunkText{
         "--- foo.txt\t2012-01-01",
         "+++ foo-formatted.txt\t2012-01-01",
         "@@ -2,6 +2,6 @@",  // one large splittable hunk
@@ -1600,7 +1600,7 @@ TEST_F(FilePatchPickApplyTest, SplitThenAcceptOnlyFirstOfTwoHunks) {
   std::istringstream ins("s\ny\nn\n");  // split, accept, reject
   std::ostringstream outs;
 
-  constexpr std::string_view kOriginal =
+  constexpr document_view kOriginal =
       "aaa\n"
       "bbb\n"
       "ccc\n"  // replaced
@@ -1608,7 +1608,7 @@ TEST_F(FilePatchPickApplyTest, SplitThenAcceptOnlyFirstOfTwoHunks) {
       "eee\n"
       "fff\n"
       "ggg\n";
-  constexpr std::string_view kExpected =
+  constexpr document_view kExpected =
       "aaa\n"
       "bbb\n"
       "C++\n"  // replaced
@@ -1627,7 +1627,7 @@ TEST_F(FilePatchPickApplyTest, SplitThenAcceptOnlyFirstOfTwoHunks) {
 
 TEST_F(FilePatchPickApplyTest, SplitThenAcceptOnlySecondOfTwoHunks) {
   {
-    const std::vector<std::string_view> kHunkText{
+    const std::vector<document_view> kHunkText{
         "--- foo.txt\t2012-01-01",
         "+++ foo-formatted.txt\t2012-01-01",
         "@@ -2,6 +2,6 @@",  // one large splittable hunk
@@ -1647,7 +1647,7 @@ TEST_F(FilePatchPickApplyTest, SplitThenAcceptOnlySecondOfTwoHunks) {
   std::istringstream ins("s\nn\ny\n");  // split, reject, accept
   std::ostringstream outs;
 
-  constexpr std::string_view kOriginal =
+  constexpr document_view kOriginal =
       "aaa\n"
       "bbb\n"
       "ccc\n"  // kept
@@ -1655,7 +1655,7 @@ TEST_F(FilePatchPickApplyTest, SplitThenAcceptOnlySecondOfTwoHunks) {
       "eee\n"
       "fff\n"  // replaced
       "ggg\n";
-  constexpr std::string_view kExpected =
+  constexpr document_view kExpected =
       "aaa\n"
       "bbb\n"
       "ccc\n"  // kept
@@ -1674,7 +1674,7 @@ TEST_F(FilePatchPickApplyTest, SplitThenAcceptOnlySecondOfTwoHunks) {
 
 TEST_F(FilePatchPickApplyTest, AbortRightAway) {
   {
-    const std::vector<std::string_view> kHunkText{
+    const std::vector<document_view> kHunkText{
         "--- foo.txt\t2012-01-01",
         "+++ foo-formatted.txt\t2012-01-01",
         "@@ -2,3 +2,3 @@",
@@ -1695,7 +1695,7 @@ TEST_F(FilePatchPickApplyTest, AbortRightAway) {
   std::istringstream ins("q\n");  // quit (abandon)
   std::ostringstream outs;
 
-  constexpr std::string_view kOriginal =
+  constexpr document_view kOriginal =
       "aaa\n"
       "bbb\n"
       "ccc\n"
@@ -1703,7 +1703,7 @@ TEST_F(FilePatchPickApplyTest, AbortRightAway) {
       "eee\n"
       "fff\n"
       "ggg\n";
-  constexpr std::string_view kExpected = kOriginal;
+  constexpr document_view kExpected = kOriginal;
 
   const auto status =
       PickApply(ins, outs,  //
@@ -1715,7 +1715,7 @@ TEST_F(FilePatchPickApplyTest, AbortRightAway) {
 
 TEST_F(FilePatchPickApplyTest, TreatEndOfUserInputAsAbort) {
   {
-    const std::vector<std::string_view> kHunkText{
+    const std::vector<document_view> kHunkText{
         "--- foo.txt\t2012-01-01",
         "+++ foo-formatted.txt\t2012-01-01",
         "@@ -2,3 +2,3 @@",
@@ -1736,7 +1736,7 @@ TEST_F(FilePatchPickApplyTest, TreatEndOfUserInputAsAbort) {
   std::istringstream ins;  // empty, end of user input
   std::ostringstream outs;
 
-  constexpr std::string_view kOriginal =
+  constexpr document_view kOriginal =
       "aaa\n"
       "bbb\n"
       "ccc\n"
@@ -1744,7 +1744,7 @@ TEST_F(FilePatchPickApplyTest, TreatEndOfUserInputAsAbort) {
       "eee\n"
       "fff\n"
       "ggg\n";
-  constexpr std::string_view kExpected = kOriginal;
+  constexpr document_view kExpected = kOriginal;
 
   const auto status =
       PickApply(ins, outs,  //
@@ -1756,7 +1756,7 @@ TEST_F(FilePatchPickApplyTest, TreatEndOfUserInputAsAbort) {
 
 TEST_F(FilePatchPickApplyTest, AbortFileAfterAcceptingOneHunk) {
   {
-    const std::vector<std::string_view> kHunkText{
+    const std::vector<document_view> kHunkText{
         "--- foo.txt\t2012-01-01",
         "+++ foo-formatted.txt\t2012-01-01",
         "@@ -2,3 +2,3 @@",
@@ -1777,7 +1777,7 @@ TEST_F(FilePatchPickApplyTest, AbortFileAfterAcceptingOneHunk) {
   std::istringstream ins("y\nq\n");  // accept, quit (abandon)
   std::ostringstream outs;
 
-  constexpr std::string_view kOriginal =
+  constexpr document_view kOriginal =
       "aaa\n"
       "bbb\n"
       "ccc\n"  // replaced
@@ -1785,7 +1785,7 @@ TEST_F(FilePatchPickApplyTest, AbortFileAfterAcceptingOneHunk) {
       "eee\n"
       "fff\n"
       "ggg\n";
-  constexpr std::string_view kExpected = kOriginal;
+  constexpr document_view kExpected = kOriginal;
 
   const auto status =
       PickApply(ins, outs,  //
@@ -1797,7 +1797,7 @@ TEST_F(FilePatchPickApplyTest, AbortFileAfterAcceptingOneHunk) {
 
 TEST_F(FilePatchPickApplyTest, AcceptTwoDeletions) {
   {
-    const std::vector<std::string_view> kHunkText{
+    const std::vector<document_view> kHunkText{
         "--- foo.txt\t2012-01-01",
         "+++ foo-formatted.txt\t2012-01-01",
         "@@ -2,3 +2,2 @@",
@@ -1816,7 +1816,7 @@ TEST_F(FilePatchPickApplyTest, AcceptTwoDeletions) {
   std::istringstream ins("y\ny\n");  // accept, accept
   std::ostringstream outs;
 
-  constexpr std::string_view kOriginal =
+  constexpr document_view kOriginal =
       "aaa\n"
       "bbb\n"
       "ccc\n"
@@ -1825,7 +1825,7 @@ TEST_F(FilePatchPickApplyTest, AcceptTwoDeletions) {
       "fff\n"
       "ggg\n"
       "hhh\n";
-  constexpr std::string_view kExpected =
+  constexpr document_view kExpected =
       "aaa\n"
       "bbb\n"
       "ddd\n"
@@ -1843,7 +1843,7 @@ TEST_F(FilePatchPickApplyTest, AcceptTwoDeletions) {
 
 TEST_F(FilePatchPickApplyTest, AcceptAllDeletions) {
   {
-    const std::vector<std::string_view> kHunkText{
+    const std::vector<document_view> kHunkText{
         "--- foo.txt\t2012-01-01",
         "+++ foo-formatted.txt\t2012-01-01",
         "@@ -2,3 +2,2 @@",
@@ -1862,7 +1862,7 @@ TEST_F(FilePatchPickApplyTest, AcceptAllDeletions) {
   std::istringstream ins("a\n");  // accept all
   std::ostringstream outs;
 
-  constexpr std::string_view kOriginal =
+  constexpr document_view kOriginal =
       "aaa\n"
       "bbb\n"
       "ccc\n"
@@ -1871,7 +1871,7 @@ TEST_F(FilePatchPickApplyTest, AcceptAllDeletions) {
       "fff\n"
       "ggg\n"
       "hhh\n";
-  constexpr std::string_view kExpected =
+  constexpr document_view kExpected =
       "aaa\n"
       "bbb\n"
       "ddd\n"
@@ -1889,7 +1889,7 @@ TEST_F(FilePatchPickApplyTest, AcceptAllDeletions) {
 
 TEST_F(FilePatchPickApplyTest, RejectAllDeletions) {
   {
-    const std::vector<std::string_view> kHunkText{
+    const std::vector<document_view> kHunkText{
         "--- foo.txt\t2012-01-01",
         "+++ foo-formatted.txt\t2012-01-01",
         "@@ -2,3 +2,2 @@",
@@ -1908,7 +1908,7 @@ TEST_F(FilePatchPickApplyTest, RejectAllDeletions) {
   std::istringstream ins("d\n");  // accept all
   std::ostringstream outs;
 
-  constexpr std::string_view kOriginal =
+  constexpr document_view kOriginal =
       "aaa\n"
       "bbb\n"
       "ccc\n"
@@ -1917,7 +1917,7 @@ TEST_F(FilePatchPickApplyTest, RejectAllDeletions) {
       "fff\n"
       "ggg\n"
       "hhh\n";
-  constexpr std::string_view kExpected = kOriginal;  // no changes
+  constexpr document_view kExpected = kOriginal;  // no changes
 
   const auto status =
       PickApply(ins, outs,  //
@@ -1929,7 +1929,7 @@ TEST_F(FilePatchPickApplyTest, RejectAllDeletions) {
 
 TEST_F(FilePatchPickApplyTest, AcceptTwoInsertions) {
   {
-    const std::vector<std::string_view> kHunkText{
+    const std::vector<document_view> kHunkText{
         "--- foo.txt\t2012-01-01",
         "+++ foo-formatted.txt\t2012-01-01",
         "@@ -2,2 +2,3 @@",
@@ -1948,14 +1948,14 @@ TEST_F(FilePatchPickApplyTest, AcceptTwoInsertions) {
   std::istringstream ins("y\ny\n");  // accept, accept
   std::ostringstream outs;
 
-  constexpr std::string_view kOriginal =
+  constexpr document_view kOriginal =
       "aaa\n"
       "bbb\n"
       "ddd\n"
       "eee\n"
       "fff\n"
       "hhh\n";
-  constexpr std::string_view kExpected =
+  constexpr document_view kExpected =
       "aaa\n"
       "bbb\n"
       "ccc\n"
@@ -1975,7 +1975,7 @@ TEST_F(FilePatchPickApplyTest, AcceptTwoInsertions) {
 
 TEST_F(FilePatchPickApplyTest, AcceptAllInsertions) {
   {
-    const std::vector<std::string_view> kHunkText{
+    const std::vector<document_view> kHunkText{
         "--- foo.txt\t2012-01-01",
         "+++ foo-formatted.txt\t2012-01-01",
         "@@ -2,2 +2,3 @@",
@@ -1994,14 +1994,14 @@ TEST_F(FilePatchPickApplyTest, AcceptAllInsertions) {
   std::istringstream ins("a\n");  // accept all
   std::ostringstream outs;
 
-  constexpr std::string_view kOriginal =
+  constexpr document_view kOriginal =
       "aaa\n"
       "bbb\n"
       "ddd\n"
       "eee\n"
       "fff\n"
       "hhh\n";
-  constexpr std::string_view kExpected =
+  constexpr document_view kExpected =
       "aaa\n"
       "bbb\n"
       "ccc\n"
@@ -2021,7 +2021,7 @@ TEST_F(FilePatchPickApplyTest, AcceptAllInsertions) {
 
 TEST_F(FilePatchPickApplyTest, RejectAllInsertions) {
   {
-    const std::vector<std::string_view> kHunkText{
+    const std::vector<document_view> kHunkText{
         "--- foo.txt\t2012-01-01",
         "+++ foo-formatted.txt\t2012-01-01",
         "@@ -2,2 +2,3 @@",
@@ -2040,14 +2040,14 @@ TEST_F(FilePatchPickApplyTest, RejectAllInsertions) {
   std::istringstream ins("d\n");  // reject all
   std::ostringstream outs;
 
-  constexpr std::string_view kOriginal =
+  constexpr document_view kOriginal =
       "aaa\n"
       "bbb\n"
       "ddd\n"
       "eee\n"
       "fff\n"
       "hhh\n";
-  constexpr std::string_view kExpected = kOriginal;
+  constexpr document_view kExpected = kOriginal;
 
   const auto status =
       PickApply(ins, outs,  //
@@ -2064,7 +2064,7 @@ namespace {
 // public interface tests
 
 TEST(PatchSetParseTest, InvalidInputs) {
-  constexpr std::string_view kTestCases[] = {
+  constexpr document_view kTestCases[] = {
       // no "+++" marker for source
       "--- /path/to/file.txt\t2020-03-30\n",
       // hunk line counts are inconsistent
@@ -2090,7 +2090,7 @@ TEST(PatchSetParseTest, InvalidInputs) {
 }
 
 TEST(PatchSetParseAndPrintTest, ValidInputs) {
-  constexpr std::string_view kTestCases[] = {
+  constexpr document_view kTestCases[] = {
       // no metadata here
       "--- /path/to/file.txt\t2020-03-30\n"
       "+++ /path/to/file.txt\t2020-03-30\n"
@@ -2166,7 +2166,7 @@ TEST(PatchSetParseAndPrintTest, ValidInputs) {
 }
 
 TEST(PatchSetAddedLinesMapTest, NewAndExistingFile) {
-  constexpr std::string_view patch_contents =  //
+  constexpr document_view patch_contents =  //
       "diff -u /dev/null local/path/to/file1.txt\n"
       "--- /dev/null\t2020-03-30\n"
       "+++ /path/to/file1.txt\t2020-03-30\n"  // new file
@@ -2204,7 +2204,7 @@ class PatchSetPickApplyTest : public PatchSet, public ::testing::Test {};
 
 TEST_F(PatchSetPickApplyTest, EmptyFilePatchHunks) {
   {
-    constexpr std::string_view patch_contents =  //
+    constexpr document_view patch_contents =  //
         "diff -u /dev/null local/path/to/file1.txt\n"
         "--- foo/bar.txt\t2020-03-30\n"
         "+++ foo/bar-formatted.txt\t2020-03-30\n";
@@ -2225,7 +2225,7 @@ TEST_F(PatchSetPickApplyTest, EmptyFilePatchHunks) {
 
 TEST_F(PatchSetPickApplyTest, MultipleEmptyFilePatchHunks) {
   {
-    constexpr std::string_view patch_contents =  //
+    constexpr document_view patch_contents =  //
         "diff -u /dev/null local/path/to/file1.txt\n"
         "--- foo/bar.txt\t2020-03-30\n"
         "+++ foo/bar-formatted.txt\t2020-03-30\n"
@@ -2253,7 +2253,7 @@ TEST_F(PatchSetPickApplyTest, MultipleEmptyFilePatchHunks) {
 
 TEST_F(PatchSetPickApplyTest, MultipleNonEmptyFilePatchHunks) {
   {
-    constexpr std::string_view patch_contents =  //
+    constexpr document_view patch_contents =  //
         "diff -u /dev/null local/path/to/file1.txt\n"
         "--- foo/bar.txt\t2020-03-30\n"
         "+++ foo/bar-formatted.txt\t2020-03-30\n"
@@ -2289,7 +2289,7 @@ TEST_F(PatchSetPickApplyTest, MultipleNonEmptyFilePatchHunks) {
 
 TEST_F(PatchSetPickApplyTest, FirstFilePatchOutOfOrder) {
   {
-    constexpr std::string_view patch_contents =  //
+    constexpr document_view patch_contents =  //
         "diff -u /dev/null local/path/to/file1.txt\n"
         "--- foo/bar.txt\t2020-03-30\n"
         "+++ foo/bar-formatted.txt\t2020-03-30\n"

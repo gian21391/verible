@@ -64,12 +64,12 @@ class CodeStreamHolder {
 template <typename L>
 class FlexLexerAdapter : private CodeStreamHolder, protected L, public Lexer {
  public:
-  explicit FlexLexerAdapter(std::string_view code)
+  explicit FlexLexerAdapter(document_view code)
       : L(&code_stream_),
         code_(code),
         // last_token_ points to the beginning of the code_ buffer
         last_token_(0 /* enum doesn't matter */, code_.substr(0, 0)) {
-    code_stream_.str(std::string(code));
+    code_stream_.str(code.to_string());
     // istringstream copies text into its own internal buffer.
   }
 
@@ -108,10 +108,10 @@ class FlexLexerAdapter : private CodeStreamHolder, protected L, public Lexer {
   }
 
   // Restart lexer by pointing to new input stream, and reset all state.
-  void Restart(std::string_view code) override {  // not yet final
+  void Restart(document_view code) override {  // not yet final
     at_eof_ = false;
     code_ = code;
-    code_stream_.str(std::string(code_));
+    code_stream_.str(code_.to_string());
     last_token_ = TokenInfo(0, code_.substr(0, 0));
 
     // Reset buffer stack.
@@ -150,7 +150,7 @@ class FlexLexerAdapter : private CodeStreamHolder, protected L, public Lexer {
 
  private:
   // A read-only view of the entire text to be scanned.
-  std::string_view code_;
+  document_view code_;
 
   // Contains the enumeration and the substring slice of the last lexed token.
   TokenInfo last_token_;

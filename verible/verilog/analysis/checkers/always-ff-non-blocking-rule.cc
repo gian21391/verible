@@ -215,7 +215,7 @@ bool AlwaysFFNonBlockingRule::LocalDeclaration(const verible::Symbol &symbol) {
         if (const auto *const ident =
                 verible::down_cast<const verible::SyntaxTreeLeaf *>(
                     node->front().get())) {
-          const std::string_view name = ident->get().text();
+          const verible::document_view name = ident->get().text();
           VLOG(4) << "Registering '" << name << '\'' << std::endl;
           locals_.emplace_back(name);
           count++;

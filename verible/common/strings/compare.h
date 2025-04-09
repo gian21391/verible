@@ -17,6 +17,8 @@
 
 #include <string_view>
 
+#include "verible/common/strings/document-view.h"
+
 namespace verible {
 
 // This comparator enables heteregeneous lookup on a string-keyed associative
@@ -30,6 +32,15 @@ struct StringViewCompare {
 
   // Works on anything that is implicitly convertible to string_view.
   bool operator()(std::string_view a, std::string_view b) const {
+    return a < b;
+  }
+};
+
+struct DocumentViewCompare {
+  using is_transparent = void;
+
+  // Works on anything that is implicitly convertible to string_view.
+  bool operator()(document_view a, document_view b) const {
     return a < b;
   }
 };

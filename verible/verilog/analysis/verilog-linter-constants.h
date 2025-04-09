@@ -20,16 +20,16 @@
 namespace verilog {
 
 // This is the leading string that makes a comment a lint waiver.
-inline constexpr std::string_view kLinterTrigger = "verilog_lint:";
+inline constexpr verible::document_view kLinterTrigger = "verilog_lint:";
 
 // This command says to waive one line (this or next applicable).
-inline constexpr std::string_view kLinterWaiveLineCommand = "waive";
+inline constexpr verible::document_view kLinterWaiveLineCommand = "waive";
 
 // This command says to start waiving a rule from this line...
-inline constexpr std::string_view kLinterWaiveStartCommand = "waive-start";
+inline constexpr verible::document_view kLinterWaiveStartCommand = "waive-start";
 
 // ... and stop waiving at this line.
-inline constexpr std::string_view kLinterWaiveStopCommand = "waive-stop";
+inline constexpr verible::document_view kLinterWaiveStopCommand = "waive-stop";
 
 }  // namespace verilog
 

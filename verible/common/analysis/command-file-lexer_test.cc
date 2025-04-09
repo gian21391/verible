@@ -30,7 +30,7 @@ namespace {
 // Removes non-essential tokens from token output stream, such as spaces.
 class FilteredCommandFileLexer : public CommandFileLexer {
  public:
-  explicit FilteredCommandFileLexer(std::string_view code)
+  explicit FilteredCommandFileLexer(document_view code)
       : CommandFileLexer(code) {}
 
   bool KeepSyntaxTreeTokens(const verible::TokenInfo &t) {

@@ -51,7 +51,7 @@ static int CompareViolation(const LintViolation &lhs, const TokenInfo &rhs) {
 
 // TODO(b/151371397): refactor this for re-use for multi-findings style tests.
 bool LintTestCase::ExactMatchFindings(
-    const std::set<LintViolation> &found_violations, std::string_view base,
+    const std::set<LintViolation> &found_violations, document_view base,
     std::ostream *diffstream) const {
   // Due to the order in which violations are visited, we can assert that
   // the reported violations are thus ordered.

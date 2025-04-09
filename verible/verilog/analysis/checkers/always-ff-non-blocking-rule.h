@@ -71,7 +71,7 @@ class AlwaysFFNonBlockingRule : public verible::SyntaxTreeLintRule {
   };
 
   // In-order stack of local variable names
-  std::vector<std::string_view> locals_;
+  std::vector<verible::document_view> locals_;
 };
 
 }  // namespace analysis

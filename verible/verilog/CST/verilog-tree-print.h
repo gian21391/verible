@@ -30,7 +30,7 @@ namespace verilog {
 class VerilogPrettyPrinter : public verible::PrettyPrinter {
  public:
   explicit VerilogPrettyPrinter(std::ostream *output_stream,
-                                std::string_view base);
+                                verible::document_view base);
 
   void Visit(const verible::SyntaxTreeLeaf &) final;
   void Visit(const verible::SyntaxTreeNode &) final;
@@ -39,7 +39,7 @@ class VerilogPrettyPrinter : public verible::PrettyPrinter {
 };
 
 // Prints tree contained at root to stream
-void PrettyPrintVerilogTree(const verible::Symbol &root, std::string_view base,
+void PrettyPrintVerilogTree(const verible::Symbol &root, verible::document_view base,
                             std::ostream *stream);
 
 }  // namespace verilog

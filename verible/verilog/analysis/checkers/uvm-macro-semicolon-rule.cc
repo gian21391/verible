@@ -58,7 +58,7 @@ static std::string FormatReason(const verible::TokenInfo &macro_id) {
 
 // Returns true if leaf is a macro and matches `uvm_
 static bool IsUvmMacroId(const verible::SyntaxTreeLeaf &leaf) {
-  const std::string_view text = leaf.get().text();
+  const std::string_view text = leaf.get().text().to_string_view();
   const bool starts_with_uvm = absl::StartsWithIgnoreCase(text, "`uvm_");
 
   if (leaf.Tag().tag == verilog_tokentype::MacroCallId ||

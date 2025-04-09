@@ -172,9 +172,7 @@ void ReserveIfSupported(Container &, ...) {}
 // Traits of a type fulfilling TreeNode concept.
 // `TreeNodeTraits<T>` is defined for every class `T` fulfilling the TreeNode
 // concept. It can be used in SFINAE tests.
-template <class Node,  //
-          typename Children_ =
-              tree_operations_internal::TreeNodeChildrenTraits<Node>>
+template <class Node>
 struct TreeNodeTraits : FeatureTraits {
   using Parent =
       detected_or_t<UnavailableFeatureTraits,
@@ -182,7 +180,9 @@ struct TreeNodeTraits : FeatureTraits {
   using Value =
       detected_or_t<UnavailableFeatureTraits,
                     tree_operations_internal::TreeNodeValueTraits, Node>;
-  using Children = Children_;
+  using Children =
+      detected_or_t<UnavailableFeatureTraits,
+                    tree_operations_internal::TreeNodeChildrenTraits, Node>;
 };
 
 // Functions operating on tree nodes:

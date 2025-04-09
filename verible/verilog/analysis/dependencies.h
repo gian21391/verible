@@ -41,7 +41,7 @@ struct FileDependencies {
   using node_type = const VerilogSourceFile *;
 
   // A set of strings, whose memory is owned outside of this data structure.
-  using SymbolNameSet = std::set<std::string_view, verible::StringViewCompare>;
+  using SymbolNameSet = std::set<verible::document_view, verible::DocumentViewCompare>;
 
   // Sort by referenced file name.
   using FileCompare = VerilogSourceFile::Less;
@@ -70,7 +70,7 @@ struct FileDependencies {
   // objects.  Typically, this is owned by VerilogSourceFile inside
   // VerilogProject.
   using symbol_index_type =
-      std::map<std::string_view, SymbolData, verible::StringViewCompare>;
+      std::map<verible::document_view, SymbolData, verible::DocumentViewCompare>;
 
   // === Fields (in order of initialization and computation)
   // All fields are const-initialized and public.

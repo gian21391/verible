@@ -165,7 +165,7 @@ absl::StatusOr<std::string> GetContentAsString(std::string_view filename) {
 #endif
     stream = stdin;
   } else {
-    const std::string filename_str = std::string{filename};
+    const std::string filename_str(filename);
     if (absl::Status status = FileExists(filename_str); !status.ok()) {
       return status;  // Bail
     }
@@ -195,7 +195,9 @@ static absl::StatusOr<std::unique_ptr<MemBlock>> AttemptMemMapFile(
    public:
     MemMapBlock(char *buffer, size_t size) : buffer_(buffer), size_(size) {}
     ~MemMapBlock() final { munmap(buffer_, size_); }
-    std::string_view AsStringView() const final { return {buffer_, size_}; }
+    document_view AsDocumentView() const final {
+      return {buffer_, size_, buffer_, buffer_ + size_};
+    }
 
    private:
     char *const buffer_;
@@ -245,7 +247,7 @@ absl::StatusOr<std::unique_ptr<MemBlock>> GetContentAsMemBlock(
   return std::make_unique<StringMemBlock>(std::move(*content_or));
 }
 
-absl::Status SetContents(std::string_view filename, std::string_view content) {
+absl::Status SetContents(std::string_view filename, document_view content) {
   VLOG(1) << __FUNCTION__ << ": Writing file: " << filename;
   FILE *out = fopen(std::string(filename).c_str(), "wb");
   if (!out) return CreateErrorStatusFromErrno(filename, "can't write.");
@@ -317,7 +319,7 @@ std::string RandomFileBasename(std::string_view prefix) {
 }
 
 ScopedTestFile::ScopedTestFile(std::string_view base_dir,
-                               std::string_view content,
+                               document_view content,
                                std::string_view use_this_filename)
     // There is no secrecy needed for test files,
     // file name just need to be unique enough.

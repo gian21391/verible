@@ -93,7 +93,7 @@ static bool UnqualifiedIdEquals(const SyntaxTreeNode &node,
           down_cast<const SyntaxTreeLeaf *>(node.front().get());
       if (leaf_ptr != nullptr) {
         const TokenInfo &token = leaf_ptr->get();
-        return token.token_enum() == SymbolIdentifier && token.text() == name;
+        return token.token_enum() == SymbolIdentifier && token.text().to_string_view() == name;
       }
     }
   }
@@ -123,7 +123,7 @@ static bool QualifiedCallIsTypeIdCreate(
 
 // Returns string_view of `text` with outermost double-quotes removed.
 // If `text` is not wrapped in quotes, return it as-is.
-static std::string_view StripOuterQuotes(std::string_view text) {
+static verible::document_view StripOuterQuotes(verible::document_view text) {
   if (!text.empty() && text[0] == '\"') {
     return text.substr(1, text.length() - 2);
   }
@@ -201,7 +201,8 @@ void CreateObjectNameMatchRule::HandleSymbol(const verible::Symbol &symbol,
     if (const TokenInfo *name_token = ExtractStringLiteralToken(*expr)) {
       if (StripOuterQuotes(name_token->text()) != lval_id->text()) {
         violations_.insert(LintViolation(
-            *name_token, FormatReason(lval_id->text(), name_token->text())));
+            *name_token, FormatReason(
+              lval_id->text().to_string_view(), name_token->text().to_string_view())));
       }
     }
   }

@@ -105,7 +105,7 @@ void PackageFilenameRule::Lint(const TextStructureView &text_structure,
     const verible::TokenInfo *package_name_token =
         GetPackageNameToken(*package_match.match);
     if (!package_name_token) continue;
-    std::string_view package_id = package_name_token->text();
+    verible::document_view package_id = package_name_token->text();
     auto package_id_plus_suffix = absl::StrCat(package_id, kOptionalSuffix);
     if ((package_id != unitname) && (package_id_plus_suffix != unitname)) {
       violations_.insert(verible::LintViolation(

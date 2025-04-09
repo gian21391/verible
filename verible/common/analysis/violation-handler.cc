@@ -34,7 +34,7 @@
 namespace verible {
 namespace {
 
-void PrintFix(std::ostream &stream, std::string_view text,
+void PrintFix(std::ostream &stream, document_view text,
               const verible::AutoFix &fix) {
   std::string after = fix.Apply(text);
   verible::LineDiffs diff(text, after);
@@ -42,7 +42,7 @@ void PrintFix(std::ostream &stream, std::string_view text,
   verible::LineDiffsToUnifiedDiff(stream, diff, 1);
 }
 
-void PrintFixAlternatives(std::ostream &stream, std::string_view text,
+void PrintFixAlternatives(std::ostream &stream, document_view text,
                           const std::vector<verible::AutoFix> &fixes) {
   const bool print_alternative_number = fixes.size() > 1;
   for (size_t i = 0; i < fixes.size(); ++i) {
@@ -61,7 +61,7 @@ void PrintFixAlternatives(std::ostream &stream, std::string_view text,
 }  // namespace
 
 void ViolationPrinter::HandleViolations(
-    const std::set<LintViolationWithStatus> &violations, std::string_view base,
+    const std::set<LintViolationWithStatus> &violations, document_view base,
     std::string_view path) {
   verible::LintStatusFormatter formatter(base);
   for (auto violation : violations) {
@@ -73,7 +73,7 @@ void ViolationPrinter::HandleViolations(
 }
 
 void ViolationWaiverPrinter::HandleViolations(
-    const std::set<LintViolationWithStatus> &violations, std::string_view base,
+    const std::set<LintViolationWithStatus> &violations, document_view base,
     std::string_view path) {
   verible::LintStatusFormatter formatter(base);
   for (auto violation : violations) {
@@ -88,7 +88,7 @@ void ViolationWaiverPrinter::HandleViolations(
   }
 }
 
-void ViolationFixer::CommitFixes(std::string_view source_content,
+void ViolationFixer::CommitFixes(document_view source_content,
                                  std::string_view source_path,
                                  const verible::AutoFix &fix) const {
   if (fix.Edits().empty()) {
@@ -111,7 +111,7 @@ void ViolationFixer::CommitFixes(std::string_view source_content,
 }
 
 void ViolationFixer::HandleViolations(
-    const std::set<LintViolationWithStatus> &violations, std::string_view base,
+    const std::set<LintViolationWithStatus> &violations, document_view base,
     std::string_view path) {
   verible::AutoFix fix;
   verible::LintStatusFormatter formatter(base);
@@ -124,7 +124,7 @@ void ViolationFixer::HandleViolations(
 }
 
 void ViolationFixer::HandleViolation(
-    const verible::LintViolation &violation, std::string_view base,
+    const verible::LintViolation &violation, document_view base,
     std::string_view path, std::string_view url, std::string_view rule_name,
     const verible::LintStatusFormatter &formatter, verible::AutoFix *fix) {
   std::stringstream violation_message;

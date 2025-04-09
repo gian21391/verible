@@ -116,13 +116,13 @@ void DffNameStyleRule::HandleBlockingAssignments(
     driven_variable = GetIncrementDecrementOperand(symbol);
   }
 
-  std::string_view lhs_str = verible::StringSpanOfSymbol(*driven_variable);
+  verible::document_view lhs_str = verible::StringSpanOfSymbol(*driven_variable);
 
   const bool found_id =
       std::any_of(valid_output_suffixes.cbegin(), valid_output_suffixes.cend(),
                   [&](const std::string &suffix) -> bool {
                     return lhs_str.size() > suffix.size() &&
-                           absl::EndsWith(lhs_str, suffix);
+                           lhs_str.ends_with(suffix);
                   });
 
   if (!found_id) return;
@@ -145,18 +145,18 @@ void DffNameStyleRule::HandleNonBlockingAssignments(
   const verible::Symbol &lhs = *GetNonBlockingAssignmentLhs(node);
   const verible::SyntaxTreeNode &rhs_expr = *GetNonBlockingAssignmentRhs(node);
 
-  std::string_view lhs_str = verible::StringSpanOfSymbol(lhs);
-  std::string_view rhs_str = verible::StringSpanOfSymbol(rhs_expr);
+  verible::document_view lhs_str = verible::StringSpanOfSymbol(lhs);
+  verible::document_view rhs_str = verible::StringSpanOfSymbol(rhs_expr);
 
   // If this variable matches the waive regex, ignore it.
-  if (waive_lhs_regex && RE2::FullMatch(lhs_str, *waive_lhs_regex)) {
+  if (waive_lhs_regex && RE2::FullMatch(lhs_str.to_string_view(), *waive_lhs_regex)) {
     return;
   }
 
   auto [clean_lhs_str, lhs_pipe_stage] = ExtractPipelineStage(lhs_str);
 
   // Check if the string without the pipeline number has a valid format
-  std::string_view lhs_base =
+  verible::document_view lhs_base =
       CheckSuffix(context, lhs, clean_lhs_str, valid_output_suffixes);
   // If the base is empty, lhs is wrongly formatted. Stop making more checks
   if (lhs_base.empty()) return;
@@ -186,7 +186,7 @@ void DffNameStyleRule::HandleNonBlockingAssignments(
     return;
   }
 
-  std::string_view rhs_base =
+  verible::document_view rhs_base =
       CheckSuffix(context, rhs_expr, rhs_str, valid_input_suffixes);
 
   // If the rhs is wrongly formatted, there is no need to check that the
@@ -245,7 +245,7 @@ void DffNameStyleRule::HandleSymbol(const verible::Symbol &symbol,
 
         if (!s) return false;
         std::string_view paren_str =
-            absl::StripAsciiWhitespace(verible::StringSpanOfSymbol(*s));
+            absl::StripAsciiWhitespace(verible::StringSpanOfSymbol(*s).to_string_view());
 
         // EXACT matching w.r.t waive_ifs_with_conditions. Substring checking
         // isn't really appropriate because we would have to check for tricky
@@ -262,12 +262,12 @@ void DffNameStyleRule::HandleSymbol(const verible::Symbol &symbol,
   HandleNonBlockingAssignments(symbol, context);
 }
 
-std::string_view DffNameStyleRule::CheckSuffix(
+verible::document_view DffNameStyleRule::CheckSuffix(
     const verible::SyntaxTreeContext &context, const verible::Symbol &root,
-    std::string_view id, const std::vector<std::string> &suffixes) {
+    verible::document_view id, const std::vector<std::string> &suffixes) {
   // Identifier is split between base and suffix:
   // "myid_q" => {"myid", "_q"}
-  std::string_view base;
+  verible::document_view base;
   // If there are no patterns to check against, everything passes the check
   if (suffixes.empty()) return base;
 
@@ -294,9 +294,9 @@ std::string_view DffNameStyleRule::CheckSuffix(
   // Check if id conforms to any valid suffix
   const bool id_ok = std::any_of(suffixes.cbegin(), suffixes.cend(),
                                  [&](const std::string &suffix) -> bool {
-                                   if (absl::EndsWith(id, suffix)) {
-                                     base = std::string_view(
-                                         id.data(), id.size() - suffix.size());
+                                   if (id.ends_with(suffix)) {
+                                     base = verible::document_view(
+                                         id.data(), id.size() - suffix.size(), id);
                                      suffix_match = suffix;
                                      return true;
                                    }
@@ -374,10 +374,10 @@ std::vector<std::string> DffNameStyleRule::ProcessSuffixes(
   return result;
 }
 
-std::pair<std::string_view, std::optional<uint64_t> >
-DffNameStyleRule::ExtractPipelineStage(std::string_view id) {
+std::pair<verible::document_view, std::optional<uint64_t> >
+DffNameStyleRule::ExtractPipelineStage(verible::document_view id) {
   // Find the number of trailing digits inside the identifier
-  std::string_view::const_reverse_iterator last_non_num = std::find_if(
+  verible::document_view::const_reverse_iterator last_non_num = std::find_if(
       id.rbegin(), id.rend(), [](unsigned char c) { return !std::isdigit(c); });
   uint64_t num_digits =
       static_cast<uint64_t>(std::distance(id.rbegin(), last_non_num));
@@ -387,9 +387,9 @@ DffNameStyleRule::ExtractPipelineStage(std::string_view id) {
   if (num_digits == 0 || num_digits == id.size()) return {id, {}};
 
   // Extract the integer value for the pipeline stage
-  const std::string_view pipe_stage_str = id.substr(id.size() - num_digits);
+  const verible::document_view pipe_stage_str = id.substr(id.size() - num_digits);
   uint64_t pipe_stage;
-  if (!absl::SimpleAtoi(pipe_stage_str, &pipe_stage) ||
+  if (!absl::SimpleAtoi(pipe_stage_str.to_string_view(), &pipe_stage) ||
       pipe_stage < kFirstValidPipeStage) {
     return {id, {}};
   }

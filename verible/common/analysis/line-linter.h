@@ -32,7 +32,7 @@ namespace verible {
 class LineLinter {
  public:
   // Analyzes a sequence of lines.
-  void Lint(const std::vector<std::string_view> &lines);
+  void Lint(const std::vector<document_view> &lines);
 
   // Transfers ownership of rule into this Linter
   void AddRule(std::unique_ptr<LineLintRule> rule) {

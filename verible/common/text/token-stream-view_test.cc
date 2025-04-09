@@ -103,7 +103,7 @@ TEST_F(TokenViewRangeTest, TokenViewRangeSpanningOffsetsNonEmpty) {
   };
   for (const auto &test_case : test_cases) {
     const int length = test_case.right_offset - test_case.left_offset;
-    const std::string_view text_range(
+    const document_view text_range(
         data_.Contents().substr(test_case.left_offset, length));
     const auto token_view_range =
         TokenViewRangeSpanningOffsets(view_, text_range);

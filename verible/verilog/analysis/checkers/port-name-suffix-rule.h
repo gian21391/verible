@@ -45,7 +45,7 @@ class PortNameSuffixRule : public verible::SyntaxTreeLintRule {
 
  private:
   // Helper functions
-  void Violation(std::string_view direction, const verible::TokenInfo &token,
+  void Violation(verible::document_view direction, const verible::TokenInfo &token,
                  const verible::SyntaxTreeContext &context);
   static bool IsSuffixCorrect(std::string_view suffix,
                               std::string_view direction);

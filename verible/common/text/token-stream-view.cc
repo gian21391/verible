@@ -52,12 +52,12 @@ void FilterTokenStreamViewInPlace(const TokenFilterPredicate &keep,
 }
 
 static bool TokenLocationLess(const TokenSequence::const_iterator &token_iter,
-                              std::string_view::const_iterator offset) {
+                              document_view::const_iterator offset) {
   return token_iter->text().begin() < offset;
 }
 
 TokenViewRange TokenViewRangeSpanningOffsets(const TokenStreamView &view,
-                                             std::string_view range) {
+                                             document_view range) {
   const auto lower = range.begin();
   const auto upper = range.end();
   const auto left =

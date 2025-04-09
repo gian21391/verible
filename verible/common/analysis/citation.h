@@ -16,7 +16,8 @@
 #define VERIBLE_COMMON_ANALYSIS_CITATION_H_
 
 #include <string>
-#include <string_view>
+
+#include "verible/common/strings/document-view.h"
 
 namespace verible {
 // Given a styleguide topic, return a reference to some styleguide

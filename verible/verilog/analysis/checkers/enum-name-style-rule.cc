@@ -86,7 +86,7 @@ void EnumNameStyleRule::HandleSymbol(const verible::Symbol &symbol,
     if (!FindAllEnumTypes(symbol).empty()) {
       const auto *identifier_leaf = GetIdentifierFromTypeDeclaration(symbol);
       const auto name = ABSL_DIE_IF_NULL(identifier_leaf)->get().text();
-      if (!RE2::FullMatch(name, *style_regex_)) {
+      if (!RE2::FullMatch(name.to_string_view(), *style_regex_)) {
         violations_.insert(LintViolation(identifier_leaf->get(),
                                          CreateViolationMessage(), context));
       }

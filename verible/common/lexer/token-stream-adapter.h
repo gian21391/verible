@@ -19,7 +19,6 @@
 
 #include <functional>
 #include <iterator>
-#include <string_view>
 #include <type_traits>
 
 #include "absl/status/status.h"
@@ -27,6 +26,7 @@
 #include "verible/common/lexer/token-generator.h"
 #include "verible/common/text/token-info.h"
 #include "verible/common/text/token-stream-view.h"
+#include "verible/common/strings/document-view.h"
 
 namespace verible {
 
@@ -35,7 +35,7 @@ TokenGenerator MakeTokenGenerator(Lexer *l);
 
 // Populates a TokenSequence with lexed tokens.
 absl::Status MakeTokenSequence(
-    Lexer *lexer, std::string_view text, TokenSequence *tokens,
+    Lexer *lexer, document_view text, TokenSequence *tokens,
     const std::function<void(const TokenInfo &)> &error_token_handler);
 
 // Generic container-to-iterator-generator adapter.

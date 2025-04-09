@@ -34,7 +34,7 @@ class NoTrailingSpacesRule : public verible::LineLintRule {
 
   NoTrailingSpacesRule() = default;
 
-  void HandleLine(std::string_view line) final;
+  void HandleLine(verible::document_view line) final;
 
   verible::LintRuleStatus Report() const final;
 

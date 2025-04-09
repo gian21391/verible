@@ -42,7 +42,7 @@ std::string JoinLinesOfTokensIntoString(const LinesOfTokens &lines_of_tokens) {
     token_strings.resize(line.size());
     CHECK_EQ(line.back().text(), "\n");
     std::transform(line.begin(), line.end(), token_strings.begin(),
-                   [](const TokenInfo &t) { return t.text(); });
+                   [](const TokenInfo &t) { return t.text().to_string_view(); });
     line_strings.push_back(absl::StrJoin(token_strings, ""));
   }
   return absl::StrJoin(line_strings, "");
@@ -73,7 +73,7 @@ std::unique_ptr<TextStructureView> MakeTextStructureViewHelloWorld() {
   auto text_structure_view =
       std::make_unique<TextStructureView>("hello, world");
   TokenSequence &tokens = text_structure_view->MutableTokenStream();
-  const std::string_view text_view = text_structure_view->Contents();
+  const document_view text_view = text_structure_view->Contents();
   tokens.push_back(TokenInfo(0, text_view.substr(0, 5)));  // "hello"
   tokens.push_back(TokenInfo(1, text_view.substr(5, 1)));  // ","
   tokens.push_back(TokenInfo(2, text_view.substr(6, 1)));  // " "

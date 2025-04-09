@@ -19,12 +19,13 @@
 #include <vector>
 
 #include "absl/strings/str_split.h"
+#include "verible/common/strings/document-view.h"
 
 namespace verible {
 
-std::vector<std::string_view> SplitLines(std::string_view text) {
+std::vector<document_view> SplitLines(document_view text) {
   if (text.empty()) return {};
-  std::vector<std::string_view> lines(absl::StrSplit(text, absl::ByChar('\n')));
+  auto lines = text.str_split(absl::ByChar('\n'));
   // If text ends cleanly with a \n, omit the last blank split,
   // otherwise treat it as if the trailing text ends with a \n.
   if (text.back() == '\n') {
@@ -51,10 +52,9 @@ class AfterCharDelimiter {
   const char delimiter_;
 };
 
-std::vector<std::string_view> SplitLinesKeepLineTerminator(
-    std::string_view text) {
+std::vector<document_view> SplitLinesKeepLineTerminator(document_view text) {
   if (text.empty()) return {};
-  return absl::StrSplit(text, AfterCharDelimiter('\n'));
+  return text.str_split(AfterCharDelimiter('\n'));
 }
 
 }  // namespace verible

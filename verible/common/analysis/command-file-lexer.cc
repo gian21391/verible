@@ -26,7 +26,7 @@
 
 namespace verible {
 
-CommandFileLexer::CommandFileLexer(std::string_view config)
+CommandFileLexer::CommandFileLexer(document_view config)
     : parent_lexer_type(config) {
   const auto lex_status = MakeTokenSequence(
       this, config, &tokens_, [&](const TokenInfo &error_token) {

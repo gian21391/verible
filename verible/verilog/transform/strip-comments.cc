@@ -31,7 +31,7 @@
 
 namespace verilog {
 
-using verible::make_string_view_range;
+using verible::make_document_view_range;
 using verible::Spacer;
 using verible::StripComment;
 using verible::TokenInfo;
@@ -80,7 +80,7 @@ void StripVerilogComments(std::string_view content, std::ostream *output,
             // Retain the "//" but erase everything thereafter.
             const std::string_view body(StripComment(text));
             const std::string_view head(
-                make_string_view_range(text.begin(), body.begin()));
+                make_document_view_range(text.begin(), body.begin()));
             *output << head << Spacer(body.length(), replacement);
             break;
           }
@@ -102,9 +102,9 @@ void StripVerilogComments(std::string_view content, std::ostream *output,
             // Retain the "/*" and "*/" but erase everything in between.
             const std::string_view body(StripComment(text));
             const std::string_view head(
-                make_string_view_range(text.begin(), body.begin()));
+                make_document_view_range(text.begin(), body.begin()));
             const std::string_view tail(
-                make_string_view_range(body.end(), text.end()));
+                make_document_view_range(body.end(), text.end()));
 
             *output << head;
             ReplaceNonNewlines(body, output, replacement);

@@ -22,6 +22,7 @@
 #include <string_view>
 #include <vector>
 
+#include "verible/common/strings/document-view.h"
 #include "verible/common/strings/utf8.h"
 
 namespace verible {
@@ -55,7 +56,7 @@ std::ostream &operator<<(std::ostream &out, const LineColumnRange &r) {
 // offsets into line:column numbers.
 // Offsets are guaranteed to be monotonically increasing (sorted), and
 // thus, are binary-searchable.
-LineColumnMap::LineColumnMap(std::string_view text) {
+LineColumnMap::LineColumnMap(document_view text) {
   // The column number after every line break is 0.
   // The first line always starts at offset 0.
   beginning_of_line_offsets_.push_back(0);
@@ -70,7 +71,7 @@ LineColumnMap::LineColumnMap(std::string_view text) {
 
 // Constructor that calculates line break offsets given an already-split
 // set of lines for a body of text.
-LineColumnMap::LineColumnMap(const std::vector<std::string_view> &lines) {
+LineColumnMap::LineColumnMap(const std::vector<document_view> &lines) {
   size_t offset = 0;
   for (const auto &line : lines) {
     beginning_of_line_offsets_.push_back(offset);
@@ -78,7 +79,7 @@ LineColumnMap::LineColumnMap(const std::vector<std::string_view> &lines) {
   }
 }
 
-LineColumn LineColumnMap::GetLineColAtOffset(std::string_view base,
+LineColumn LineColumnMap::GetLineColAtOffset(document_view base,
                                              int bytes_offset) const {
   const auto begin = beginning_of_line_offsets_.begin();
   const auto end = beginning_of_line_offsets_.end();
@@ -86,7 +87,7 @@ LineColumn LineColumnMap::GetLineColAtOffset(std::string_view base,
   const auto line_at_offset = std::upper_bound(begin, end, bytes_offset) - 1;
   const int line_number = std::distance(begin, line_at_offset);
   const int len_within_line = bytes_offset - *line_at_offset;
-  std::string_view line = base.substr(*line_at_offset, len_within_line);
+  document_view line = base.substr(*line_at_offset, len_within_line);
   return LineColumn{line_number, utf8_len(line)};
 }
 

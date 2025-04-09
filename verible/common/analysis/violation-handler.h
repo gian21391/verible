@@ -40,7 +40,7 @@ class ViolationHandler {
   // from different files. `base` contains source code from the file.
   virtual void HandleViolations(
       const std::set<verible::LintViolationWithStatus> &violations,
-      std::string_view base, std::string_view path) = 0;
+      document_view base, std::string_view path) = 0;
 };
 
 // ViolationHandler that prints all violations in a form of user-friendly
@@ -51,7 +51,7 @@ class ViolationPrinter : public ViolationHandler {
 
   void HandleViolations(
       const std::set<verible::LintViolationWithStatus> &violations,
-      std::string_view base, std::string_view path) final;
+      document_view base, std::string_view path) final;
 
  protected:
   std::ostream *const stream_;
@@ -68,7 +68,7 @@ class ViolationWaiverPrinter : public ViolationHandler {
 
   void HandleViolations(
       const std::set<verible::LintViolationWithStatus> &violations,
-      std::string_view base, std::string_view path) final;
+      document_view base, std::string_view path) final;
 
  protected:
   std::ostream *const message_stream_;
@@ -131,7 +131,7 @@ class ViolationFixer : public verible::ViolationHandler {
 
   void HandleViolations(
       const std::set<verible::LintViolationWithStatus> &violations,
-      std::string_view base, std::string_view path) final;
+      document_view base, std::string_view path) final;
 
  private:
   ViolationFixer(std::ostream *message_stream, std::ostream *patch_stream,
@@ -143,7 +143,7 @@ class ViolationFixer : public verible::ViolationHandler {
         ultimate_answer_({AnswerChoice::kUnknown, 0}) {}
 
   void HandleViolation(const verible::LintViolation &violation,
-                       std::string_view base, std::string_view path,
+                       document_view base, std::string_view path,
                        std::string_view url, std::string_view rule_name,
                        const verible::LintStatusFormatter &formatter,
                        verible::AutoFix *fix);
@@ -151,7 +151,7 @@ class ViolationFixer : public verible::ViolationHandler {
   static Answer InteractiveAnswerChooser(
       const verible::LintViolation &violation, std::string_view rule_name);
 
-  void CommitFixes(std::string_view source_content,
+  void CommitFixes(document_view source_content,
                    std::string_view source_path,
                    const verible::AutoFix &fix) const;
 

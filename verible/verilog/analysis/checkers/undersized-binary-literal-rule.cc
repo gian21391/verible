@@ -94,9 +94,9 @@ void UndersizedBinaryLiteralRule::HandleSymbol(
   const auto *literal_node = manager.GetAs<SyntaxTreeNode>("literal");
   if (!width_leaf || !literal_node) return;
 
-  const auto width_text = width_leaf->get().text();
+  const verible::document_view width_text = width_leaf->get().text();
   size_t width;
-  if (!absl::SimpleAtoi(width_text, &width)) return;
+  if (!absl::SimpleAtoi(width_text.to_string_view(), &width)) return;
 
   const auto *base_leaf =
       down_cast<const SyntaxTreeLeaf *>((*literal_node)[0].get());
@@ -106,7 +106,7 @@ void UndersizedBinaryLiteralRule::HandleSymbol(
   const auto base_text = base_leaf->get().text();
   const auto digits_text = digits_leaf->get().text();
 
-  const BasedNumber number(base_text, digits_text);
+  const BasedNumber number(base_text.to_string_view(), digits_text.to_string_view());
   int bits_per_digit = 1;
   switch (number.base) {
     case 'd':
@@ -165,14 +165,14 @@ void UndersizedBinaryLiteralRule::HandleSymbol(
 
     violations_.insert(LintViolation(
         digits_leaf->get(),
-        FormatReason(width_text, base_text, number.base, digits_text), context,
+        FormatReason(width_text.to_string_view(), base_text, number.base, digits_text.to_string_view()), context,
         autofixes));
   }
 }
 
 // Generate string representation of why lint error occurred at leaf
 std::string UndersizedBinaryLiteralRule::FormatReason(
-    std::string_view width, std::string_view base_text, char base,
+    std::string_view width, verible::document_view base_text, char base,
     std::string_view literal) {
   std::string_view base_describe;
   switch (base) {

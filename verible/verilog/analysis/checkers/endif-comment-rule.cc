@@ -95,7 +95,7 @@ void EndifCommentRule::HandleToken(const TokenInfo &token) {
       if (conditional_scopes_.empty()) break;  // unbalanced
       // Checking for comment immediately following `endif.
       // Matching comment must be on the same line as the `endif
-      const std::string_view expect = conditional_scopes_.top().text();
+      const verible::document_view expect = conditional_scopes_.top().text();
       switch (token.token_enum()) {
         case TK_SPACE:  // stay in the same state
           break;
@@ -103,7 +103,7 @@ void EndifCommentRule::HandleToken(const TokenInfo &token) {
         case TK_EOL_COMMENT: {
           // check comment text, unwrap comment, unpad whitespace.
           // allow either // COND or /* COND */
-          const std::string_view contents =
+          const verible::document_view contents =
               verible::StripCommentAndSpacePadding(token.text());
           if (contents != expect) {
             violations_.insert(LintViolation(

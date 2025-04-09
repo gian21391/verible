@@ -40,7 +40,7 @@ using FileReaderFunction =
 
 // function interface like file::SetContents()
 using FileWriterFunction = std::function<absl::Status(
-    std::string_view filename, std::string_view contents)>;
+    std::string_view filename, document_view contents)>;
 }  // namespace internal
 
 using FileLineNumbersMap =
@@ -55,7 +55,7 @@ class PatchSet {
   PatchSet() = default;
 
   // Parse a unified-diff patch file into internal representation.
-  absl::Status Parse(std::string_view patch_contents);
+  absl::Status Parse(document_view patch_contents);
 
   // Prints a unified-diff formatted output.
   std::ostream &Render(std::ostream &stream) const;
@@ -95,7 +95,7 @@ std::ostream &operator<<(std::ostream &, const PatchSet &);
 // Private implementation details follow.
 namespace internal {
 
-using LineIterator = std::vector<std::string_view>::const_iterator;
+using LineIterator = std::vector<document_view>::const_iterator;
 using LineRange = container_iterator_range<LineIterator>;
 
 // A single line of a patch hunk.
@@ -106,7 +106,7 @@ struct MarkedLine {
 
   // only used in manual test case construction
   // so ok to use CHECK here.
-  explicit MarkedLine(std::string_view text) : line(text.begin(), text.end()) {
+  explicit MarkedLine(document_view text) : line(text.to_string()) {
     CHECK(!line.empty()) << "MarkedLine must start with a marker in [ -+].";
     CHECK(Valid()) << "Unexpected marker '" << Marker() << "'.";
   }
@@ -126,13 +126,13 @@ struct MarkedLine {
   bool IsAdded() const { return Marker() == '+'; }
   bool IsDeleted() const { return Marker() == '-'; }
 
-  std::string_view Text() const { return {&line[1], line.length() - 1}; }
+  document_view Text() const { return {&line[1], line.length() - 1}; }
 
   // default equality operator
   bool operator==(const MarkedLine &other) const { return line == other.line; }
   bool operator!=(const MarkedLine &other) const { return !(*this == other); }
 
-  absl::Status Parse(std::string_view);
+  absl::Status Parse(document_view);
 };
 
 std::ostream &operator<<(std::ostream &, const MarkedLine &);
@@ -149,7 +149,7 @@ struct HunkIndices {
 
   std::string FormatToString() const;
 
-  absl::Status Parse(std::string_view);
+  absl::Status Parse(document_view);
 };
 
 std::ostream &operator<<(std::ostream &, const HunkIndices &);
@@ -168,7 +168,7 @@ struct HunkHeader {
   }
   bool operator!=(const HunkHeader &other) const { return !(*this == other); }
 
-  absl::Status Parse(std::string_view);
+  absl::Status Parse(document_view);
 };
 
 std::ostream &operator<<(std::ostream &, const HunkHeader &);
@@ -209,7 +209,7 @@ class Hunk {
   // Verify consistency of lines in the patch (old-file) against the file that
   // is read in whole.
   absl::Status VerifyAgainstOriginalLines(
-      const std::vector<std::string_view> &original_lines) const;
+      const std::vector<document_view> &original_lines) const;
 
   // default structural comparison
   bool operator==(const Hunk &other) const {
@@ -236,7 +236,7 @@ struct SourceInfo {
   std::string path;       // location to patched file, absolute or relative
   std::string timestamp;  // unspecified date format, not parsed, optional
 
-  absl::Status Parse(std::string_view);
+  absl::Status Parse(document_view);
 };
 
 std::ostream &operator<<(std::ostream &, const SourceInfo &);
@@ -263,7 +263,7 @@ class FilePatch {
   // Verify consistency of lines in the patch (old-file) against the file that
   // is read in whole.
   absl::Status VerifyAgainstOriginalLines(
-      const std::vector<std::string_view> &original_lines) const;
+      const std::vector<document_view> &original_lines) const;
 
   absl::Status PickApplyInPlace(std::istream &ins, std::ostream &outs) const;
 

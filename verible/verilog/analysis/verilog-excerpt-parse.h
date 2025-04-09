@@ -29,51 +29,51 @@
 namespace verilog {
 
 // The interface for these functions should all be:
-//   std::unique_ptr<VerilogAnalyzer> (std::string_view text,
+//   std::unique_ptr<VerilogAnalyzer> (verible::document_view text,
 //                                     std::string_view filename,
 //                                     const VerilogPreprocess::Config& config);
 // );
 
 // Analyzes test as Verilog property_spec
 std::unique_ptr<VerilogAnalyzer> AnalyzeVerilogPropertySpec(
-    std::string_view text, std::string_view filename,
+    verible::document_view text, std::string_view filename,
     const VerilogPreprocess::Config &preprocess_config);
 
 // Analyzes text as Verilog statements.
 std::unique_ptr<VerilogAnalyzer> AnalyzeVerilogStatements(
-    std::string_view text, std::string_view filename,
+    verible::document_view text, std::string_view filename,
     const VerilogPreprocess::Config &preprocess_config);
 
 // Analyzes text as any Verilog expression.
 std::unique_ptr<VerilogAnalyzer> AnalyzeVerilogExpression(
-    std::string_view text, std::string_view filename,
+    verible::document_view text, std::string_view filename,
     const VerilogPreprocess::Config &preprocess_config);
 
 // Analyzes text as any Verilog module body.
 std::unique_ptr<VerilogAnalyzer> AnalyzeVerilogModuleBody(
-    std::string_view text, std::string_view filename,
+    verible::document_view text, std::string_view filename,
     const VerilogPreprocess::Config &preprocess_config);
 
 // Analyzes text as any Verilog class body.
 std::unique_ptr<VerilogAnalyzer> AnalyzeVerilogClassBody(
-    std::string_view text, std::string_view filename,
+    verible::document_view text, std::string_view filename,
     const VerilogPreprocess::Config &preprocess_config);
 
 // Analyzes text as any Verilog package body.
 std::unique_ptr<VerilogAnalyzer> AnalyzeVerilogPackageBody(
-    std::string_view text, std::string_view filename,
+    verible::document_view text, std::string_view filename,
     const VerilogPreprocess::Config &preprocess_config);
 
 // TODO(fangism): analogous functions for: function, task, ...
 
 // Analyzes text as any Verilog library map.
 std::unique_ptr<VerilogAnalyzer> AnalyzeVerilogLibraryMap(
-    std::string_view text, std::string_view filename,
+    verible::document_view text, std::string_view filename,
     const VerilogPreprocess::Config &preprocess_config);
 
 // Analyzes text in the selected parsing `mode`.
 std::unique_ptr<VerilogAnalyzer> AnalyzeVerilogWithMode(
-    std::string_view text, std::string_view filename, std::string_view mode,
+    verible::document_view text, std::string_view filename, verible::document_view mode,
     const VerilogPreprocess::Config &preprocess_config);
 
 }  // namespace verilog

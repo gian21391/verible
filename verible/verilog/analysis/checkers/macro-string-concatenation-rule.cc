@@ -51,7 +51,7 @@ const LintRuleDescriptor &MacroStringConcatenationRule::GetDescriptor() {
 
 void MacroStringConcatenationRule::HandleToken(const TokenInfo &token) {
   const auto token_enum = static_cast<verilog_tokentype>(token.token_enum());
-  const std::string_view text(token.text());
+  const verible::document_view text = token.text();
 
   // Search only in `define tokens. Ignore state as `defines can be nested.
   if (token_enum == PP_define_body) {

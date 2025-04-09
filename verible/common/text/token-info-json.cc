@@ -32,7 +32,7 @@ nlohmann::json ToJson(const TokenInfo &token_info,
   json["tag"] = stream.str();
 
   if (include_text) {
-    json["text"] = std::string(token_info.text());
+    json["text"] = token_info.text().to_string();
   }
 
   return json;

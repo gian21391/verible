@@ -18,6 +18,8 @@
 #include <cstddef>
 #include <string_view>
 
+#include <verible/common/strings/document-view.h>
+
 namespace verilog {
 
 // Returns token identifier suitable for use in string-based APIs (such as JSON
@@ -30,7 +32,7 @@ namespace verilog {
 //   "SymbolIdentifier", "TK_DecNumber", "TK_EOL_COMMENT", "TK_NEWLINE"
 //
 // See also: verilog_symbol_name() in verilog_parser.h
-std::string_view TokenTypeToString(size_t tokentype);
+verible::document_view TokenTypeToString(size_t tokentype);
 
 }  // namespace verilog
 

@@ -65,7 +65,7 @@ class LintWaiver {
 
   // Converts the prepared regular expressions to line numbers and applies the
   // waivers.
-  void RegexToLines(std::string_view content, const LineColumnMap &line_map);
+  void RegexToLines(document_view content, const LineColumnMap &line_map);
 
   // Returns true if `line_number` should be waived for a particular rule.
   bool RuleIsWaivedOnLine(std::string_view rule_name, int line_number) const;
@@ -123,10 +123,10 @@ class LintWaiverBuilder {
   // 'waive_command' is the second argument after the trigger, and is the
   //   command for 'waive-one-line'.
   LintWaiverBuilder(TokenFilterPredicate &&is_comment,
-                    TokenFilterPredicate &&is_space, std::string_view trigger,
-                    std::string_view waive_line_command,
-                    std::string_view waive_start_command,
-                    std::string_view waive_stop_command)
+                    TokenFilterPredicate &&is_space, document_view trigger,
+                    document_view waive_line_command,
+                    document_view waive_start_command,
+                    document_view waive_stop_command)
       : waiver_trigger_keyword_(trigger),
         waive_one_line_keyword_(waive_line_command),
         waive_range_start_keyword_(waive_start_command),
@@ -148,7 +148,7 @@ class LintWaiverBuilder {
   absl::Status ApplyExternalWaivers(
       const std::set<std::string_view> &active_rules,
       std::string_view lintee_filename, std::string_view waiver_filename,
-      std::string_view waivers_config_content);
+      document_view waivers_config_content);
 
   const LintWaiver &GetLintWaiver() const { return lint_waiver_; }
 
@@ -157,21 +157,21 @@ class LintWaiverBuilder {
   // If text does not match the waived form, then return an empty string.
   // `comment_tokens` is just re-used memory to avoid re-allocation.
   std::string_view ExtractWaivedRuleFromComment(
-      std::string_view comment_text,
-      std::vector<std::string_view> *comment_tokens) const;
+      document_view comment_text,
+      std::vector<document_view> *comment_tokens) const;
 
   // Special string that leads a comment that is a waiver directive
   // Typically, name of linter tool is used here.
-  std::string_view waiver_trigger_keyword_;
+  document_view waiver_trigger_keyword_;
 
   // Command to waive one line, either the current line if there are tokens
   // on the current line or the next non-comment-non-blank-line.
-  std::string_view waive_one_line_keyword_;  // e.g. "waive"
+  document_view waive_one_line_keyword_;  // e.g. "waive"
 
   // Command pair to start and stop waiving ranges of lines.
   // e.g. "waive-start", "waive-stop"
-  std::string_view waive_range_start_keyword_;
-  std::string_view waive_range_stop_keyword_;
+  document_view waive_range_start_keyword_;
+  document_view waive_range_stop_keyword_;
 
   // Returns true if token is a comment.
   TokenFilterPredicate is_token_comment_;

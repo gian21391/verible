@@ -32,7 +32,7 @@ namespace verible {
 // negative if left is 'less' than right,
 // positive if left is 'greater' than right.
 // Compares lower bounds, and then upper bounds.
-static int CompareStringRanges(std::string_view left, std::string_view right) {
+static int CompareStringRanges(document_view left, document_view right) {
   // tuple-compare the bounds of the string_view ranges (lexicographical)
   {
     const int delta = std::distance(right.begin(), left.begin());
@@ -52,16 +52,16 @@ static int CompareStringRanges(std::string_view left, std::string_view right) {
 }
 
 struct LessStringRanges {
-  bool operator()(std::string_view left, std::string_view right) const {
+  bool operator()(document_view left, document_view right) const {
     return CompareStringRanges(left, right) < 0;
   }
 };
 
-using StringRangeSet = std::set<std::string_view, LessStringRanges>;
+using StringRangeSet = std::set<document_view, LessStringRanges>;
 
 // This function helps find symmetric differences between two sets
 // of findings (actual vs. expected) based on locations.
-static int CompareFindingLocation(std::string_view lhs, const TokenInfo &rhs) {
+static int CompareFindingLocation(document_view lhs, const TokenInfo &rhs) {
   const int delta = CompareStringRanges(lhs, rhs.text());
   // Then compare enums, where we only care about equality.
   return delta;
@@ -69,14 +69,14 @@ static int CompareFindingLocation(std::string_view lhs, const TokenInfo &rhs) {
 
 // TODO(b/151371397): refactor this for re-use for multi-findings style tests.
 bool SyntaxTreeSearchTestCase::ExactMatchFindings(
-    const std::vector<TreeSearchMatch> &actual_findings, std::string_view base,
+    const std::vector<TreeSearchMatch> &actual_findings, document_view base,
     std::ostream *diffstream) const {
   // Convert actual_findings into string ranges.  Ignore matches' context.
   StringRangeSet actual_findings_ranges;
   for (const auto &finding : actual_findings) {
     if (finding.match == nullptr) continue;
     const auto &match_symbol(*finding.match);
-    const std::string_view spanned_text = StringSpanOfSymbol(match_symbol);
+    const document_view spanned_text = StringSpanOfSymbol(match_symbol);
     // Spanned text can be empty when a subtree is devoid of leaves.
     if (spanned_text.empty()) continue;
     actual_findings_ranges.insert(spanned_text);
@@ -90,7 +90,7 @@ bool SyntaxTreeSearchTestCase::ExactMatchFindings(
   // Thus, we can use an algorithm like std::set_symmetric_difference().
 
   // These containers will catch unmatched differences found.
-  std::vector<std::string_view> unmatched_actual_findings;
+  std::vector<document_view> unmatched_actual_findings;
   std::vector<TokenInfo> unmatched_expected_findings;
 
   set_symmetric_difference_split(

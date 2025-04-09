@@ -31,7 +31,7 @@ namespace {
 TEST(SyntaxTreeSearchTestCaseExactMatchFindingsTest, AllEmpty) {
   const SyntaxTreeSearchTestCase test{};
   const std::vector<TreeSearchMatch> actual_findings;
-  const std::string_view text;
+  const document_view text;
   std::ostringstream diffstream;
   EXPECT_TRUE(test.ExactMatchFindings(actual_findings, text, &diffstream));
 }
@@ -44,12 +44,12 @@ TEST(SyntaxTreeSearchTestCaseExactMatchFindingsTest, OneMatchingViolation) {
       "ghi",
   };
   const std::string text_copy(test.code);
-  const std::string_view text_view(text_copy);
+  const document_view text_view(text_copy);
 
   // string buffers are in different memory
-  EXPECT_FALSE(BoundsEqual(std::string_view(test.code), text_view));
+  EXPECT_FALSE(BoundsEqual(document_view(test.code), text_view));
 
-  const std::string_view bad_text = text_view.substr(3, 3);
+  const document_view bad_text = text_view.substr(3, 3);
   constexpr int kTag = -1;
   auto leaf = Leaf(kTag, bad_text);
   const std::vector<TreeSearchMatch> actual_findings{
@@ -68,12 +68,12 @@ TEST(SyntaxTreeSearchTestCaseExactMatchFindingsTest, IgnoreEmptyStringSpan) {
       "ghi",
   };
   const std::string text_copy(test.code);
-  const std::string_view text_view(text_copy);
+  const document_view text_view(text_copy);
 
   // string buffers are in different memory
-  EXPECT_FALSE(BoundsEqual(std::string_view(test.code), text_view));
+  EXPECT_FALSE(BoundsEqual(document_view(test.code), text_view));
 
-  const std::string_view bad_text = text_view.substr(3, 3);
+  const document_view bad_text = text_view.substr(3, 3);
   constexpr int kTag = -1;
   auto leaf = Leaf(kTag, bad_text);
   auto ignored_leaf = Leaf(kTag, bad_text.substr(0, 0));
@@ -94,12 +94,12 @@ TEST(SyntaxTreeSearchTestCaseExactMatchFindingsTest, IgnoreNullptrSymbol) {
       "ghi",
   };
   const std::string text_copy(test.code);
-  const std::string_view text_view(text_copy);
+  const document_view text_view(text_copy);
 
   // string buffers are in different memory
-  EXPECT_FALSE(BoundsEqual(std::string_view(test.code), text_view));
+  EXPECT_FALSE(BoundsEqual(document_view(test.code), text_view));
 
-  const std::string_view bad_text = text_view.substr(3, 3);
+  const document_view bad_text = text_view.substr(3, 3);
   constexpr int kTag = -1;
   auto leaf = Leaf(kTag, bad_text);
   const std::vector<TreeSearchMatch> actual_findings{
@@ -121,10 +121,10 @@ TEST(SyntaxTreeSearchTestCaseExactMatchFindingsTest,
       {kToken, "jkl"},
   };
   const std::string text_copy(test.code);
-  const std::string_view text_view(text_copy);
+  const document_view text_view(text_copy);
 
   // string buffers are in different memory
-  EXPECT_FALSE(BoundsEqual(std::string_view(test.code), text_view));
+  EXPECT_FALSE(BoundsEqual(document_view(test.code), text_view));
 
   const auto bad_text1 = Leaf(kToken, text_view.substr(3, 3));
   const auto bad_text2 = Leaf(kToken, text_view.substr(9, 3));
@@ -147,12 +147,12 @@ TEST(SyntaxTreeSearchTestCaseExactMatchFindingsTest, OneFoundNotExpected) {
   constexpr int kToken = 42;
   const SyntaxTreeSearchTestCase test{"abcdefghi"};  // no expected violations
   const std::string text_copy(test.code);
-  const std::string_view text_view(text_copy);
+  const document_view text_view(text_copy);
 
   // string buffers are in different memory
-  EXPECT_FALSE(BoundsEqual(std::string_view(test.code), text_view));
+  EXPECT_FALSE(BoundsEqual(document_view(test.code), text_view));
 
-  const std::string_view bad_text = text_view.substr(3, 3);
+  const document_view bad_text = text_view.substr(3, 3);
   const auto leaf = Leaf(kToken, bad_text);
   const std::vector<TreeSearchMatch> actual_findings{
       {leaf.get(), {/* context ignored */}},
@@ -161,7 +161,7 @@ TEST(SyntaxTreeSearchTestCaseExactMatchFindingsTest, OneFoundNotExpected) {
   EXPECT_FALSE(
       test.ExactMatchFindings(actual_findings, text_view, &diffstream));
   EXPECT_TRUE(absl::StrContains(diffstream.str(), kFoundNotExpectedMessage));
-  EXPECT_TRUE(absl::StrContains(diffstream.str(), bad_text));
+  EXPECT_TRUE(absl::StrContains(diffstream.str(), bad_text.to_string_view()));
   EXPECT_FALSE(absl::StrContains(diffstream.str(), kExpectedNotFoundMessage));
 }
 
@@ -169,18 +169,18 @@ TEST(SyntaxTreeSearchTestCaseExactMatchFindingsTest, OneExpectedNotFound) {
   constexpr int kToken = 42;
   const SyntaxTreeSearchTestCase test{"abc", {kToken, "def"}, "ghi"};
   const std::string text_copy(test.code);
-  const std::string_view text_view(text_copy);
+  const document_view text_view(text_copy);
 
   // string buffers are in different memory
-  EXPECT_FALSE(BoundsEqual(std::string_view(test.code), text_view));
+  EXPECT_FALSE(BoundsEqual(document_view(test.code), text_view));
 
-  const std::string_view bad_text = text_view.substr(3, 3);
+  const document_view bad_text = text_view.substr(3, 3);
   const std::vector<TreeSearchMatch> actual_findings;  // none expected
   std::ostringstream diffstream;
   EXPECT_FALSE(
       test.ExactMatchFindings(actual_findings, text_view, &diffstream));
   EXPECT_FALSE(absl::StrContains(diffstream.str(), kFoundNotExpectedMessage));
-  EXPECT_TRUE(absl::StrContains(diffstream.str(), bad_text));
+  EXPECT_TRUE(absl::StrContains(diffstream.str(), bad_text.to_string_view()));
   EXPECT_TRUE(absl::StrContains(diffstream.str(), kExpectedNotFoundMessage));
 }
 
@@ -188,12 +188,12 @@ TEST(SyntaxTreeSearchTestCaseExactMatchFindingsTest, OneMismatchEach) {
   constexpr int kToken = 42;
   const SyntaxTreeSearchTestCase test{"abc", {kToken, "def"}, "ghi"};
   const std::string text_copy(test.code);
-  const std::string_view text_view(text_copy);
+  const document_view text_view(text_copy);
 
   // string buffers are in different memory
-  EXPECT_FALSE(BoundsEqual(std::string_view(test.code), text_view));
+  EXPECT_FALSE(BoundsEqual(document_view(test.code), text_view));
 
-  const std::string_view bad_text = text_view.substr(4, 3);  // "efg"
+  const document_view bad_text = text_view.substr(4, 3);  // "efg"
   const auto leaf = Leaf(kToken, bad_text);
   const std::vector<TreeSearchMatch> actual_findings{
       {leaf.get(), {/* context ignored */}},
@@ -202,9 +202,9 @@ TEST(SyntaxTreeSearchTestCaseExactMatchFindingsTest, OneMismatchEach) {
   EXPECT_FALSE(
       test.ExactMatchFindings(actual_findings, text_view, &diffstream));
   EXPECT_TRUE(absl::StrContains(diffstream.str(), kFoundNotExpectedMessage));
-  EXPECT_TRUE(absl::StrContains(diffstream.str(), bad_text));
+  EXPECT_TRUE(absl::StrContains(diffstream.str(), bad_text.to_string_view()));
   EXPECT_TRUE(absl::StrContains(diffstream.str(), kExpectedNotFoundMessage));
-  EXPECT_TRUE(absl::StrContains(diffstream.str(), text_view.substr(3, 3)));
+  EXPECT_TRUE(absl::StrContains(diffstream.str(), text_view.to_string_view().substr(3, 3)));
 }
 
 }  // namespace

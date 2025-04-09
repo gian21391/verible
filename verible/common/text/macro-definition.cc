@@ -31,7 +31,7 @@ bool MacroDefinition::AppendParameter(const MacroParameterInfo &param_info) {
   is_callable_ = true;
   // Record position of this parameter.
   const bool inserted = parameter_positions_
-                            .insert({std::string(param_info.name.text()),
+                            .insert({param_info.name.text().to_string(),
                                      parameter_info_array_.size()})
                             .second;
   parameter_info_array_.push_back(param_info);

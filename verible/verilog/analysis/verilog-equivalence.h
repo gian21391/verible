@@ -45,8 +45,8 @@ std::ostream &operator<<(std::ostream &, DiffStatus);
 // If errstream is provided, print detailed error message to that stream.
 // TODO(fangism): move this to language-agnostic common/analysis library.
 DiffStatus LexicallyEquivalent(
-    std::string_view left, std::string_view right,
-    const std::function<bool(std::string_view, verible::TokenSequence *)>
+    verible::document_view left, verible::document_view right,
+    const std::function<bool(verible::document_view, verible::TokenSequence *)>
         &lexer,
     const std::function<bool(const verible::TokenInfo &)> &recursion_predicate,
     const std::function<bool(const verible::TokenInfo &)> &remove_predicate,
@@ -60,7 +60,7 @@ DiffStatus LexicallyEquivalent(
 // out by remove_predicate, and using the equal_comparator binary predicate.
 // If errstream is provided, print detailed error message to that stream.
 DiffStatus VerilogLexicallyEquivalent(
-    std::string_view left, std::string_view right,
+    verible::document_view left, verible::document_view right,
     const std::function<bool(const verible::TokenInfo &)> &remove_predicate,
     const std::function<bool(const verible::TokenInfo &,
                              const verible::TokenInfo &)> &equal_comparator,
@@ -68,7 +68,7 @@ DiffStatus VerilogLexicallyEquivalent(
 
 // Returns true if both token sequences are equivalent, ignoring whitespace.
 // If errstream is provided, print detailed error message to that stream.
-DiffStatus FormatEquivalent(std::string_view left, std::string_view right,
+DiffStatus FormatEquivalent(verible::document_view left, verible::document_view right,
                             std::ostream *errstream = nullptr);
 
 // Similar to FormatEquivalent except that:
@@ -76,7 +76,7 @@ DiffStatus FormatEquivalent(std::string_view left, std::string_view right,
 //   2) identifiers only need to match in length and not string content to be
 //      considered equal.
 // Such equivalence is good for formatter test cases.
-DiffStatus ObfuscationEquivalent(std::string_view left, std::string_view right,
+DiffStatus ObfuscationEquivalent(verible::document_view left, verible::document_view right,
                                  std::ostream *errstream = nullptr);
 
 }  // namespace verilog

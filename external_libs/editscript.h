@@ -178,8 +178,8 @@ inline int64_t CommonAffix(TokenIter span1_begin, TokenIter span1_end,
  */
 template <typename TokenIter>
 class Diff {
- private:
-  friend Edits GetTokenDiffs<>(TokenIter tokens1_begin, TokenIter tokens1_end,
+ public:
+  friend Edits GetTokenDiffs(TokenIter tokens1_begin, TokenIter tokens1_end,
                                TokenIter tokens2_begin, TokenIter tokens2_end);
 
   /**
@@ -188,7 +188,6 @@ class Diff {
    * Every token in the combined document belongs to exactly one edit.
    * @param tokens1_begin Iterator pointing to start of tokens1.
    * @param tokens2_begin Iterator pointing to start of tokens2.
-   * @param edits Cumulative edits to transform tokens1 into tokens2 (inout).
    */
   Diff(TokenIter tokens1_begin, TokenIter tokens2_begin)
       : tokens1_begin_(tokens1_begin), tokens2_begin_(tokens2_begin) {}
@@ -478,7 +477,7 @@ class Diff {
 }  // namespace diff_impl
 
 template <typename TokenIter>
-inline Edits GetTokenDiffs(TokenIter tokens1_begin, TokenIter tokens1_end,
+Edits GetTokenDiffs(TokenIter tokens1_begin, TokenIter tokens1_end,
                            TokenIter tokens2_begin, TokenIter tokens2_end) {
   Edits token_edits;
   diff_impl::Diff<TokenIter>(tokens1_begin, tokens2_begin)

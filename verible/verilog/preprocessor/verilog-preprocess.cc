@@ -227,7 +227,7 @@ absl::Status VerilogPreprocess::ConsumeAndParseMacroCall(
     const StreamIteratorGenerator &generator, verible::MacroCall *macro_call,
     const verible::MacroDefinition &macro_definition) {
   // Parsing the macro .
-  const std::string_view macro_name_str = (*iter)->text().substr(1);
+  const verible::document_view macro_name_str = (*iter)->text().substr(1);
   verible::TokenInfo macro_name_token(MacroCallId, macro_name_str);
   macro_call->macro_name = macro_name_token;
 
@@ -288,7 +288,7 @@ absl::Status VerilogPreprocess::HandleMacroIdentifier(
   // true.
 
   // Finding the macro definition.
-  const std::string_view sv = (*iter)->text();
+  const verible::document_view sv = (*iter)->text();
   const auto *found =
       FindOrNull(preprocess_data_.macro_definitions, sv.substr(1));
   if (!found) {
@@ -333,7 +333,7 @@ void VerilogPreprocess::RegisterMacroDefinition(
 // preprocess_data_.lexed_macros_backup Can be accessed directly after expansion
 // as: preprocess_data_.lexed_macros_backup.back()
 absl::Status VerilogPreprocess::ExpandText(
-    const std::string_view &definition_text) {
+    const verible::document_view &definition_text) {
   VerilogLexer lexer(definition_text);
   verible::TokenSequence lexed_sequence;
   verible::TokenSequence expanded_lexed_sequence;
@@ -382,7 +382,7 @@ absl::Status VerilogPreprocess::ExpandMacro(
     const verible::MacroDefinition *macro_definition) {
   const auto &actual_parameters = macro_call.positional_arguments;
 
-  std::map<std::string_view, verible::DefaultTokenInfo> subs_map;
+  std::map<verible::document_view, verible::DefaultTokenInfo> subs_map;
   if (macro_definition->IsCallable()) {
     RETURN_IF_ERROR(macro_definition->PopulateSubstitutionMap(actual_parameters,
                                                               &subs_map));
@@ -600,7 +600,7 @@ absl::Status VerilogPreprocess::HandleInclude(
   const auto &token_text = file_token_iter->text();
 
   std::filesystem::path file_path =
-      std::string(token_text.substr(1, token_text.size() - 2));
+      token_text.substr(1, token_text.size() - 2).to_string();
 
   // Use the provided FileOpener to open the included file.
   const auto status_or_file = file_opener_(file_path.string());
@@ -609,7 +609,7 @@ absl::Status VerilogPreprocess::HandleInclude(
         **token_iter, std::string(status_or_file.status().message()));
     return status_or_file.status();
   }
-  const std::string_view source_contents = *status_or_file;
+  const verible::document_view source_contents = *status_or_file;
 
   // Creating a new "VerilogPreprocess" object for the included file,
   // With the same configuration and preprocessing info (defines, incdirs) as

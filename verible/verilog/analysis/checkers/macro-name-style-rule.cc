@@ -83,7 +83,7 @@ std::string MacroNameStyleRule::CreateViolationMessage() {
 
 void MacroNameStyleRule::HandleToken(const TokenInfo &token) {
   const auto token_enum = static_cast<verilog_tokentype>(token.token_enum());
-  const std::string_view text(token.text());
+  const verible::document_view text(token.text());
   if (IsUnlexed(verilog_tokentype(token.token_enum()))) {
     // recursively lex to examine inside macro definition bodies, etc.
     RecursiveLexText(
@@ -109,19 +109,19 @@ void MacroNameStyleRule::HandleToken(const TokenInfo &token) {
         case TK_SPACE:  // stay in the same state
           break;
         case PP_Identifier: {
-          if (absl::StartsWith(text, "uvm_")) {
+          if (text.starts_with("uvm_")) {
             // Special case for uvm_* macros
-            if (!RE2::FullMatch(text, *style_lower_snake_case_regex_)) {
+            if (!RE2::FullMatch(text.to_string_view(), *style_lower_snake_case_regex_)) {
               violations_.insert(LintViolation(token, kUVMLowerCaseMessage));
             }
-          } else if (absl::StartsWith(text, "UVM_")) {
+          } else if (text.starts_with("UVM_")) {
             // Special case for UVM_* macros
-            if (!RE2::FullMatch(text, *style_upper_snake_case_regex_)) {
+            if (!RE2::FullMatch(text.to_string_view(), *style_upper_snake_case_regex_)) {
               violations_.insert(LintViolation(token, kUVMUpperCaseMessage));
             }
           } else {
             // General case for everything else
-            if (!RE2::FullMatch(text, *style_regex_)) {
+            if (!RE2::FullMatch(text.to_string_view(), *style_regex_)) {
               violations_.insert(
                   LintViolation(token, CreateViolationMessage()));
             }

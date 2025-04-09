@@ -84,8 +84,8 @@ void GenerateLabelPrefixRule::HandleSymbol(
       }
 
       if (label != nullptr) {
-        if (!(absl::StartsWith(label->text(), "g_") ||
-              absl::StartsWith(label->text(), "gen_"))) {
+        if (!(label->text().starts_with( "g_") ||
+              label->text().starts_with( "gen_"))) {
           violations_.insert(verible::LintViolation(*label, kMessage, context));
         }
       }

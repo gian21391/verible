@@ -35,16 +35,18 @@
 #include <functional>
 #include <string_view>
 
+#include "verible/common/strings/document-view.h"
+
 namespace verilog {
 
 class VerilogLexer : public verible::FlexLexerAdapter<verilogFlexLexer> {
   using parent_lexer_type = verible::FlexLexerAdapter<verilogFlexLexer>;
 
  public:
-  explicit VerilogLexer(std::string_view code);
+  explicit VerilogLexer(verible::document_view code);
 
   // Restart lexer with new input stream.
-  void Restart(std::string_view) final;
+  void Restart(verible::document_view) final;
 
   // Returns true if token is invalid.
   bool TokenIsError(const verible::TokenInfo &) const final;
@@ -72,7 +74,7 @@ class VerilogLexer : public verible::FlexLexerAdapter<verilogFlexLexer> {
 
 // Recursively lex the given 'text', and apply 'func' to each subtoken.
 void RecursiveLexText(
-    std::string_view text,
+    verible::document_view text,
     const std::function<void(const verible::TokenInfo &)> &func);
 
 }  // namespace verilog
