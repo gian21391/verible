@@ -28,7 +28,11 @@ include(cmake/targets.cmake)
 include(CMakePackageConfigHelpers)
 include(GNUInstallDirs)
 
-enable_testing()
+option(VERIBLE_TEST "Generate the test targets." ON)
+if (VERIBLE_TEST)
+    message("Testing enabled")
+    include(CTest)
+endif ()
 
 find_package(absl CONFIG REQUIRED)
 find_package(GTest CONFIG REQUIRED)
@@ -37,15 +41,9 @@ find_package(nlohmann_json CONFIG REQUIRED)
 find_package(ZLIB REQUIRED)
 find_package(Python3 REQUIRED COMPONENTS Interpreter)
 
-file(GLOB_RECURSE V_GLOB LIST_DIRECTORIES true "*")
-foreach(item ${V_GLOB})
-    if(IS_DIRECTORY ${item})
-        if(EXISTS "${item}/CMakeLists.txt")
-            message("Adding: ${item}")
-            add_subdirectory(${item})
-        endif ()
-    endif()
-endforeach()
+add_subdirectory(external_libs)
+add_subdirectory(third_party/portable_endian)
+add_subdirectory(verible)
 
 configure_package_config_file(cmake/config.cmake.in
         ${CMAKE_CURRENT_BINARY_DIR}/verible-config.cmake

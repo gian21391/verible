@@ -38,6 +38,10 @@ function(cc_test)
             "${options}" "${oneValueArgs}" "${multiValueArgs}"
     )
 
+    if (NOT VERIBLE_TEST)
+        return()
+    endif ()
+
     set(target ${arg_NAME})
 #    string(CONCAT target ${target} "__testing")
 
