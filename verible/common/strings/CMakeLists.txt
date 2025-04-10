@@ -1,5 +1,12 @@
 cc_library(
         NAME
+        "document-view"
+        DEPS
+        absl::strings
+)
+
+cc_library(
+        NAME
         "compare"
 )
 
@@ -293,6 +300,7 @@ cc_library(
         "line-column-map.cc"
         DEPS
         utf8
+        document-view
 )
 
 cc_test(
