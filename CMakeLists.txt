@@ -1,12 +1,17 @@
 cmake_minimum_required(VERSION 3.20)
-project(verible)
+set(verible_VERSION 0.1)
+project(verible
+        VERSION ${verible_VERSION}
+        DESCRIPTION ""
+        HOMEPAGE_URL "https://github.com/chipsalliance/verible"
+        LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 
-include(FetchContent)
 if(WIN32)
     find_package(BISON)
     if(NOT BISON_FOUND)
+        include(FetchContent)
         FetchContent_Declare(win_flex_bison
                 URL https://github.com/lexxmark/winflexbison/releases/download/v2.5.25/win_flex_bison-2.5.25.zip
                 URL_MD5 720226b1befe7033fb3ecc98f5ffd425
@@ -22,6 +27,8 @@ find_package(BISON REQUIRED)
 cmake_path(GET FLEX_EXECUTABLE PARENT_PATH FLEX_INCLUDE_DIR)
 
 include(cmake/targets.cmake)
+include(CMakePackageConfigHelpers)
+include(GNUInstallDirs)
 
 enable_testing()
 
@@ -41,3 +48,23 @@ foreach(item ${V_GLOB})
         endif ()
     endif()
 endforeach()
+
+configure_package_config_file(cmake/config.cmake.in
+        ${CMAKE_CURRENT_BINARY_DIR}/verible-config.cmake
+        INSTALL_DESTINATION ${CMAKE_INSTALL_DATADIR}/verible
+        NO_SET_AND_CHECK_MACRO)
+write_basic_package_version_file(
+        ${CMAKE_CURRENT_BINARY_DIR}/verible-config-version.cmake
+        VERSION ${verible_VERSION}
+        COMPATIBILITY SameMajorVersion)
+install(FILES
+        ${CMAKE_CURRENT_BINARY_DIR}/verible-config.cmake
+        ${CMAKE_CURRENT_BINARY_DIR}/verible-config-version.cmake
+        DESTINATION ${CMAKE_INSTALL_DATADIR}/verible)
+install(TARGETS verible-verilog-syntax EXPORT verible-targets)
+install(DIRECTORY verible/
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+        FILES_MATCHING PATTERN "*.h")
+install(EXPORT verible-targets
+        NAMESPACE verible::
+        DESTINATION ${CMAKE_INSTALL_DATADIR}/verible)
