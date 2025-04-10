@@ -6,6 +6,8 @@ project(verible
         HOMEPAGE_URL "https://github.com/chipsalliance/verible"
         LANGUAGES CXX)
 
+set(CMAKE_CXX_STANDARD 20)
+
 if(WIN32)
     find_package(BISON)
     if(NOT BISON_FOUND)
