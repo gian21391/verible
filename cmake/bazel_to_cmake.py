@@ -90,7 +90,7 @@ def main():
             print("    DEPS")
             for dep in kwargs["deps"]:
                 print("    " + convert_dep(dep))
-        print(")")
+        print(")\n")
 
 
 if __name__ == "__main__":
