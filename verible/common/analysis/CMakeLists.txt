@@ -322,6 +322,8 @@ target_link_libraries(line-linter_test PRIVATE
         verible::common::analysis::line-linter
         verible::common::analysis::lint-rule-status
         verible::common::text::token-info
+        absl::status
+        absl::log
         GTest::gtest
         GTest::gtest_main
 )
@@ -339,6 +341,7 @@ target_link_libraries(syntax-tree-linter_test PRIVATE
         verible::common::text::token-info
         verible::common::text::tree-builder-test-util
         verible::common::util::casts
+        absl::status
         GTest::gtest
         GTest::gtest_main
 )
@@ -389,6 +392,7 @@ target_link_libraries(token-stream-linter_test PRIVATE
         verible::common::analysis::token-stream-linter
         verible::common::text::token-info
         verible::common::text::token-stream-view
+        absl::status
         GTest::gtest
         GTest::gtest_main
 )

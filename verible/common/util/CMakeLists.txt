@@ -114,7 +114,8 @@ target_link_libraries(interval-set INTERFACE
         verible::common::util::interval
         verible::common::util::iterator-range
         verible::common::util::logging
-        absl::base
+        absl::strings
+        absl::random_random
 )
 
 add_library(logging INTERFACE)
@@ -122,6 +123,9 @@ add_library(verible::common::util::logging ALIAS logging)
 target_include_directories(logging INTERFACE ${CMAKE_SOURCE_DIR})
 target_link_libraries(logging INTERFACE
         absl::base
+        absl::log
+        absl::die_if_null
+        absl::log_internal_check_op
 )
 
 add_library(casts INTERFACE)
