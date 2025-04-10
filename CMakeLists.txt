@@ -16,9 +16,12 @@ if(WIN32)
         LIST(APPEND CMAKE_PROGRAM_PATH "${win_flex_bison_SOURCE_DIR}")
     endif ()
 endif ()
+
 find_package(FLEX REQUIRED)
 find_package(BISON REQUIRED)
 cmake_path(GET FLEX_EXECUTABLE PARENT_PATH FLEX_INCLUDE_DIR)
+
+include(cmake/targets.cmake)
 
 enable_testing()
 
