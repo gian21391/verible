@@ -1,7 +1,9 @@
-add_library(verilog-preprocess STATIC verilog-preprocess.cc)
-add_library(verible::verilog::preprocessor::verilog-preprocess ALIAS verilog-preprocess)
-target_include_directories(verilog-preprocess PUBLIC ${CMAKE_SOURCE_DIR})
-target_link_libraries(verilog-preprocess PUBLIC
+cc_library(
+        NAME
+        "verilog-preprocess"
+        SRCS
+        "verilog-preprocess.cc"
+        DEPS
         verible::common::lexer::token-generator
         verible::common::lexer::token-stream-adapter
         verible::common::text::macro-definition
@@ -15,5 +17,33 @@ target_link_libraries(verilog-preprocess PUBLIC
         verible::verilog::parser::verilog-lexer
         verible::verilog::parser::verilog-parser
         verible::verilog::parser::verilog-token-enum
+        absl::status
         absl::statusor
+        absl::strings
 )
+
+cc_test(
+        NAME
+        "verilog-preprocess_test"
+        SRCS
+        "verilog-preprocess_test.cc"
+        DEPS
+        verilog-preprocess
+        verible::common::text::macro-definition
+        verible::common::text::text-structure
+        verible::common::text::token-info
+        verible::common::text::token-stream-view
+        verible::common::util::container-util
+        verible::common::util::file-util
+        verible::verilog::analysis::verilog-analyzer
+        verible::verilog::analysis::verilog-filelist
+        verible::verilog::analysis::verilog-project
+        verible::verilog::parser::verilog-lexer
+        verible::verilog::parser::verilog-token-enum
+        absl::status
+        absl::statusor
+        absl::strings
+        GTest::gtest
+        GTest::gtest_main
+)
+

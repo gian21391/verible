@@ -310,11 +310,11 @@ absl::Status VerilogProject::IncludeFileNotFoundError(
 }
 
 absl::StatusOr<VerilogSourceFile *> VerilogProject::OpenIncludedFile(
-    verible::document_view referenced_filename) {
+    std::string_view referenced_filename) {
   VLOG(2) << __FUNCTION__ << ", referenced: " << referenced_filename;
   // Check for a pre-existing entry to avoid duplicate files.
   {
-    const auto opened_file = FindOpenedFile(referenced_filename.to_string_view());
+    const auto opened_file = FindOpenedFile(referenced_filename);
     if (opened_file) {
       return *opened_file;
     }
@@ -323,7 +323,7 @@ absl::StatusOr<VerilogSourceFile *> VerilogProject::OpenIncludedFile(
   // Check if this is already opened include file
   for (const auto &include_path : include_paths_) {
     const std::string resolved_filename =
-        verible::file::JoinPath(include_path, referenced_filename.to_string_view());
+        verible::file::JoinPath(include_path, referenced_filename);
     const auto opened_file = FindOpenedFile(resolved_filename);
     if (opened_file) {
       return *opened_file;
@@ -333,10 +333,10 @@ absl::StatusOr<VerilogSourceFile *> VerilogProject::OpenIncludedFile(
   // Locate the file among the base paths.
   for (const auto &include_path : include_paths_) {
     const std::string resolved =
-        verible::file::JoinPath(include_path, referenced_filename.to_string_view());
+        verible::file::JoinPath(include_path, referenced_filename);
     if (verible::file::FileExists(resolved).ok()) {
       VLOG(2) << referenced_filename << " in incdir '" << resolved << "'";
-      return OpenFile(referenced_filename.to_string_view(), resolved, Corpus());
+      return OpenFile(referenced_filename, resolved, Corpus());
     }
     VLOG(2) << referenced_filename << " not in incdir '" << resolved << "'";
   }
@@ -344,9 +344,9 @@ absl::StatusOr<VerilogSourceFile *> VerilogProject::OpenIncludedFile(
   VLOG(1) << __FUNCTION__ << "': '" << referenced_filename << "' not found";
   // Not found in any path.  Cache this status.
   const auto inserted = files_.emplace(
-      referenced_filename.to_string_view(),
+      referenced_filename,
       std::make_unique<VerilogSourceFile>(
-          referenced_filename.to_string_view(), IncludeFileNotFoundError(referenced_filename.to_string_view())));
+          referenced_filename, IncludeFileNotFoundError(referenced_filename)));
   CHECK(inserted.second) << "Not-found file should have been recorded as such.";
   return inserted.first->second->Status();
 }

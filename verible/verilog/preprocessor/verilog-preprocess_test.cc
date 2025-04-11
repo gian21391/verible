@@ -52,7 +52,7 @@ using FileOpener = VerilogPreprocess::FileOpener;
 
 class LexerTester {
  public:
-  explicit LexerTester(std::string_view text) : lexer_(text) {
+  explicit LexerTester(verible::document_view text) : lexer_(text) {
     for (lexer_.DoNextToken(); !lexer_.GetLastToken().isEOF();
          lexer_.DoNextToken()) {
       lexed_sequence_.push_back(lexer_.GetLastToken());
@@ -70,12 +70,12 @@ class LexerTester {
 
 class PreprocessorTester {
  public:
-  PreprocessorTester(std::string_view text,
+  PreprocessorTester(verible::document_view text,
                      const VerilogPreprocess::Config &config)
       : analyzer_(text, "<<inline-file>>", config),
         status_(analyzer_.Analyze()) {}
 
-  explicit PreprocessorTester(std::string_view text)
+  explicit PreprocessorTester(verible::document_view text)
       : PreprocessorTester(text, VerilogPreprocess::Config()) {}
 
   const VerilogPreprocessData &PreprocessorData() const {
@@ -94,7 +94,7 @@ class PreprocessorTester {
 };
 
 struct FailTest {
-  std::string_view input;
+  verible::document_view input;
   int offset;
 };
 TEST(VerilogPreprocessTest, InvalidPreprocessorInputs) {
@@ -148,7 +148,7 @@ TEST(VerilogPreprocessTest, InvalidPreprocessorInputs) {
 
 // Verify that VerilogPreprocess works without any directives.
 TEST(VerilogPreprocessTest, WorksWithoutDefinitions) {
-  std::string_view test_cases[] = {
+  verible::document_view test_cases[] = {
       "",
       "\n",
       "module foo;\nendmodule\n",
@@ -164,7 +164,7 @@ TEST(VerilogPreprocessTest, WorksWithoutDefinitions) {
 }
 
 TEST(VerilogPreprocessTest, OneMacroDefinitionNoParamsNoValue) {
-  std::string_view test_cases[] = {
+  verible::document_view test_cases[] = {
       "`define FOOOO\n",
       "`define     FOOOO\n",
       "module foo;\nendmodule\n"
@@ -322,7 +322,7 @@ TEST(VerilogPreprocessTest, DefaultPreprocessorKeepsDefineInStream) {
 }
 
 struct BranchFailTest {
-  std::string_view input;
+  verible::document_view input;
   int offset;
   std::string_view expected_error;
 };
@@ -358,8 +358,8 @@ TEST(VerilogPreprocessTest, IncompleteOrUnbalancedIfdef) {
 
 struct RawAndFiltered {
   std::string_view description;
-  std::string_view pp_input;
-  std::string_view equivalent;
+  verible::document_view pp_input;
+  verible::document_view equivalent;
 };
 TEST(VerilogPreprocess, FilterPPBranches) {
   const RawAndFiltered test_cases[] = {
@@ -887,7 +887,7 @@ static void IncludeFileTestWithIncludeBracket(const char *start_inc,
                                               const char *end_inc) {
   const auto tempdir = testing::TempDir();
   const std::string includes_dir = JoinPath(tempdir, "includes");
-  constexpr std::string_view included_content(
+  constexpr verible::document_view included_content(
       "module included_file(); endmodule");
   const std::string_view included_filename = "included_file.sv";
   const std::string included_absolute_path =
@@ -901,7 +901,7 @@ static void IncludeFileTestWithIncludeBracket(const char *start_inc,
 
   FileOpener file_opener =
       [included_absolute_path, included_content](
-          std::string_view filename) -> absl::StatusOr<std::string_view> {
+          std::string_view filename) -> absl::StatusOr<verible::document_view> {
     if (filename == included_absolute_path) return included_content;
     return absl::NotFoundError(absl::StrCat(filename, " is not found"));
   };
@@ -947,7 +947,7 @@ TEST(VerilogPreprocessTest, IncludingFileWithRelativePath) {
   const auto tempdir = testing::TempDir();
   const std::string includes_dir = JoinPath(tempdir, "includes");
   EXPECT_TRUE(CreateDir(includes_dir).ok());
-  constexpr std::string_view included_content(
+  constexpr verible::document_view included_content(
       "module included_file(); endmodule");
   const std::string_view included_filename = "included_file.sv";
   const ScopedTestFile tf(includes_dir, included_content, included_filename);
@@ -962,7 +962,7 @@ TEST(VerilogPreprocessTest, IncludingFileWithRelativePath) {
   verilog::VerilogProject project(".", {"/", includes_dir});
   FileOpener file_opener =
       [&project](
-          std::string_view filename) -> absl::StatusOr<std::string_view> {
+          std::string_view filename) -> absl::StatusOr<verible::document_view> {
     auto result = project.OpenIncludedFile(filename);
     if (!result.status().ok()) return result.status();
     return (*result)->GetContent();
@@ -1003,7 +1003,7 @@ TEST(VerilogPreprocessTest,
   const auto tempdir = testing::TempDir();
   const std::string includes_dir = JoinPath(tempdir, "includes");
   EXPECT_TRUE(CreateDir(includes_dir).ok());
-  constexpr std::string_view included_content(
+  constexpr verible::document_view included_content(
       "module included_file(); endmodule\n");
   const std::string_view included_filename = "included_file.sv";
   const ScopedTestFile tf(includes_dir, included_content, included_filename);
@@ -1015,7 +1015,7 @@ TEST(VerilogPreprocessTest,
   verilog::VerilogProject project(".", {"/"});
   FileOpener file_opener =
       [&project](
-          std::string_view filename) -> absl::StatusOr<std::string_view> {
+          std::string_view filename) -> absl::StatusOr<verible::document_view> {
     auto result = project.OpenIncludedFile(filename);
     if (!result.status().ok()) return result.status();
     return (*result)->GetContent();

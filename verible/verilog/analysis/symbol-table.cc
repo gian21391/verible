@@ -1629,7 +1629,7 @@ class SymbolTable::Builder : public TreeContextVisitor {
     VerilogProject *project = symbol_table_->project_;
     if (project == nullptr) return;  // Without project, ignore.
 
-    const auto status_or_file = project->OpenIncludedFile(filename_unquoted);
+    const auto status_or_file = project->OpenIncludedFile(filename_unquoted.to_string_view());
     if (!status_or_file.ok()) {
       diagnostics_.push_back(status_or_file.status());
       // Errors can be retrieved later.

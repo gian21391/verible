@@ -290,7 +290,7 @@ class VerilogProject {
   // Opens a file that was `included.
   // If the file was previously opened, that data is returned.
   absl::StatusOr<VerilogSourceFile *> OpenIncludedFile(
-      verible::document_view referenced_filename);
+      std::string_view referenced_filename);
 
   // Adds an already opened file by directly passing its content.
   // This is needed in external kythe backends.
