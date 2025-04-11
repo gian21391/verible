@@ -43,19 +43,7 @@ def load(path, *symbols):
     return [None] * len(symbols)
 
 
-def package(**kwargs):
-    pass
-
-
-def genlex(**kwargs):
-    pass
-
-
-def genrule(**kwargs):
-    pass
-
-
-def get_version_define_from_module():
+def do_nothing(**kwargs):
     pass
 
 
@@ -85,11 +73,14 @@ def main():
             "cc_library": cc_library,
             "cc_test": cc_test,
             "load": load,
-            "package": package,
-            "genlex": genlex,
+            "package": do_nothing,
+            "genlex": do_nothing,
+            "genyacc": do_nothing,
             "select": select,
-            "genrule": genrule,
-            "get_version_define_from_module": get_version_define_from_module,
+            "genrule": do_nothing,
+            "get_version_define_from_module": do_nothing,
+            "std_move_parser_symbols": do_nothing,
+            "record_recovered_syntax_errors": do_nothing,
         },
     )
 

@@ -1,70 +1,153 @@
-add_library(bound-symbol-manager STATIC bound-symbol-manager.cc)
-add_library(verible::common::analysis::matcher::bound-symbol-manager ALIAS bound-symbol-manager)
-target_include_directories(bound-symbol-manager PUBLIC ${CMAKE_SOURCE_DIR})
-target_link_libraries(bound-symbol-manager PUBLIC
+cc_library(
+        NAME
+        "bound-symbol-manager"
+        SRCS
+        "bound-symbol-manager.cc"
+        DEPS
         verible::common::text::symbol
         verible::common::util::casts
         verible::common::util::container-util
         verible::common::util::logging
 )
 
-add_library(matcher STATIC matcher.cc)
-add_library(verible::common::analysis::matcher::matcher ALIAS matcher)
-target_include_directories(matcher PUBLIC ${CMAKE_SOURCE_DIR})
-target_link_libraries(matcher PUBLIC
-        verible::common::analysis::matcher::bound-symbol-manager
+cc_library(
+        NAME
+        "matcher"
+        SRCS
+        "matcher.cc"
+        DEPS
+        bound-symbol-manager
         verible::common::text::symbol
         absl::optional
 )
 
-add_library(core-matchers INTERFACE)
-add_library(verible::common::analysis::matcher::core-matchers ALIAS core-matchers)
-target_include_directories(core-matchers INTERFACE ${CMAKE_SOURCE_DIR})
-target_link_libraries(core-matchers INTERFACE
-        verible::common::analysis::matcher::inner-match-handlers
-        verible::common::analysis::matcher::matcher
+cc_test(
+        NAME
+        "matcher_test"
+        SRCS
+        "matcher_test.cc"
+        DEPS
+        bound-symbol-manager
+        inner-match-handlers
+        matcher
+        matcher-builders
+        verible::common::text::concrete-syntax-leaf
+        verible::common::text::concrete-syntax-tree
+        verible::common::text::symbol
+        verible::common::text::tree-builder-test-util
+        verible::common::util::casts
+        GTest::gtest
+        GTest::gtest_main
+)
+
+cc_library(
+        NAME
+        "core-matchers"
+        DEPS
+        inner-match-handlers
+        matcher
         verible::common::text::symbol
 )
 
-add_library(inner-match-handlers STATIC inner-match-handlers.cc)
-add_library(verible::common::analysis::matcher::inner-match-handlers ALIAS inner-match-handlers)
-target_include_directories(inner-match-handlers PUBLIC ${CMAKE_SOURCE_DIR})
-target_link_libraries(inner-match-handlers PUBLIC
-        verible::common::analysis::matcher::bound-symbol-manager
-        verible::common::analysis::matcher::matcher
+cc_test(
+        NAME
+        "core-matchers_test"
+        SRCS
+        "core-matchers_test.cc"
+        DEPS
+        bound-symbol-manager
+        core-matchers
+        matcher
+        matcher-builders
+        matcher-test-utils
+        verible::common::text::symbol
+        verible::common::text::tree-builder-test-util
+        GTest::gtest
+        GTest::gtest_main
+)
+
+cc_library(
+        NAME
+        "inner-match-handlers"
+        SRCS
+        "inner-match-handlers.cc"
+        DEPS
+        bound-symbol-manager
+        matcher
         verible::common::text::symbol
         verible::common::util::logging
 )
 
-add_library(matcher-builders INTERFACE)
-add_library(verible::common::analysis::matcher::matcher-builders ALIAS matcher-builders)
-target_include_directories(matcher-builders INTERFACE ${CMAKE_SOURCE_DIR})
-target_link_libraries(matcher-builders INTERFACE
-        verible::common::analysis::matcher::descent-path
-        verible::common::analysis::matcher::inner-match-handlers
-        verible::common::analysis::matcher::matcher
+cc_library(
+        NAME
+        "matcher-builders"
+        DEPS
+        descent-path
+        inner-match-handlers
+        matcher
         verible::common::text::symbol
 )
 
-add_library(descent-path STATIC descent-path.cc)
-add_library(verible::common::analysis::matcher::descent-path ALIAS descent-path)
-target_include_directories(descent-path PUBLIC ${CMAKE_SOURCE_DIR})
-target_link_libraries(descent-path PUBLIC
+cc_test(
+        NAME
+        "matcher-builders_test"
+        SRCS
+        "matcher-builders_test.cc"
+        DEPS
+        bound-symbol-manager
+        matcher
+        matcher-builders
+        matcher-test-utils
+        verible::common::text::concrete-syntax-leaf
+        verible::common::text::concrete-syntax-tree
+        verible::common::text::symbol
+        verible::common::text::tree-builder-test-util
+        verible::common::util::casts
+        GTest::gtest
+        GTest::gtest_main
+)
+
+cc_library(
+        NAME
+        "descent-path"
+        SRCS
+        "descent-path.cc"
+        DEPS
         verible::common::text::concrete-syntax-tree
         verible::common::text::symbol
         verible::common::util::casts
 )
 
-add_library(matcher-test-utils STATIC matcher-test-utils.cc)
-add_library(verible::common::analysis::matcher::matcher-test-utils ALIAS matcher-test-utils)
-target_include_directories(matcher-test-utils PUBLIC ${CMAKE_SOURCE_DIR})
-target_link_libraries(matcher-test-utils PUBLIC
-        verible::common::analysis::matcher::bound-symbol-manager
-        verible::common::analysis::matcher::matcher
+cc_test(
+        NAME
+        "descent-path_test"
+        SRCS
+        "descent-path_test.cc"
+        DEPS
+        descent-path
+        verible::common::text::concrete-syntax-leaf
+        verible::common::text::concrete-syntax-tree
+        verible::common::text::symbol
+        verible::common::text::token-info
+        verible::common::text::tree-builder-test-util
+        verible::common::util::casts
+        GTest::gtest
+        GTest::gtest_main
+)
+
+cc_library(
+        NAME
+        "matcher-test-utils"
+        SRCS
+        "matcher-test-utils.cc"
+        DEPS
+        bound-symbol-manager
+        matcher
         verible::common::text::concrete-syntax-leaf
         verible::common::text::concrete-syntax-tree
         verible::common::text::symbol
         verible::common::text::tree-utils
         verible::common::text::visitors
+        absl::status
         GTest::gtest
 )

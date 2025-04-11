@@ -318,7 +318,7 @@ TEST(FindAllTaskFunctionPortDeclarationsTest, ExpectNoTaskFunctionPorts) {
 }
 
 struct ExpectedPort {
-  std::string_view id;  // name of port
+  verible::document_view id;  // name of port
   bool have_type;       // is type specified?
 };
 

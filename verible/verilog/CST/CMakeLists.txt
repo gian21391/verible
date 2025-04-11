@@ -1,51 +1,10 @@
-function(generate_extract_nonterminals_script)
-    set(script_content [[
-# Read the input file
-file(READ "${INPUT_FILE}" content)
-
-# Process each line
-file(STRINGS "${INPUT_FILE}" lines)
-
-set(capture FALSE)
-set(processed_content "")
-
-foreach(line IN LISTS lines)
-  if(line MATCHES "BEGIN GENERATE")
-    set(capture TRUE)
-    continue()
-  endif()
-
-  if(capture)
-    if(line MATCHES "END GENERATE")
-      set(capture FALSE)
-      continue()
-    endif()
-
-    string(REGEX REPLACE "^ +" "CONSIDER(" line "${line}")
-    string(REGEX REPLACE " =.*," "," line "${line}")
-    string(REGEX REPLACE "," ")" line "${line}")
-
-    string(APPEND processed_content "${line}\n")
-  endif()
-endforeach()
-
-# Write the transformed content to the output file
-file(WRITE "${OUTPUT_FILE}" "${processed_content}")
-]])
-
-    file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/extract_nonterminals.cmake" "${script_content}")
-endfunction()
-
-generate_extract_nonterminals_script()
-
 set(NONTERMINALS_INPUT "${CMAKE_CURRENT_SOURCE_DIR}/verilog-nonterminals.h")
 set(NONTERMINALS_OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/verilog_nonterminals_foreach-gen.inc")
 
 add_custom_command(
         OUTPUT ${NONTERMINALS_OUTPUT}
         DEPENDS ${NONTERMINALS_INPUT}
-        COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}
-        COMMAND ${CMAKE_COMMAND} -DINPUT_FILE=${NONTERMINALS_INPUT} -DOUTPUT_FILE=${NONTERMINALS_OUTPUT} -P ${CMAKE_CURRENT_BINARY_DIR}/extract_nonterminals.cmake
+        COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/cmake/verilog_non_terminals.py ${NONTERMINALS_INPUT} ${NONTERMINALS_OUTPUT}
         COMMENT "Generating verilog_nonterminals_foreach-gen.inc"
 )
 
@@ -53,41 +12,97 @@ add_custom_target(verilog-nonterminals-foreach-gen
         DEPENDS ${NONTERMINALS_OUTPUT}
 )
 
-add_library(verilog-nonterminals STATIC verilog-nonterminals.cc ${CMAKE_CURRENT_BINARY_DIR}/verilog_nonterminals_foreach-gen.inc)
-add_library(verible::verilog::CST::verilog-nonterminals ALIAS verilog-nonterminals)
-target_include_directories(verilog-nonterminals PUBLIC ${CMAKE_SOURCE_DIR} ${CMAKE_BINARY_DIR})
-target_link_libraries(verilog-nonterminals PUBLIC
+cc_library(
+        NAME
+        "verilog-nonterminals"
+        SRCS
+        "verilog-nonterminals.cc"
+        "verilog_nonterminals_foreach-gen.inc"
+        DEPS
         verible::common::text::constants
-        absl::base
+        absl::strings
 )
 add_dependencies(verilog-nonterminals verilog-nonterminals-foreach-gen)
 
-add_library(verilog-matchers INTERFACE)
-add_library(verible::verilog::CST::verilog-matchers ALIAS verilog-matchers)
-target_include_directories(verilog-matchers INTERFACE ${CMAKE_SOURCE_DIR})
-target_link_libraries(verilog-matchers INTERFACE
-        verible::verilog::CST::verilog-nonterminals
+cc_test(
+        NAME
+        "verilog-nonterminals_test"
+        SRCS
+        "verilog-nonterminals_test.cc"
+        DEPS
+        verilog-nonterminals
+        verible::common::text::constants
+        GTest::gtest
+        GTest::gtest_main
+)
+
+cc_library(
+        NAME
+        "verilog-matchers"
+        SRCS
+        "verilog-matchers.cc"
+        "verilog_nonterminals_foreach.inc"
+        "verilog_nonterminals_foreach-gen.inc"
+        DEPS
+        verilog-nonterminals
         verible::common::analysis::matcher::matcher-builders
         verible::common::text::symbol
         verible::verilog::parser::verilog-token-enum
 )
 
-add_library(verilog-treebuilder-utils STATIC verilog-treebuilder-utils.cc)
-add_library(verible::verilog::CST::verilog-treebuilder-utils ALIAS verilog-treebuilder-utils)
-target_include_directories(verilog-treebuilder-utils PUBLIC ${CMAKE_SOURCE_DIR})
-target_link_libraries(verilog-treebuilder-utils PUBLIC
-        verible::verilog::CST::verilog-nonterminals
+cc_test(
+        NAME
+        "verilog-matchers_test"
+        SRCS
+        "verilog-matchers_test.cc"
+        DEPS
+        verilog-matchers
+        verilog-treebuilder-utils
+        verible::common::analysis::matcher::core-matchers
+        verible::common::analysis::matcher::matcher-builders
+        verible::common::analysis::matcher::matcher-test-utils
+        verible::verilog::analysis::verilog-analyzer
+        GTest::gtest
+        GTest::gtest_main
+)
+
+cc_library(
+        NAME
+        "verilog-treebuilder-utils"
+        SRCS
+        "verilog-treebuilder-utils.cc"
+        DEPS
+        verilog-nonterminals
         verible::common::text::concrete-syntax-leaf
         verible::common::text::concrete-syntax-tree
         verible::common::text::symbol
         verible::common::text::token-info
         verible::common::util::logging
+        absl::strings
 )
 
-add_library(match-test-utils STATIC match-test-utils.cc)
-add_library(verible::verilog::CST::match-test-utils ALIAS match-test-utils)
-target_include_directories(match-test-utils PUBLIC ${CMAKE_SOURCE_DIR})
-target_link_libraries(match-test-utils PUBLIC
+cc_test(
+        NAME
+        "verilog-treebuilder-utils_test"
+        SRCS
+        "verilog-treebuilder-utils_test.cc"
+        DEPS
+        verilog-treebuilder-utils
+        verible::common::text::tree-builder-test-util
+        verible::common::text::tree-utils
+        GTest::gtest
+        GTest::gtest_main
+)
+
+
+
+
+cc_library(
+        NAME
+        "match-test-utils"
+        SRCS
+        "match-test-utils.cc"
+        DEPS
         verible::common::analysis::syntax-tree-search
         verible::common::analysis::syntax-tree-search-test-utils
         verible::common::text::text-structure
@@ -95,13 +110,15 @@ target_link_libraries(match-test-utils PUBLIC
         GTest::gtest
 )
 
-add_library(constraints STATIC constraints.cc)
-add_library(verible::verilog::CST::constraints ALIAS constraints)
-target_include_directories(constraints PUBLIC ${CMAKE_SOURCE_DIR})
-target_link_libraries(constraints PUBLIC
-        verible::verilog::CST::identifier
-        verible::verilog::CST::verilog-matchers
-        verible::verilog::CST::verilog-nonterminals
+cc_library(
+        NAME
+        "constraints"
+        SRCS
+        "constraints.cc"
+        DEPS
+        identifier
+        verilog-matchers
+        verilog-nonterminals
         verible::common::analysis::syntax-tree-search
         verible::common::text::concrete-syntax-leaf
         verible::common::text::concrete-syntax-tree
@@ -110,12 +127,31 @@ target_link_libraries(constraints PUBLIC
         verible::common::text::tree-utils
 )
 
-add_library(DPI STATIC DPI.cc)
-add_library(verible::verilog::CST::DPI ALIAS DPI)
-target_include_directories(DPI PUBLIC ${CMAKE_SOURCE_DIR})
-target_link_libraries(DPI PUBLIC
-        verible::verilog::CST::verilog-matchers
-        verible::verilog::CST::verilog-nonterminals
+cc_test(
+        NAME
+        "constraints_test"
+        SRCS
+        "constraints_test.cc"
+        DEPS
+        constraints
+        match-test-utils
+        verible::common::analysis::syntax-tree-search
+        verible::common::analysis::syntax-tree-search-test-utils
+        verible::common::text::text-structure
+        verible::common::text::token-info
+        verible::verilog::analysis::verilog-analyzer
+        GTest::gtest
+        GTest::gtest_main
+)
+
+cc_library(
+        NAME
+        "DPI"
+        SRCS
+        "DPI.cc"
+        DEPS
+        verilog-matchers
+        verilog-nonterminals
         verible::common::analysis::syntax-tree-search
         verible::common::text::concrete-syntax-tree
         verible::common::text::symbol
@@ -126,14 +162,32 @@ target_link_libraries(DPI PUBLIC
         verible::verilog::parser::verilog-token-enum
 )
 
-add_library(declaration STATIC declaration.cc)
-add_library(verible::verilog::CST::declaration ALIAS declaration)
-target_include_directories(declaration PUBLIC ${CMAKE_SOURCE_DIR})
-target_link_libraries(declaration PUBLIC
-        verible::verilog::CST::identifier
-        verible::verilog::CST::type
-        verible::verilog::CST::verilog-matchers
-        verible::verilog::CST::verilog-nonterminals
+cc_test(
+        NAME
+        "DPI_test"
+        SRCS
+        "DPI_test.cc"
+        DEPS
+        DPI
+        match-test-utils
+        verible::common::analysis::syntax-tree-search
+        verible::common::analysis::syntax-tree-search-test-utils
+        verible::common::text::text-structure
+        verible::common::util::logging
+        GTest::gtest
+        GTest::gtest_main
+)
+
+cc_library(
+        NAME
+        "declaration"
+        SRCS
+        "declaration.cc"
+        DEPS
+        identifier
+        type
+        verilog-matchers
+        verilog-nonterminals
         verible::common::analysis::syntax-tree-search
         verible::common::text::concrete-syntax-leaf
         verible::common::text::concrete-syntax-tree
@@ -146,26 +200,68 @@ target_link_libraries(declaration PUBLIC
         verible::verilog::parser::verilog-token-enum
 )
 
-add_library(dimensions STATIC dimensions.cc)
-add_library(verible::verilog::CST::dimensions ALIAS dimensions)
-target_include_directories(dimensions PUBLIC ${CMAKE_SOURCE_DIR})
-target_link_libraries(dimensions PUBLIC
-        verible::verilog::CST::verilog-matchers
-        # fixdeps:: keep
-        verible::verilog::CST::verilog-nonterminals
+cc_test(
+        NAME
+        "declaration_test"
+        SRCS
+        "declaration_test.cc"
+        DEPS
+        declaration
+        match-test-utils
+        verible::common::analysis::syntax-tree-search
+        verible::common::analysis::syntax-tree-search-test-utils
+        verible::common::text::text-structure
+        verible::common::text::tree-utils
+        verible::common::util::logging
+        GTest::gtest
+        GTest::gtest_main
+)
+
+cc_library(
+        NAME
+        "dimensions"
+        SRCS
+        "dimensions.cc"
+        DEPS
+        verilog-matchers
+        verilog-nonterminals
         verible::common::analysis::syntax-tree-search
         verible::common::text::concrete-syntax-tree
         verible::common::text::symbol
         verible::common::text::tree-utils
 )
 
-add_library(expression STATIC expression.cc)
-add_library(verible::verilog::CST::expression ALIAS expression)
-target_include_directories(expression PUBLIC ${CMAKE_SOURCE_DIR})
-target_link_libraries(expression PUBLIC
-        verible::verilog::CST::type
-        verible::verilog::CST::verilog-matchers
-        verible::verilog::CST::verilog-nonterminals
+cc_test(
+        NAME
+        "dimensions_test"
+        SRCS
+        "dimensions_test.cc"
+        DEPS
+        dimensions
+        verilog-matchers
+        verible::common::analysis::syntax-tree-search
+        verible::common::text::concrete-syntax-leaf
+        verible::common::text::concrete-syntax-tree
+        verible::common::text::symbol
+        verible::common::text::text-structure
+        verible::common::text::token-info
+        verible::common::text::tree-utils
+        verible::common::util::casts
+        verible::common::util::logging
+        verible::verilog::analysis::verilog-analyzer
+        GTest::gtest
+        GTest::gtest_main
+)
+
+cc_library(
+        NAME
+        "expression"
+        SRCS
+        "expression.cc"
+        DEPS
+        type
+        verilog-matchers
+        verilog-nonterminals
         verible::common::analysis::syntax-tree-search
         verible::common::text::concrete-syntax-leaf
         verible::common::text::concrete-syntax-tree
@@ -175,18 +271,44 @@ target_link_libraries(expression PUBLIC
         verible::common::util::casts
         verible::verilog::parser::verilog-token-classifications
         verible::verilog::parser::verilog-token-enum
+        absl::strings
 )
 
-add_library(functions STATIC functions.cc)
-add_library(verible::verilog::CST::functions ALIAS functions)
-target_include_directories(functions PUBLIC ${CMAKE_SOURCE_DIR})
-target_link_libraries(functions PUBLIC
-        verible::verilog::CST::identifier
-        verible::verilog::CST::type
-        verible::verilog::CST::verilog-matchers
-        # fixdeps:: keep
-        verible::verilog::CST::verilog-nonterminals
-        verible::verilog::CST::verilog-treebuilder-utils
+cc_test(
+        NAME
+        "expression_test"
+        SRCS
+        "expression_test.cc"
+        DEPS
+        expression
+        match-test-utils
+        verilog-matchers
+        verilog-nonterminals
+        verible::common::analysis::syntax-tree-search
+        verible::common::analysis::syntax-tree-search-test-utils
+        verible::common::text::concrete-syntax-tree
+        verible::common::text::symbol
+        verible::common::text::text-structure
+        verible::common::text::token-info
+        verible::common::text::tree-utils
+        verible::common::util::logging
+        verible::verilog::analysis::verilog-analyzer
+        verible::verilog::preprocessor::verilog-preprocess
+        GTest::gtest
+        GTest::gtest_main
+)
+
+cc_library(
+        NAME
+        "functions"
+        SRCS
+        "functions.cc"
+        DEPS
+        identifier
+        type
+        verilog-matchers
+        verilog-nonterminals
+        verilog-treebuilder-utils
         verible::common::analysis::syntax-tree-search
         verible::common::text::concrete-syntax-leaf
         verible::common::text::concrete-syntax-tree
@@ -194,13 +316,37 @@ target_link_libraries(functions PUBLIC
         verible::common::text::tree-utils
 )
 
-add_library(identifier STATIC identifier.cc)
-add_library(verible::verilog::CST::identifier ALIAS identifier)
-target_include_directories(identifier PUBLIC ${CMAKE_SOURCE_DIR})
-target_link_libraries(identifier PUBLIC
-        verible::verilog::CST::verilog-matchers
-        # fixdeps:: keep
-        verible::verilog::CST::verilog-nonterminals
+cc_test(
+        NAME
+        "functions_test"
+        SRCS
+        "functions_test.cc"
+        DEPS
+        functions
+        identifier
+        match-test-utils
+        verilog-nonterminals
+        verible::common::analysis::syntax-tree-search
+        verible::common::analysis::syntax-tree-search-test-utils
+        verible::common::text::concrete-syntax-leaf
+        verible::common::text::text-structure
+        verible::common::text::token-info-test-util
+        verible::common::text::tree-utils
+        verible::common::util::logging
+        verible::verilog::analysis::verilog-analyzer
+        verible::verilog::parser::verilog-token-enum
+        GTest::gtest
+        GTest::gtest_main
+)
+
+cc_library(
+        NAME
+        "identifier"
+        SRCS
+        "identifier.cc"
+        DEPS
+        verilog-matchers
+        verilog-nonterminals
         verible::common::analysis::syntax-tree-search
         verible::common::text::concrete-syntax-leaf
         verible::common::text::concrete-syntax-tree
@@ -212,10 +358,14 @@ target_link_libraries(identifier PUBLIC
         verible::verilog::parser::verilog-token-enum
 )
 
-add_executable(identifier_test identifier_test.cc)
-target_link_libraries(identifier_test PRIVATE
-        verible::verilog::CST::identifier
-        verible::verilog::CST::match-test-utils
+cc_test(
+        NAME
+        "identifier_test"
+        SRCS
+        "identifier_test.cc"
+        DEPS
+        identifier
+        match-test-utils
         verible::common::analysis::syntax-tree-search
         verible::common::analysis::syntax-tree-search-test-utils
         verible::common::text::concrete-syntax-leaf
@@ -225,14 +375,15 @@ target_link_libraries(identifier_test PRIVATE
         GTest::gtest
         GTest::gtest_main
 )
-add_test(NAME identifier_test COMMAND identifier_test)
 
-add_library(macro STATIC macro.cc)
-add_library(verible::verilog::CST::macro ALIAS macro)
-target_include_directories(macro PUBLIC ${CMAKE_SOURCE_DIR})
-target_link_libraries(macro PUBLIC
-        verible::verilog::CST::verilog-matchers
-        verible::verilog::CST::verilog-nonterminals
+cc_library(
+        NAME
+        "macro"
+        SRCS
+        "macro.cc"
+        DEPS
+        verilog-matchers
+        verilog-nonterminals
         verible::common::analysis::syntax-tree-search
         verible::common::text::concrete-syntax-leaf
         verible::common::text::concrete-syntax-tree
@@ -244,14 +395,34 @@ target_link_libraries(macro PUBLIC
         verible::verilog::parser::verilog-token-enum
 )
 
-add_library(class STATIC class.cc)
-add_library(verible::verilog::CST::class ALIAS class)
-target_include_directories(class PUBLIC ${CMAKE_SOURCE_DIR})
-target_link_libraries(class PUBLIC
-        verible::verilog::CST::identifier
-        verible::verilog::CST::verilog-matchers
-        # fixdeps:: keep
-        verible::verilog::CST::verilog-nonterminals
+cc_test(
+        NAME
+        "macro_test"
+        SRCS
+        "macro_test.cc"
+        DEPS
+        macro
+        match-test-utils
+        verible::common::analysis::syntax-tree-search
+        verible::common::analysis::syntax-tree-search-test-utils
+        verible::common::text::text-structure
+        verible::common::text::token-info-test-util
+        verible::common::util::logging
+        verible::common::util::range
+        verible::verilog::analysis::verilog-analyzer
+        GTest::gtest
+        GTest::gtest_main
+)
+
+cc_library(
+        NAME
+        "class"
+        SRCS
+        "class.cc"
+        DEPS
+        identifier
+        verilog-matchers
+        verilog-nonterminals
         verible::common::analysis::syntax-tree-search
         verible::common::text::concrete-syntax-leaf
         verible::common::text::concrete-syntax-tree
@@ -260,13 +431,31 @@ target_link_libraries(class PUBLIC
         verible::common::text::visitors
 )
 
-add_library(module STATIC module.cc)
-add_library(verible::verilog::CST::module ALIAS module)
-target_include_directories(module PUBLIC ${CMAKE_SOURCE_DIR})
-target_link_libraries(module PUBLIC
-        verible::verilog::CST::verilog-matchers
-        # fixdeps:: keep
-        verible::verilog::CST::verilog-nonterminals
+cc_test(
+        NAME
+        "class_test"
+        SRCS
+        "class_test.cc"
+        DEPS
+        class
+        match-test-utils
+        verible::common::analysis::syntax-tree-search
+        verible::common::analysis::syntax-tree-search-test-utils
+        verible::common::text::text-structure
+        verible::common::util::logging
+        verible::verilog::analysis::verilog-analyzer
+        GTest::gtest
+        GTest::gtest_main
+)
+
+cc_library(
+        NAME
+        "module"
+        SRCS
+        "module.cc"
+        DEPS
+        verilog-matchers
+        verilog-nonterminals
         verible::common::analysis::syntax-tree-search
         verible::common::text::concrete-syntax-leaf
         verible::common::text::concrete-syntax-tree
@@ -276,14 +465,32 @@ target_link_libraries(module PUBLIC
         verible::common::util::logging
 )
 
-add_library(net STATIC net.cc)
-add_library(verible::verilog::CST::net ALIAS net)
-target_include_directories(net PUBLIC ${CMAKE_SOURCE_DIR})
-target_link_libraries(net PUBLIC
-        verible::verilog::CST::identifier
-        verible::verilog::CST::verilog-matchers
-        # fixdeps:: keep
-        verible::verilog::CST::verilog-nonterminals
+cc_test(
+        NAME
+        "module_test"
+        SRCS
+        "module_test.cc"
+        DEPS
+        match-test-utils
+        module
+        verible::common::analysis::syntax-tree-search
+        verible::common::analysis::syntax-tree-search-test-utils
+        verible::common::text::text-structure
+        verible::common::util::logging
+        verible::verilog::analysis::verilog-analyzer
+        GTest::gtest
+        GTest::gtest_main
+)
+
+cc_library(
+        NAME
+        "net"
+        SRCS
+        "net.cc"
+        DEPS
+        identifier
+        verilog-matchers
+        verilog-nonterminals
         verible::common::analysis::syntax-tree-search
         verible::common::analysis::matcher::inner-match-handlers
         verible::common::text::concrete-syntax-leaf
@@ -293,14 +500,36 @@ target_link_libraries(net PUBLIC
         verible::common::text::tree-utils
 )
 
-add_library(data STATIC data.cc)
-add_library(verible::verilog::CST::data ALIAS data)
-target_include_directories(data PUBLIC ${CMAKE_SOURCE_DIR})
-target_link_libraries(data PUBLIC
-        verible::verilog::CST::identifier
-        verible::verilog::CST::verilog-matchers
-        # fixdeps:: keep
-        verible::verilog::CST::verilog-nonterminals
+cc_test(
+        NAME
+        "net_test"
+        SRCS
+        "net_test.cc"
+        DEPS
+        declaration
+        match-test-utils
+        net
+        verilog-nonterminals
+        verible::common::analysis::syntax-tree-search
+        verible::common::analysis::syntax-tree-search-test-utils
+        verible::common::text::syntax-tree-context
+        verible::common::text::text-structure
+        verible::common::util::logging
+        verible::verilog::analysis::verilog-analyzer
+        absl::strings
+        GTest::gtest
+        GTest::gtest_main
+)
+
+cc_library(
+        NAME
+        "data"
+        SRCS
+        "data.cc"
+        DEPS
+        identifier
+        verilog-matchers
+        verilog-nonterminals
         verible::common::analysis::syntax-tree-search
         verible::common::analysis::matcher::inner-match-handlers
         verible::common::text::concrete-syntax-leaf
@@ -310,12 +539,28 @@ target_link_libraries(data PUBLIC
         verible::common::text::tree-utils
 )
 
-add_library(package STATIC package.cc)
-add_library(verible::verilog::CST::package ALIAS package)
-target_include_directories(package PUBLIC ${CMAKE_SOURCE_DIR})
-target_link_libraries(package PUBLIC
-        verible::verilog::CST::verilog-matchers
-        verible::verilog::CST::verilog-nonterminals
+cc_test(
+        NAME
+        "data_test"
+        SRCS
+        "data_test.cc"
+        DEPS
+        data
+        verible::common::text::text-structure
+        verible::common::util::logging
+        verible::verilog::analysis::verilog-analyzer
+        GTest::gtest
+        GTest::gtest_main
+)
+
+cc_library(
+        NAME
+        "package"
+        SRCS
+        "package.cc"
+        DEPS
+        verilog-matchers
+        verilog-nonterminals
         verible::common::analysis::syntax-tree-search
         verible::common::text::concrete-syntax-leaf
         verible::common::text::concrete-syntax-tree
@@ -325,14 +570,36 @@ target_link_libraries(package PUBLIC
         verible::verilog::parser::verilog-token-enum
 )
 
-add_library(parameters STATIC parameters.cc)
-add_library(verible::verilog::CST::parameters ALIAS parameters)
-target_include_directories(parameters PUBLIC ${CMAKE_SOURCE_DIR})
-target_link_libraries(parameters PUBLIC
-        verible::verilog::CST::identifier
-        verible::verilog::CST::verilog-matchers
-        # fixdeps:: keep
-        verible::verilog::CST::verilog-nonterminals
+cc_test(
+        NAME
+        "package_test"
+        SRCS
+        "package_test.cc"
+        DEPS
+        match-test-utils
+        package
+        verible::common::analysis::syntax-tree-search
+        verible::common::analysis::syntax-tree-search-test-utils
+        verible::common::text::concrete-syntax-tree
+        verible::common::text::text-structure
+        verible::common::text::token-info
+        verible::common::util::casts
+        verible::common::util::logging
+        verible::verilog::analysis::verilog-analyzer
+        absl::status
+        GTest::gtest
+        GTest::gtest_main
+)
+
+cc_library(
+        NAME
+        "parameters"
+        SRCS
+        "parameters.cc"
+        DEPS
+        identifier
+        verilog-matchers
+        verilog-nonterminals
         verible::common::analysis::syntax-tree-search
         verible::common::text::concrete-syntax-leaf
         verible::common::text::concrete-syntax-tree
@@ -344,14 +611,38 @@ target_link_libraries(parameters PUBLIC
         verible::verilog::parser::verilog-token-enum
 )
 
-add_library(port STATIC port.cc)
-add_library(verible::verilog::CST::port ALIAS port)
-target_include_directories(port PUBLIC ${CMAKE_SOURCE_DIR})
-target_link_libraries(port PUBLIC
-        verible::verilog::CST::identifier
-        verible::verilog::CST::verilog-matchers
-        # fixdeps:: keep
-        verible::verilog::CST::verilog-nonterminals
+cc_test(
+        NAME
+        "parameters_test"
+        SRCS
+        "parameters_test.cc"
+        DEPS
+        match-test-utils
+        parameters
+        verilog-nonterminals
+        verible::common::analysis::syntax-tree-search
+        verible::common::analysis::syntax-tree-search-test-utils
+        verible::common::text::concrete-syntax-tree
+        verible::common::text::symbol
+        verible::common::text::text-structure
+        verible::common::text::token-info
+        verible::common::util::casts
+        verible::common::util::logging
+        verible::verilog::analysis::verilog-analyzer
+        verible::verilog::parser::verilog-token-enum
+        GTest::gtest
+        GTest::gtest_main
+)
+
+cc_library(
+        NAME
+        "port"
+        SRCS
+        "port.cc"
+        DEPS
+        identifier
+        verilog-matchers
+        verilog-nonterminals
         verible::common::analysis::syntax-tree-search
         verible::common::text::concrete-syntax-leaf
         verible::common::text::concrete-syntax-tree
@@ -360,11 +651,36 @@ target_link_libraries(port PUBLIC
         verible::common::util::logging
 )
 
-add_library(seq-block STATIC seq-block.cc)
-add_library(verible::verilog::CST::seq-block ALIAS seq-block)
-target_include_directories(seq-block PUBLIC ${CMAKE_SOURCE_DIR})
-target_link_libraries(seq-block PUBLIC
-        verible::verilog::CST::verilog-nonterminals
+cc_test(
+        NAME
+        "port_test"
+        SRCS
+        "port_test.cc"
+        DEPS
+        match-test-utils
+        port
+        type
+        verilog-nonterminals
+        verible::common::analysis::syntax-tree-search
+        verible::common::analysis::syntax-tree-search-test-utils
+        verible::common::text::concrete-syntax-leaf
+        verible::common::text::syntax-tree-context
+        verible::common::text::text-structure
+        verible::common::text::token-info
+        verible::common::util::logging
+        verible::verilog::analysis::verilog-analyzer
+        absl::strings
+        GTest::gtest
+        GTest::gtest_main
+)
+
+cc_library(
+        NAME
+        "seq-block"
+        SRCS
+        "seq-block.cc"
+        DEPS
+        verilog-nonterminals
         verible::common::text::concrete-syntax-leaf
         verible::common::text::concrete-syntax-tree
         verible::common::text::symbol
@@ -375,16 +691,35 @@ target_link_libraries(seq-block PUBLIC
         verible::verilog::parser::verilog-token-enum
 )
 
-add_library(statement STATIC statement.cc)
-add_library(verible::verilog::CST::statement ALIAS statement)
-target_include_directories(statement PUBLIC ${CMAKE_SOURCE_DIR})
-target_link_libraries(statement PUBLIC
-        verible::verilog::CST::declaration
-        verible::verilog::CST::identifier
-        verible::verilog::CST::type
-        verible::verilog::CST::verilog-matchers
-        # fixdeps:: keep
-        verible::verilog::CST::verilog-nonterminals
+cc_test(
+        NAME
+        "seq-block_test"
+        SRCS
+        "seq-block_test.cc"
+        DEPS
+        seq-block
+        verilog-matchers
+        verilog-nonterminals
+        verible::common::analysis::syntax-tree-search
+        verible::common::text::symbol
+        verible::common::text::text-structure
+        verible::common::util::logging
+        verible::verilog::analysis::verilog-analyzer
+        GTest::gtest
+        GTest::gtest_main
+)
+
+cc_library(
+        NAME
+        "statement"
+        SRCS
+        "statement.cc"
+        DEPS
+        declaration
+        identifier
+        type
+        verilog-matchers
+        verilog-nonterminals
         verible::common::analysis::syntax-tree-search
         verible::common::text::concrete-syntax-leaf
         verible::common::text::concrete-syntax-tree
@@ -393,14 +728,38 @@ target_link_libraries(statement PUBLIC
         verible::common::text::visitors
 )
 
-add_library(tasks STATIC tasks.cc)
-add_library(verible::verilog::CST::tasks ALIAS tasks)
-target_include_directories(tasks PUBLIC ${CMAKE_SOURCE_DIR})
-target_link_libraries(tasks PUBLIC
-        verible::verilog::CST::identifier
-        verible::verilog::CST::verilog-matchers
-        # fixdeps:: keep
-        verible::verilog::CST::verilog-nonterminals
+cc_test(
+        NAME
+        "statement_test"
+        SRCS
+        "statement_test.cc"
+        DEPS
+        match-test-utils
+        statement
+        verilog-matchers
+        verilog-nonterminals
+        verible::common::analysis::syntax-tree-search
+        verible::common::analysis::syntax-tree-search-test-utils
+        verible::common::analysis::matcher::matcher-builders
+        verible::common::text::concrete-syntax-tree
+        verible::common::text::symbol
+        verible::common::text::text-structure
+        verible::common::text::tree-utils
+        verible::common::util::logging
+        verible::verilog::analysis::verilog-analyzer
+        GTest::gtest
+        GTest::gtest_main
+)
+
+cc_library(
+        NAME
+        "tasks"
+        SRCS
+        "tasks.cc"
+        DEPS
+        identifier
+        verilog-matchers
+        verilog-nonterminals
         verible::common::analysis::syntax-tree-search
         verible::common::text::concrete-syntax-leaf
         verible::common::text::concrete-syntax-tree
@@ -408,14 +767,40 @@ target_link_libraries(tasks PUBLIC
         verible::common::text::tree-utils
 )
 
-add_library(type STATIC type.cc)
-add_library(verible::verilog::CST::type ALIAS type)
-target_include_directories(type PUBLIC ${CMAKE_SOURCE_DIR})
-target_link_libraries(type PUBLIC
-        verible::verilog::CST::identifier
-        verible::verilog::CST::verilog-matchers
-        # fixdeps:: keep
-        verible::verilog::CST::verilog-nonterminals
+cc_test(
+        NAME
+        "tasks_test"
+        SRCS
+        "tasks_test.cc"
+        DEPS
+        identifier
+        match-test-utils
+        tasks
+        verilog-nonterminals
+        verible::common::analysis::syntax-tree-search
+        verible::common::analysis::syntax-tree-search-test-utils
+        verible::common::text::concrete-syntax-leaf
+        verible::common::text::concrete-syntax-tree
+        verible::common::text::text-structure
+        verible::common::text::token-info
+        verible::common::text::tree-utils
+        verible::common::util::casts
+        verible::common::util::logging
+        verible::verilog::analysis::verilog-analyzer
+        verible::verilog::parser::verilog-token-enum
+        GTest::gtest
+        GTest::gtest_main
+)
+
+cc_library(
+        NAME
+        "type"
+        SRCS
+        "type.cc"
+        DEPS
+        identifier
+        verilog-matchers
+        verilog-nonterminals
         verible::common::analysis::syntax-tree-search
         verible::common::text::concrete-syntax-leaf
         verible::common::text::concrete-syntax-tree
@@ -426,26 +811,52 @@ target_link_libraries(type PUBLIC
         verible::verilog::parser::verilog-token-enum
 )
 
-add_library(context-functions INTERFACE)
-add_library(verible::verilog::CST::context-functions ALIAS context-functions)
-target_include_directories(context-functions INTERFACE ${CMAKE_SOURCE_DIR})
-target_link_libraries(context-functions INTERFACE
-        verible::verilog::CST::verilog-nonterminals
+cc_test(
+        NAME
+        "type_test"
+        SRCS
+        "type_test.cc"
+        DEPS
+        context-functions
+        declaration
+        expression
+        match-test-utils
+        type
+        verible::common::analysis::syntax-tree-search
+        verible::common::analysis::syntax-tree-search-test-utils
+        verible::common::text::text-structure
+        verible::common::text::tree-utils
+        verible::common::util::logging
+        verible::verilog::analysis::verilog-analyzer
+        GTest::gtest
+        GTest::gtest_main
+)
+
+cc_library(
+        NAME
+        "context-functions"
+        DEPS
+        verilog-nonterminals
         verible::common::text::syntax-tree-context
 )
 
-add_library(numbers STATIC numbers.cc)
-add_library(verible::verilog::CST::numbers ALIAS numbers)
-target_include_directories(numbers PUBLIC ${CMAKE_SOURCE_DIR})
-target_link_libraries(numbers PUBLIC
+cc_library(
+        NAME
+        "numbers"
+        SRCS
+        "numbers.cc"
+        DEPS
         verible::common::util::logging
+        absl::strings
 )
 
-add_library(verilog-tree-print STATIC verilog-tree-print.cc)
-add_library(verible::verilog::CST::verilog-tree-print ALIAS verilog-tree-print)
-target_include_directories(verilog-tree-print PUBLIC ${CMAKE_SOURCE_DIR})
-target_link_libraries(verilog-tree-print PUBLIC
-        verible::verilog::CST::verilog-nonterminals
+cc_library(
+        NAME
+        "verilog-tree-print"
+        SRCS
+        "verilog-tree-print.cc"
+        DEPS
+        verilog-nonterminals
         verible::common::text::concrete-syntax-leaf
         verible::common::text::concrete-syntax-tree
         verible::common::text::symbol
@@ -453,13 +864,16 @@ target_link_libraries(verilog-tree-print PUBLIC
         verible::common::text::tree-utils
         verible::common::util::value-saver
         verible::verilog::parser::verilog-parser
+        absl::strings
 )
 
-add_library(verilog-tree-json STATIC verilog-tree-json.cc)
-add_library(verible::verilog::CST::verilog-tree-json ALIAS verilog-tree-json)
-target_include_directories(verilog-tree-json PUBLIC ${CMAKE_SOURCE_DIR})
-target_link_libraries(verilog-tree-json PUBLIC
-        verible::verilog::CST::verilog-nonterminals
+cc_library(
+        NAME
+        "verilog-tree-json"
+        SRCS
+        "verilog-tree-json.cc"
+        DEPS
+        verilog-nonterminals
         verible::common::text::concrete-syntax-leaf
         verible::common::text::concrete-syntax-tree
         verible::common::text::symbol
@@ -470,5 +884,61 @@ target_link_libraries(verilog-tree-json PUBLIC
         verible::verilog::parser::verilog-token
         verible::verilog::parser::verilog-token-classifications
         verible::verilog::parser::verilog-token-enum
+        nlohmann_json::nlohmann_json
+)
+
+cc_test(
+        NAME
+        "context-functions_test"
+        SRCS
+        "context-functions_test.cc"
+        DEPS
+        context-functions
+        verilog-nonterminals
+        verible::common::text::concrete-syntax-tree
+        verible::common::text::symbol
+        verible::common::text::syntax-tree-context
+        verible::common::text::tree-builder-test-util
+        verible::common::util::casts
+        GTest::gtest
+        GTest::gtest_main
+)
+
+cc_test(
+        NAME
+        "numbers_test"
+        SRCS
+        "numbers_test.cc"
+        DEPS
+        numbers
+        GTest::gtest
+        GTest::gtest_main
+)
+
+cc_test(
+        NAME
+        "verilog-tree-print_test"
+        SRCS
+        "verilog-tree-print_test.cc"
+        DEPS
+        verilog-tree-print
+        verible::common::text::symbol
+        verible::verilog::analysis::verilog-analyzer
+        GTest::gtest
+        GTest::gtest_main
+)
+
+cc_test(
+        NAME
+        "verilog-tree-json_test"
+        SRCS
+        "verilog-tree-json_test.cc"
+        DEPS
+        verilog-tree-json
+        verible::common::text::symbol
+        verible::common::util::logging
+        verible::verilog::analysis::verilog-analyzer
+        GTest::gtest
+        GTest::gtest_main
         nlohmann_json::nlohmann_json
 )

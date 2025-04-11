@@ -115,7 +115,7 @@ TEST(GetClassNameTest, ClassEndLabel) {
 }
 
 TEST(GetClassNameTest, NoClassEndLabelTest) {
-  constexpr std::string_view kTestCases[] = {
+  constexpr verible::document_view kTestCases[] = {
       {"class foo; endclass"},
   };
   for (const auto &test : kTestCases) {

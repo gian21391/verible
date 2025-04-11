@@ -43,7 +43,7 @@ using verible::TextStructureView;
 using verible::TreeSearchMatch;
 
 struct FindAllTestCase {
-  std::string_view code;
+  verible::document_view code;
   int expected_matches;
 };
 
@@ -79,8 +79,8 @@ TEST(FindAllMacroCallsTest, Various) {
 }
 
 struct MatchIdTestCase {
-  std::string_view code;
-  std::vector<std::string_view> expected_names;
+  verible::document_view code;
+  std::vector<verible::document_view> expected_names;
 };
 
 TEST(GetMacroCallIdsTest, Various) {
@@ -102,7 +102,7 @@ TEST(GetMacroCallIdsTest, Various) {
     EXPECT_OK(analyzer.Analyze());
     const auto &root = analyzer.Data().SyntaxTree();
     const auto macro_calls = FindAllMacroCalls(*ABSL_DIE_IF_NULL(root));
-    std::vector<std::string_view> found_names;
+    std::vector<verible::document_view> found_names;
     found_names.reserve(macro_calls.size());
     for (const auto &match : macro_calls) {
       found_names.push_back(GetMacroCallId(*match.match)->text());
@@ -115,7 +115,7 @@ TEST(GetMacroCallIdsTest, Various) {
 }
 
 struct CallArgsTestCase {
-  std::string_view code;
+  verible::document_view code;
   bool expect_empty;
 };
 
@@ -156,9 +156,9 @@ TEST(GetFunctionFormalPortsGroupTest, WithFormalPorts) {
       {"module m;\n", {kTag, "`FOO"}, "\nendmodule\n"},
   };
   for (const auto &test : kTestCases) {
-    const std::string_view code(test.code);
+    const verible::document_view code(test.code);
     VerilogAnalyzer analyzer(code, "test-file");
-    const std::string_view code_copy(analyzer.Data().Contents());
+    const verible::document_view code_copy(analyzer.Data().Contents());
     ASSERT_OK(analyzer.Analyze()) << "failed on:\n" << code;
     const auto &root = analyzer.Data().SyntaxTree();
 
@@ -166,7 +166,7 @@ TEST(GetFunctionFormalPortsGroupTest, WithFormalPorts) {
     ASSERT_EQ(macro_items.size(), 1);
     const auto &macro_item = *macro_items.front().match;
     const auto &id = GetMacroGenericItemId(macro_item);
-    const std::string_view id_text = id->text();
+    const verible::document_view id_text = id->text();
 
     // TODO(b/151371397): Refactor this test code along with
     // common/analysis/linter_test_util.h to be able to compare set-symmetric

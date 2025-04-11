@@ -828,7 +828,7 @@ TEST(GetAnyConditionalElseClauseTest, NoElseClause) {
         "endtask\n"}},
   };
   for (const auto &test : kTestCases) {
-    const std::string_view code(test.token_data.code);
+    const verible::document_view code(test.token_data.code);
     VerilogAnalyzer analyzer(code, "test-file");
     ASSERT_OK(analyzer.Analyze()) << "failed on:\n" << code;
     const auto &root = analyzer.Data().SyntaxTree();
