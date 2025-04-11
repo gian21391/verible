@@ -56,11 +56,20 @@ target_link_libraries(file-util PUBLIC
         absl::strings
 )
 
-add_custom_command(
-        OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/generated-verible-build-version.h
-        COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/cmake/build_version.py > ${CMAKE_CURRENT_BINARY_DIR}/generated-verible-build-version.h
-        COMMENT "Generating generated-verible-build-version.h"
-)
+if (DEFINED VERIBLE_COMMIT_TIMESTAMP AND DEFINED VERIBLE_GIT_DESCRIBE)
+    add_custom_command(
+            OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/generated-verible-build-version.h
+            COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/cmake/build_version.py -c "${VERIBLE_COMMIT_TIMESTAMP}" -v "${VERIBLE_GIT_DESCRIBE}" > ${CMAKE_CURRENT_BINARY_DIR}/generated-verible-build-version.h
+            COMMENT "Generating generated-verible-build-version.h"
+    )
+else ()
+    add_custom_command(
+            OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/generated-verible-build-version.h
+            COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/cmake/build_version.py > ${CMAKE_CURRENT_BINARY_DIR}/generated-verible-build-version.h
+            COMMENT "Generating generated-verible-build-version.h"
+    )
+endif ()
+
 
 add_custom_target(generated-verible-build-version-gen
         DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/generated-verible-build-version.h

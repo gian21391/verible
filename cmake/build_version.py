@@ -1,3 +1,4 @@
+import argparse
 import subprocess
 from datetime import datetime
 
@@ -7,13 +8,31 @@ def get_stdout(cmd):
     except subprocess.CalledProcessError:
         return ''
 
+def main():
+    parser = argparse.ArgumentParser(description='Parser symbol modification utility')
+    parser.add_argument("-c", "--commit", help="Commit timestamp")
+    parser.add_argument("-v", "--version", help="Git describe")
+    args = parser.parse_args()
 
-commit_timestamp = get_stdout(['git', 'log', '-n1', '--format=%cd', '--date=unix'])
-git_describe = get_stdout(['git', 'describe', '--tags', '--match=v*'])
-build_timestamp = int(datetime.now().timestamp())
-formatted_date = datetime.now()
+    commit_timestamp = get_stdout(['git', 'log', '-n1', '--format=%cd', '--date=unix'])
+    if args.commit != "":
+        commit_timestamp = args.commit
+    if commit_timestamp == "":
+        commit_timestamp = "0"
 
-print("#define VERIBLE_BUILD_TIMESTAMP", build_timestamp)
-print("#define VERIBLE_COMMIT_TIMESTAMP", commit_timestamp)
-print('#define VERIBLE_FORMATTED_DATE "{}"'.format(formatted_date))
-print('#define VERIBLE_GIT_DESCRIBE "{}"'.format(git_describe))
+    git_describe = get_stdout(['git', 'describe', '--tags', '--match=v*'])
+    if args.version != "":
+        git_describe = args.version
+    if git_describe == "":
+        git_describe = "No git info"
+
+    build_timestamp = int(datetime.now().timestamp())
+    formatted_date = datetime.now()
+
+    print("#define VERIBLE_BUILD_TIMESTAMP", build_timestamp)
+    print("#define VERIBLE_COMMIT_TIMESTAMP", commit_timestamp)
+    print('#define VERIBLE_FORMATTED_DATE "{}"'.format(formatted_date))
+    print('#define VERIBLE_GIT_DESCRIBE "{}"'.format(git_describe))
+
+if __name__ == "__main__":
+    main()
