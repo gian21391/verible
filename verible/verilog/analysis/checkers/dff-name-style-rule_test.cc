@@ -215,8 +215,8 @@ TEST(DffNameStyleRuleTest, Reject) {
 
 TEST(DffNameStyleRuleTest, ExtractPipelineStage) {
   struct Test {
-    std::string_view str;
-    std::pair<std::string_view, std::optional<int>> expected;
+    verible::document_view str;
+    std::pair<verible::document_view, std::optional<int>> expected;
   };
   const std::vector<Test> kTestCases = {
       {"data_q0", {"data_q0", {}}}, {"data_q1", {"data_q", {1}}},

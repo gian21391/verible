@@ -114,7 +114,7 @@ void RunLintTestCases(std::initializer_list<LintTestCase> tests,
 }
 
 struct AutoFixInOut {
-  std::string_view code;
+  document_view code;
   std::string_view expected_output;
   int fix_alternative = 0;  // Some rules provide alternative fixes
 };

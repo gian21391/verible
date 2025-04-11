@@ -1,1126 +1,2206 @@
-add_library(verilog-lint-rules INTERFACE)
-add_library(verible::verilog::analysis::checkers::verilog-lint-rules ALIAS verilog-lint-rules)
-target_include_directories(verilog-lint-rules INTERFACE ${CMAKE_SOURCE_DIR})
-target_link_libraries(verilog-lint-rules INTERFACE
-  verible::verilog::analysis::checkers::always-comb-blocking-rule
-  verible::verilog::analysis::checkers::always-comb-rule
-  verible::verilog::analysis::checkers::always-ff-non-blocking-rule
-  verible::verilog::analysis::checkers::banned-declared-name-patterns-rule
-  verible::verilog::analysis::checkers::case-missing-default-rule
-  verible::verilog::analysis::checkers::constraint-name-style-rule
-  verible::verilog::analysis::checkers::create-object-name-match-rule
-  verible::verilog::analysis::checkers::dff-name-style-rule
-  verible::verilog::analysis::checkers::disable-statement-rule
-  verible::verilog::analysis::checkers::endif-comment-rule
-  verible::verilog::analysis::checkers::enum-name-style-rule
-  verible::verilog::analysis::checkers::explicit-begin-rule
-  verible::verilog::analysis::checkers::explicit-function-lifetime-rule
-  verible::verilog::analysis::checkers::explicit-function-task-parameter-type-rule
-  verible::verilog::analysis::checkers::explicit-parameter-storage-type-rule
-  verible::verilog::analysis::checkers::explicit-task-lifetime-rule
-  verible::verilog::analysis::checkers::forbid-consecutive-null-statements-rule
-  verible::verilog::analysis::checkers::forbid-defparam-rule
-  verible::verilog::analysis::checkers::forbid-line-continuations-rule
-  verible::verilog::analysis::checkers::forbid-negative-array-dim
-  verible::verilog::analysis::checkers::forbidden-anonymous-enums-rule
-  verible::verilog::analysis::checkers::forbidden-anonymous-structs-unions-rule
-  verible::verilog::analysis::checkers::forbidden-macro-rule
-  verible::verilog::analysis::checkers::forbidden-symbol-rule
-  verible::verilog::analysis::checkers::generate-label-prefix-rule
-  verible::verilog::analysis::checkers::generate-label-rule
-  verible::verilog::analysis::checkers::instance-shadow-rule
-  verible::verilog::analysis::checkers::interface-name-style-rule
-  verible::verilog::analysis::checkers::legacy-generate-region-rule
-  verible::verilog::analysis::checkers::legacy-genvar-declaration-rule
-  verible::verilog::analysis::checkers::line-length-rule
-  verible::verilog::analysis::checkers::macro-name-style-rule
-  verible::verilog::analysis::checkers::macro-string-concatenation-rule
-  verible::verilog::analysis::checkers::mismatched-labels-rule
-  verible::verilog::analysis::checkers::module-begin-block-rule
-  verible::verilog::analysis::checkers::module-filename-rule
-  verible::verilog::analysis::checkers::module-instantiation-rules
-  verible::verilog::analysis::checkers::no-tabs-rule
-  verible::verilog::analysis::checkers::no-trailing-spaces-rule
-  verible::verilog::analysis::checkers::numeric-format-string-style-rule
-  verible::verilog::analysis::checkers::one-module-per-file-rule
-  verible::verilog::analysis::checkers::package-filename-rule
-  verible::verilog::analysis::checkers::packed-dimensions-rule
-  verible::verilog::analysis::checkers::parameter-name-style-rule
-  verible::verilog::analysis::checkers::parameter-type-name-style-rule
-  verible::verilog::analysis::checkers::plusarg-assignment-rule
-  verible::verilog::analysis::checkers::port-name-suffix-rule
-  verible::verilog::analysis::checkers::positive-meaning-parameter-name-rule
-  verible::verilog::analysis::checkers::posix-eof-rule
-  verible::verilog::analysis::checkers::proper-parameter-declaration-rule
-  verible::verilog::analysis::checkers::signal-name-style-rule
-  verible::verilog::analysis::checkers::struct-union-name-style-rule
-  verible::verilog::analysis::checkers::suggest-parentheses-rule
-  verible::verilog::analysis::checkers::suspicious-semicolon-rule
-  verible::verilog::analysis::checkers::truncated-numeric-literal-rule
-  verible::verilog::analysis::checkers::undersized-binary-literal-rule
-  verible::verilog::analysis::checkers::unpacked-dimensions-rule
-  verible::verilog::analysis::checkers::uvm-macro-semicolon-rule
-  verible::verilog::analysis::checkers::v2001-generate-begin-rule
-  verible::verilog::analysis::checkers::void-cast-rule
+cc_library(
+        NAME
+        "verilog-lint-rules"
+        DEPS
+        always-comb-blocking-rule
+        always-comb-rule
+        always-ff-non-blocking-rule
+        banned-declared-name-patterns-rule
+        case-missing-default-rule
+        constraint-name-style-rule
+        create-object-name-match-rule
+        dff-name-style-rule
+        disable-statement-rule
+        endif-comment-rule
+        enum-name-style-rule
+        explicit-begin-rule
+        explicit-function-lifetime-rule
+        explicit-function-task-parameter-type-rule
+        explicit-parameter-storage-type-rule
+        explicit-task-lifetime-rule
+        forbid-consecutive-null-statements-rule
+        forbid-defparam-rule
+        forbid-line-continuations-rule
+        forbid-negative-array-dim
+        forbidden-anonymous-enums-rule
+        forbidden-anonymous-structs-unions-rule
+        forbidden-macro-rule
+        forbidden-symbol-rule
+        generate-label-prefix-rule
+        generate-label-rule
+        instance-shadow-rule
+        interface-name-style-rule
+        legacy-generate-region-rule
+        legacy-genvar-declaration-rule
+        line-length-rule
+        macro-name-style-rule
+        macro-string-concatenation-rule
+        mismatched-labels-rule
+        module-begin-block-rule
+        module-filename-rule
+        module-instantiation-rules
+        no-tabs-rule
+        no-trailing-spaces-rule
+        numeric-format-string-style-rule
+        one-module-per-file-rule
+        package-filename-rule
+        packed-dimensions-rule
+        parameter-name-style-rule
+        parameter-type-name-style-rule
+        plusarg-assignment-rule
+        port-name-suffix-rule
+        positive-meaning-parameter-name-rule
+        posix-eof-rule
+        proper-parameter-declaration-rule
+        signal-name-style-rule
+        struct-union-name-style-rule
+        suggest-parentheses-rule
+        suspicious-semicolon-rule
+        truncated-numeric-literal-rule
+        undersized-binary-literal-rule
+        unpacked-dimensions-rule
+        uvm-macro-semicolon-rule
+        v2001-generate-begin-rule
+        void-cast-rule
 )
 
-add_library(banned-declared-name-patterns-rule STATIC banned-declared-name-patterns-rule.cc)
-add_library(verible::verilog::analysis::checkers::banned-declared-name-patterns-rule ALIAS banned-declared-name-patterns-rule)
-target_include_directories(banned-declared-name-patterns-rule PUBLIC ${CMAKE_SOURCE_DIR})
-target_link_libraries(banned-declared-name-patterns-rule PUBLIC
-  verible::common::analysis::lint-rule-status
-  verible::common::analysis::syntax-tree-lint-rule
-  verible::common::text::concrete-syntax-tree
-  verible::common::text::symbol
-  verible::common::text::syntax-tree-context
-  verible::common::text::token-info
-  verible::verilog::CST::module
-  verible::verilog::CST::package
-  verible::verilog::CST::verilog-matchers
-  verible::verilog::CST::verilog-nonterminals
-  verible::verilog::analysis::descriptions
-  verible::verilog::analysis::lint-rule-registry
+cc_library(
+        NAME
+        "banned-declared-name-patterns-rule"
+        SRCS
+        "banned-declared-name-patterns-rule.cc"
+        DEPS
+        verible::common::analysis::lint-rule-status
+        verible::common::analysis::syntax-tree-lint-rule
+        verible::common::text::concrete-syntax-tree
+        verible::common::text::symbol
+        verible::common::text::syntax-tree-context
+        verible::common::text::token-info
+        verible::verilog::CST::module
+        verible::verilog::CST::package
+        verible::verilog::CST::verilog-matchers
+        verible::verilog::CST::verilog-nonterminals
+        verible::verilog::analysis::descriptions
+        verible::verilog::analysis::lint-rule-registry
+        absl::strings
 )
 
-add_library(no-tabs-rule STATIC no-tabs-rule.cc)
-add_library(verible::verilog::analysis::checkers::no-tabs-rule ALIAS no-tabs-rule)
-target_include_directories(no-tabs-rule PUBLIC ${CMAKE_SOURCE_DIR})
-target_link_libraries(no-tabs-rule PUBLIC
-  verible::common::analysis::line-lint-rule
-  verible::common::analysis::lint-rule-status
-  verible::common::text::token-info
-  verible::verilog::analysis::descriptions
-  verible::verilog::analysis::lint-rule-registry
-  verible::verilog::parser::verilog-token-enum
+cc_test(
+        NAME
+        "banned-declared-name-patterns-rule_test"
+        SRCS
+        "banned-declared-name-patterns-rule_test.cc"
+        DEPS
+        banned-declared-name-patterns-rule
+        verible::common::analysis::linter-test-utils
+        verible::common::analysis::syntax-tree-linter-test-utils
+        verible::verilog::analysis::verilog-analyzer
+        verible::verilog::parser::verilog-token-enum
+        GTest::gtest
+        GTest::gtest_main
 )
 
-add_library(no-trailing-spaces-rule STATIC no-trailing-spaces-rule.cc)
-add_library(verible::verilog::analysis::checkers::no-trailing-spaces-rule ALIAS no-trailing-spaces-rule)
-target_include_directories(no-trailing-spaces-rule PUBLIC ${CMAKE_SOURCE_DIR})
-target_link_libraries(no-trailing-spaces-rule PUBLIC
-  verible::common::analysis::line-lint-rule
-  verible::common::analysis::lint-rule-status
-  verible::common::text::token-info
-  verible::verilog::analysis::descriptions
-  verible::verilog::analysis::lint-rule-registry
-  verible::verilog::parser::verilog-token-enum
+cc_library(
+        NAME
+        "no-tabs-rule"
+        SRCS
+        "no-tabs-rule.cc"
+        DEPS
+        verible::common::analysis::line-lint-rule
+        verible::common::analysis::lint-rule-status
+        verible::common::text::token-info
+        verible::verilog::analysis::descriptions
+        verible::verilog::analysis::lint-rule-registry
+        verible::verilog::parser::verilog-token-enum
 )
 
-add_library(positive-meaning-parameter-name-rule STATIC positive-meaning-parameter-name-rule.cc)
-add_library(verible::verilog::analysis::checkers::positive-meaning-parameter-name-rule ALIAS positive-meaning-parameter-name-rule)
-target_include_directories(positive-meaning-parameter-name-rule PUBLIC ${CMAKE_SOURCE_DIR})
-target_link_libraries(positive-meaning-parameter-name-rule PUBLIC
-  verible::common::analysis::lint-rule-status
-  verible::common::analysis::syntax-tree-lint-rule
-  verible::common::analysis::matcher::bound-symbol-manager
-  verible::common::text::symbol
-  verible::common::text::syntax-tree-context
-  verible::common::text::token-info
-  verible::verilog::CST::parameters
-  verible::verilog::CST::verilog-matchers
-  verible::verilog::analysis::descriptions
-  verible::verilog::analysis::lint-rule-registry
+cc_test(
+        NAME
+        "no-tabs-rule_test"
+        SRCS
+        "no-tabs-rule_test.cc"
+        DEPS
+        no-tabs-rule
+        verible::common::analysis::line-linter-test-utils
+        verible::common::analysis::linter-test-utils
+        verible::verilog::analysis::verilog-analyzer
+        verible::verilog::parser::verilog-token-enum
+        GTest::gtest
+        GTest::gtest_main
 )
 
-add_library(posix-eof-rule STATIC posix-eof-rule.cc)
-add_library(verible::verilog::analysis::checkers::posix-eof-rule ALIAS posix-eof-rule)
-target_include_directories(posix-eof-rule PUBLIC ${CMAKE_SOURCE_DIR})
-target_link_libraries(posix-eof-rule PUBLIC
-  verible::common::analysis::lint-rule-status
-  verible::common::analysis::text-structure-lint-rule
-  verible::common::text::text-structure
-  verible::common::text::token-info
-  verible::verilog::analysis::descriptions
-  verible::verilog::analysis::lint-rule-registry
-  verible::verilog::parser::verilog-token-enum
+cc_library(
+        NAME
+        "no-trailing-spaces-rule"
+        SRCS
+        "no-trailing-spaces-rule.cc"
+        DEPS
+        verible::common::analysis::line-lint-rule
+        verible::common::analysis::lint-rule-status
+        verible::common::text::token-info
+        verible::verilog::analysis::descriptions
+        verible::verilog::analysis::lint-rule-registry
+        verible::verilog::parser::verilog-token-enum
+        absl::strings
 )
 
-add_library(line-length-rule STATIC line-length-rule.cc)
-add_library(verible::verilog::analysis::checkers::line-length-rule ALIAS line-length-rule)
-target_include_directories(line-length-rule PUBLIC ${CMAKE_SOURCE_DIR})
-target_link_libraries(line-length-rule PUBLIC
-  verible::common::analysis::lint-rule-status
-  verible::common::analysis::text-structure-lint-rule
-  verible::common::strings::comment-utils
-  verible::common::strings::utf8
-  verible::common::text::config-utils
-  verible::common::text::constants
-  verible::common::text::text-structure
-  verible::common::text::token-info
-  verible::common::text::token-stream-view
-  verible::common::util::iterator-range
-  verible::verilog::analysis::descriptions
-  verible::verilog::analysis::lint-rule-registry
-  verible::verilog::analysis::verilog-linter-constants
-  verible::verilog::parser::verilog-token-classifications
-  verible::verilog::parser::verilog-token-enum
+cc_test(
+        NAME
+        "no-trailing-spaces-rule_test"
+        SRCS
+        "no-trailing-spaces-rule_test.cc"
+        DEPS
+        no-trailing-spaces-rule
+        verible::common::analysis::line-linter-test-utils
+        verible::common::analysis::linter-test-utils
+        verible::verilog::analysis::verilog-analyzer
+        verible::verilog::parser::verilog-token-enum
+        GTest::gtest
+        GTest::gtest_main
 )
 
-add_library(forbid-consecutive-null-statements-rule STATIC forbid-consecutive-null-statements-rule.cc)
-add_library(verible::verilog::analysis::checkers::forbid-consecutive-null-statements-rule ALIAS forbid-consecutive-null-statements-rule)
-target_include_directories(forbid-consecutive-null-statements-rule PUBLIC ${CMAKE_SOURCE_DIR})
-target_link_libraries(forbid-consecutive-null-statements-rule PUBLIC
-  verible::common::analysis::lint-rule-status
-  verible::common::analysis::syntax-tree-lint-rule
-  verible::common::text::concrete-syntax-leaf
-  verible::common::text::symbol
-  verible::common::text::syntax-tree-context
-  verible::verilog::CST::verilog-matchers
-  # fixdeps:: keep
-  verible::verilog::CST::verilog-nonterminals
-  verible::verilog::analysis::descriptions
-  verible::verilog::analysis::lint-rule-registry
+cc_library(
+        NAME
+        "positive-meaning-parameter-name-rule"
+        SRCS
+        "positive-meaning-parameter-name-rule.cc"
+        DEPS
+        verible::common::analysis::lint-rule-status
+        verible::common::analysis::syntax-tree-lint-rule
+        verible::common::analysis::matcher::bound-symbol-manager
+        verible::common::text::symbol
+        verible::common::text::syntax-tree-context
+        verible::common::text::token-info
+        verible::verilog::CST::parameters
+        verible::verilog::CST::verilog-matchers
+        verible::verilog::analysis::descriptions
+        verible::verilog::analysis::lint-rule-registry
+        absl::strings
 )
 
-add_library(forbid-defparam-rule STATIC forbid-defparam-rule.cc)
-add_library(verible::verilog::analysis::checkers::forbid-defparam-rule ALIAS forbid-defparam-rule)
-target_include_directories(forbid-defparam-rule PUBLIC ${CMAKE_SOURCE_DIR})
-target_link_libraries(forbid-defparam-rule PUBLIC
-  verible::common::analysis::lint-rule-status
-  verible::common::analysis::syntax-tree-lint-rule
-  verible::common::analysis::matcher::bound-symbol-manager
-  verible::common::text::concrete-syntax-leaf
-  verible::common::text::symbol
-  verible::common::text::syntax-tree-context
-  verible::common::text::tree-utils
-  verible::common::util::logging
-  verible::verilog::CST::verilog-matchers
-  # fixdeps:: keep
-  verible::verilog::CST::verilog-nonterminals
-  verible::verilog::analysis::descriptions
-  verible::verilog::analysis::lint-rule-registry
-  verible::verilog::parser::verilog-token-enum
+cc_test(
+        NAME
+        "positive-meaning-parameter-name-rule_test"
+        SRCS
+        "positive-meaning-parameter-name-rule_test.cc"
+        DEPS
+        positive-meaning-parameter-name-rule
+        verible::common::analysis::linter-test-utils
+        verible::common::analysis::syntax-tree-linter-test-utils
+        verible::verilog::analysis::verilog-analyzer
+        verible::verilog::parser::verilog-token-enum
+        GTest::gtest
+        GTest::gtest_main
 )
 
-add_library(mismatched-labels-rule STATIC mismatched-labels-rule.cc)
-add_library(verible::verilog::analysis::checkers::mismatched-labels-rule ALIAS mismatched-labels-rule)
-target_include_directories(mismatched-labels-rule PUBLIC ${CMAKE_SOURCE_DIR})
-target_link_libraries(mismatched-labels-rule PUBLIC
-  verible::common::analysis::lint-rule-status
-  verible::common::analysis::syntax-tree-lint-rule
-  verible::common::analysis::matcher::bound-symbol-manager
-  verible::common::text::concrete-syntax-tree
-  verible::common::text::symbol
-  verible::common::text::syntax-tree-context
-  verible::verilog::CST::seq-block
-  verible::verilog::CST::verilog-matchers
-  # fixdeps:: keep
-  verible::verilog::analysis::descriptions
-  verible::verilog::analysis::lint-rule-registry
+cc_library(
+        NAME
+        "posix-eof-rule"
+        SRCS
+        "posix-eof-rule.cc"
+        DEPS
+        verible::common::analysis::lint-rule-status
+        verible::common::analysis::text-structure-lint-rule
+        verible::common::text::text-structure
+        verible::common::text::token-info
+        verible::verilog::analysis::descriptions
+        verible::verilog::analysis::lint-rule-registry
+        verible::verilog::parser::verilog-token-enum
 )
 
-add_library(module-begin-block-rule STATIC module-begin-block-rule.cc)
-add_library(verible::verilog::analysis::checkers::module-begin-block-rule ALIAS module-begin-block-rule)
-target_include_directories(module-begin-block-rule PUBLIC ${CMAKE_SOURCE_DIR})
-target_link_libraries(module-begin-block-rule PUBLIC
-  verible::common::analysis::lint-rule-status
-  verible::common::analysis::syntax-tree-lint-rule
-  verible::common::analysis::matcher::bound-symbol-manager
-  verible::common::text::symbol
-  verible::common::text::syntax-tree-context
-  verible::verilog::CST::verilog-matchers
-  # fixdeps:: keep
-  verible::verilog::analysis::descriptions
-  verible::verilog::analysis::lint-rule-registry
+cc_test(
+        NAME
+        "posix-eof-rule_test"
+        SRCS
+        "posix-eof-rule_test.cc"
+        DEPS
+        posix-eof-rule
+        verible::common::analysis::linter-test-utils
+        verible::common::analysis::text-structure-linter-test-utils
+        verible::verilog::analysis::verilog-analyzer
+        verible::verilog::parser::verilog-token-enum
+        GTest::gtest
+        GTest::gtest_main
 )
 
-add_library(module-filename-rule STATIC module-filename-rule.cc)
-add_library(verible::verilog::analysis::checkers::module-filename-rule ALIAS module-filename-rule)
-target_include_directories(module-filename-rule PUBLIC ${CMAKE_SOURCE_DIR})
-target_link_libraries(module-filename-rule PUBLIC
-  verible::common::analysis::lint-rule-status
-  verible::common::analysis::syntax-tree-search
-  verible::common::analysis::text-structure-lint-rule
-  verible::common::text::concrete-syntax-leaf
-  verible::common::text::config-utils
-  verible::common::text::symbol
-  verible::common::text::text-structure
-  verible::common::text::token-info
-  verible::common::util::file-util
-  verible::common::util::logging
-  verible::verilog::CST::module
-  verible::verilog::CST::verilog-nonterminals
-  verible::verilog::analysis::descriptions
-  verible::verilog::analysis::lint-rule-registry
+cc_library(
+        NAME
+        "line-length-rule"
+        SRCS
+        "line-length-rule.cc"
+        DEPS
+        verible::common::analysis::lint-rule-status
+        verible::common::analysis::text-structure-lint-rule
+        verible::common::strings::comment-utils
+        verible::common::strings::utf8
+        verible::common::text::config-utils
+        verible::common::text::constants
+        verible::common::text::text-structure
+        verible::common::text::token-info
+        verible::common::text::token-stream-view
+        verible::common::util::iterator-range
+        verible::verilog::analysis::descriptions
+        verible::verilog::analysis::lint-rule-registry
+        verible::verilog::analysis::verilog-linter-constants
+        verible::verilog::parser::verilog-token-classifications
+        verible::verilog::parser::verilog-token-enum
+        absl::status
+        absl::strings
 )
 
-add_library(package-filename-rule STATIC package-filename-rule.cc)
-add_library(verible::verilog::analysis::checkers::package-filename-rule ALIAS package-filename-rule)
-target_include_directories(package-filename-rule PUBLIC ${CMAKE_SOURCE_DIR})
-target_link_libraries(package-filename-rule PUBLIC
-  verible::common::analysis::lint-rule-status
-  verible::common::analysis::syntax-tree-search
-  verible::common::analysis::text-structure-lint-rule
-  verible::common::text::config-utils
-  verible::common::text::text-structure
-  verible::common::text::token-info
-  verible::common::util::file-util
-  verible::verilog::CST::package
-  verible::verilog::analysis::descriptions
-  verible::verilog::analysis::lint-rule-registry
+cc_test(
+        NAME
+        "line-length-rule_test"
+        SRCS
+        "line-length-rule_test.cc"
+        DEPS
+        line-length-rule
+        verible::common::analysis::linter-test-utils
+        verible::common::analysis::text-structure-linter-test-utils
+        verible::common::util::logging
+        verible::verilog::analysis::verilog-analyzer
+        verible::verilog::parser::verilog-token-enum
+        absl::status
+        absl::strings
+        GTest::gtest
+        GTest::gtest_main
 )
 
-add_library(module-instantiation-rules STATIC module-instantiation-rules.cc)
-add_library(verible::verilog::analysis::checkers::module-instantiation-rules ALIAS module-instantiation-rules)
-target_include_directories(module-instantiation-rules PUBLIC ${CMAKE_SOURCE_DIR})
-target_link_libraries(module-instantiation-rules PUBLIC
-  verible::common::analysis::lint-rule-status
-  verible::common::analysis::syntax-tree-lint-rule
-  verible::common::analysis::matcher::bound-symbol-manager
-  verible::common::text::concrete-syntax-leaf
-  verible::common::text::concrete-syntax-tree
-  verible::common::text::symbol
-  verible::common::text::syntax-tree-context
-  verible::common::text::token-info
-  verible::common::text::tree-utils
-  verible::common::util::casts
-  verible::common::util::logging
-  verible::verilog::CST::context-functions
-  verible::verilog::CST::verilog-matchers
-  verible::verilog::CST::verilog-nonterminals
-  verible::verilog::analysis::descriptions
-  verible::verilog::analysis::lint-rule-registry
+cc_library(
+        NAME
+        "forbid-consecutive-null-statements-rule"
+        SRCS
+        "forbid-consecutive-null-statements-rule.cc"
+        DEPS
+        verible::common::analysis::lint-rule-status
+        verible::common::analysis::syntax-tree-lint-rule
+        verible::common::text::concrete-syntax-leaf
+        verible::common::text::symbol
+        verible::common::text::syntax-tree-context
+        verible::verilog::CST::verilog-matchers
+        verible::verilog::CST::verilog-nonterminals
+        verible::verilog::analysis::descriptions
+        verible::verilog::analysis::lint-rule-registry
 )
 
-add_library(one-module-per-file-rule STATIC one-module-per-file-rule.cc)
-add_library(verible::verilog::analysis::checkers::one-module-per-file-rule ALIAS one-module-per-file-rule)
-target_include_directories(one-module-per-file-rule PUBLIC ${CMAKE_SOURCE_DIR})
-target_link_libraries(one-module-per-file-rule PUBLIC
-  verible::common::analysis::lint-rule-status
-  verible::common::analysis::syntax-tree-search
-  verible::common::analysis::text-structure-lint-rule
-  verible::common::text::text-structure
-  verible::common::util::logging
-  verible::verilog::CST::module
-  verible::verilog::CST::verilog-nonterminals
-  verible::verilog::analysis::descriptions
-  verible::verilog::analysis::lint-rule-registry
+cc_test(
+        NAME
+        "forbid-consecutive-null-statements-rule_test"
+        SRCS
+        "forbid-consecutive-null-statements-rule_test.cc"
+        DEPS
+        forbid-consecutive-null-statements-rule
+        verible::common::analysis::linter-test-utils
+        verible::common::analysis::syntax-tree-linter-test-utils
+        verible::verilog::analysis::verilog-analyzer
+        GTest::gtest
+        GTest::gtest_main
 )
 
-add_library(endif-comment-rule STATIC endif-comment-rule.cc)
-add_library(verible::verilog::analysis::checkers::endif-comment-rule ALIAS endif-comment-rule)
-target_include_directories(endif-comment-rule PUBLIC ${CMAKE_SOURCE_DIR})
-target_link_libraries(endif-comment-rule PUBLIC
-  verible::common::analysis::lint-rule-status
-  verible::common::analysis::token-stream-lint-rule
-  verible::common::strings::comment-utils
-  verible::common::text::token-info
-  verible::verilog::analysis::descriptions
-  verible::verilog::analysis::lint-rule-registry
-  verible::verilog::parser::verilog-token-enum
+cc_library(
+        NAME
+        "forbid-defparam-rule"
+        SRCS
+        "forbid-defparam-rule.cc"
+        DEPS
+        verible::common::analysis::lint-rule-status
+        verible::common::analysis::syntax-tree-lint-rule
+        verible::common::analysis::matcher::bound-symbol-manager
+        verible::common::text::concrete-syntax-leaf
+        verible::common::text::symbol
+        verible::common::text::syntax-tree-context
+        verible::common::text::tree-utils
+        verible::common::util::logging
+        verible::verilog::CST::verilog-matchers
+        verible::verilog::CST::verilog-nonterminals
+        verible::verilog::analysis::descriptions
+        verible::verilog::analysis::lint-rule-registry
+        verible::verilog::parser::verilog-token-enum
 )
 
-add_library(forbidden-anonymous-enums-rule STATIC forbidden-anonymous-enums-rule.cc)
-add_library(verible::verilog::analysis::checkers::forbidden-anonymous-enums-rule ALIAS forbidden-anonymous-enums-rule)
-target_include_directories(forbidden-anonymous-enums-rule PUBLIC ${CMAKE_SOURCE_DIR})
-target_link_libraries(forbidden-anonymous-enums-rule PUBLIC
-  verible::common::analysis::lint-rule-status
-  verible::common::analysis::syntax-tree-lint-rule
-  verible::common::analysis::matcher::bound-symbol-manager
-  verible::common::text::symbol
-  verible::common::text::syntax-tree-context
-  verible::verilog::CST::verilog-matchers
-  verible::verilog::CST::verilog-nonterminals
-  verible::verilog::analysis::descriptions
-  verible::verilog::analysis::lint-rule-registry
+cc_test(
+        NAME
+        "forbid-defparam-rule_test"
+        SRCS
+        "forbid-defparam-rule_test.cc"
+        DEPS
+        forbid-defparam-rule
+        verible::common::analysis::linter-test-utils
+        verible::common::analysis::syntax-tree-linter-test-utils
+        verible::verilog::analysis::verilog-analyzer
+        verible::verilog::parser::verilog-token-enum
+        GTest::gtest
+        GTest::gtest_main
 )
 
-add_library(enum-name-style-rule STATIC enum-name-style-rule.cc)
-add_library(verible::verilog::analysis::checkers::enum-name-style-rule ALIAS enum-name-style-rule)
-target_include_directories(enum-name-style-rule PUBLIC ${CMAKE_SOURCE_DIR})
-target_link_libraries(enum-name-style-rule PUBLIC
-  verible::common::analysis::lint-rule-status
-  verible::common::analysis::syntax-tree-lint-rule
-  verible::common::analysis::matcher::bound-symbol-manager
-  verible::common::text::config-utils
-  verible::common::text::symbol
-  verible::common::text::syntax-tree-context
-  verible::common::util::logging
-  verible::verilog::CST::type
-  verible::verilog::CST::verilog-matchers
-  verible::verilog::analysis::descriptions
-  verible::verilog::analysis::lint-rule-registry
+cc_library(
+        NAME
+        "mismatched-labels-rule"
+        SRCS
+        "mismatched-labels-rule.cc"
+        DEPS
+        verible::common::analysis::lint-rule-status
+        verible::common::analysis::syntax-tree-lint-rule
+        verible::common::analysis::matcher::bound-symbol-manager
+        verible::common::text::concrete-syntax-tree
+        verible::common::text::symbol
+        verible::common::text::syntax-tree-context
+        verible::verilog::CST::seq-block
+        verible::verilog::CST::verilog-matchers
+        verible::verilog::analysis::descriptions
+        verible::verilog::analysis::lint-rule-registry
 )
 
-add_library(forbidden-macro-rule STATIC forbidden-macro-rule.cc)
-add_library(verible::verilog::analysis::checkers::forbidden-macro-rule ALIAS forbidden-macro-rule)
-target_include_directories(forbidden-macro-rule PUBLIC ${CMAKE_SOURCE_DIR})
-target_link_libraries(forbidden-macro-rule PUBLIC
-  verible::common::analysis::citation
-  verible::common::analysis::lint-rule-status
-  verible::common::analysis::syntax-tree-lint-rule
-  verible::common::analysis::matcher::bound-symbol-manager
-  verible::common::text::concrete-syntax-leaf
-  verible::common::text::symbol
-  verible::common::text::syntax-tree-context
-  verible::common::text::token-info
-  verible::common::util::container-util
-  verible::verilog::CST::verilog-matchers
-  verible::verilog::analysis::descriptions
-  verible::verilog::analysis::lint-rule-registry
+cc_test(
+        NAME
+        "mismatched-labels-rule_test"
+        SRCS
+        "mismatched-labels-rule_test.cc"
+        DEPS
+        mismatched-labels-rule
+        verible::common::analysis::linter-test-utils
+        verible::common::analysis::syntax-tree-linter-test-utils
+        verible::verilog::analysis::verilog-analyzer
+        verible::verilog::parser::verilog-token-enum
+        GTest::gtest
+        GTest::gtest_main
 )
 
-add_library(forbidden-anonymous-structs-unions-rule STATIC forbidden-anonymous-structs-unions-rule.cc)
-add_library(verible::verilog::analysis::checkers::forbidden-anonymous-structs-unions-rule ALIAS forbidden-anonymous-structs-unions-rule)
-target_include_directories(forbidden-anonymous-structs-unions-rule PUBLIC ${CMAKE_SOURCE_DIR})
-target_link_libraries(forbidden-anonymous-structs-unions-rule PUBLIC
-  verible::common::analysis::lint-rule-status
-  verible::common::analysis::syntax-tree-lint-rule
-  verible::common::analysis::matcher::bound-symbol-manager
-  verible::common::text::config-utils
-  verible::common::text::symbol
-  verible::common::text::syntax-tree-context
-  verible::verilog::CST::verilog-matchers
-  verible::verilog::CST::verilog-nonterminals
-  verible::verilog::analysis::descriptions
-  verible::verilog::analysis::lint-rule-registry
+cc_library(
+        NAME
+        "module-begin-block-rule"
+        SRCS
+        "module-begin-block-rule.cc"
+        DEPS
+        verible::common::analysis::lint-rule-status
+        verible::common::analysis::syntax-tree-lint-rule
+        verible::common::analysis::matcher::bound-symbol-manager
+        verible::common::text::symbol
+        verible::common::text::syntax-tree-context
+        verible::verilog::CST::verilog-matchers
+        verible::verilog::analysis::descriptions
+        verible::verilog::analysis::lint-rule-registry
 )
 
-add_library(forbidden-symbol-rule STATIC forbidden-symbol-rule.cc)
-add_library(verible::verilog::analysis::checkers::forbidden-symbol-rule ALIAS forbidden-symbol-rule)
-target_include_directories(forbidden-symbol-rule PUBLIC ${CMAKE_SOURCE_DIR})
-target_link_libraries(forbidden-symbol-rule PUBLIC
-  verible::common::analysis::lint-rule-status
-  verible::common::analysis::syntax-tree-lint-rule
-  verible::common::analysis::matcher::bound-symbol-manager
-  verible::common::text::concrete-syntax-leaf
-  verible::common::text::symbol
-  verible::common::text::syntax-tree-context
-  verible::common::text::token-info
-  verible::common::util::container-util
-  verible::verilog::CST::verilog-matchers
-  verible::verilog::analysis::descriptions
-  verible::verilog::analysis::lint-rule-registry
+cc_test(
+        NAME
+        "module-begin-block-rule_test"
+        SRCS
+        "module-begin-block-rule_test.cc"
+        DEPS
+        module-begin-block-rule
+        verible::common::analysis::linter-test-utils
+        verible::common::analysis::syntax-tree-linter-test-utils
+        verible::verilog::analysis::verilog-analyzer
+        verible::verilog::parser::verilog-token-enum
+        GTest::gtest
+        GTest::gtest_main
 )
 
-add_library(generate-label-rule STATIC generate-label-rule.cc)
-add_library(verible::verilog::analysis::checkers::generate-label-rule ALIAS generate-label-rule)
-target_include_directories(generate-label-rule PUBLIC ${CMAKE_SOURCE_DIR})
-target_link_libraries(generate-label-rule PUBLIC
-  verible::common::analysis::lint-rule-status
-  verible::common::analysis::syntax-tree-lint-rule
-  verible::common::analysis::matcher::bound-symbol-manager
-  verible::common::analysis::matcher::core-matchers
-  verible::common::text::symbol
-  verible::common::text::syntax-tree-context
-  verible::verilog::CST::verilog-matchers
-  verible::verilog::analysis::descriptions
-  verible::verilog::analysis::lint-rule-registry
+cc_library(
+        NAME
+        "module-filename-rule"
+        SRCS
+        "module-filename-rule.cc"
+        DEPS
+        verible::common::analysis::lint-rule-status
+        verible::common::analysis::syntax-tree-search
+        verible::common::analysis::text-structure-lint-rule
+        verible::common::text::concrete-syntax-leaf
+        verible::common::text::config-utils
+        verible::common::text::symbol
+        verible::common::text::text-structure
+        verible::common::text::token-info
+        verible::common::util::file-util
+        verible::common::util::logging
+        verible::verilog::CST::module
+        verible::verilog::CST::verilog-nonterminals
+        verible::verilog::analysis::descriptions
+        verible::verilog::analysis::lint-rule-registry
+        absl::status
+        absl::strings
 )
 
-add_library(generate-label-prefix-rule STATIC generate-label-prefix-rule.cc)
-add_library(verible::verilog::analysis::checkers::generate-label-prefix-rule ALIAS generate-label-prefix-rule)
-target_include_directories(generate-label-prefix-rule PUBLIC ${CMAKE_SOURCE_DIR})
-target_link_libraries(generate-label-prefix-rule PUBLIC
-  verible::common::analysis::lint-rule-status
-  verible::common::analysis::syntax-tree-lint-rule
-  verible::common::analysis::matcher::bound-symbol-manager
-  verible::common::text::symbol
-  verible::common::text::syntax-tree-context
-  verible::common::text::token-info
-  verible::common::text::tree-utils
-  verible::verilog::CST::seq-block
-  verible::verilog::CST::verilog-matchers
-  verible::verilog::CST::verilog-nonterminals
-  verible::verilog::analysis::descriptions
-  verible::verilog::analysis::lint-rule-registry
+cc_test(
+        NAME
+        "module-filename-rule_test"
+        SRCS
+        "module-filename-rule_test.cc"
+        DEPS
+        module-filename-rule
+        verible::common::analysis::linter-test-utils
+        verible::common::analysis::text-structure-linter-test-utils
+        verible::verilog::analysis::verilog-analyzer
+        verible::verilog::parser::verilog-token-enum
+        GTest::gtest
+        GTest::gtest_main
 )
 
-add_library(v2001-generate-begin-rule STATIC v2001-generate-begin-rule.cc)
-add_library(verible::verilog::analysis::checkers::v2001-generate-begin-rule ALIAS v2001-generate-begin-rule)
-target_include_directories(v2001-generate-begin-rule PUBLIC ${CMAKE_SOURCE_DIR})
-target_link_libraries(v2001-generate-begin-rule PUBLIC
-  verible::common::analysis::lint-rule-status
-  verible::common::analysis::syntax-tree-lint-rule
-  verible::common::analysis::matcher::bound-symbol-manager
-  verible::common::text::concrete-syntax-leaf
-  verible::common::text::concrete-syntax-tree
-  verible::common::text::symbol
-  verible::common::text::syntax-tree-context
-  verible::common::text::tree-utils
-  verible::verilog::CST::verilog-matchers
-  verible::verilog::analysis::descriptions
-  verible::verilog::analysis::lint-rule-registry
+cc_library(
+        NAME
+        "package-filename-rule"
+        SRCS
+        "package-filename-rule.cc"
+        DEPS
+        verible::common::analysis::lint-rule-status
+        verible::common::analysis::syntax-tree-search
+        verible::common::analysis::text-structure-lint-rule
+        verible::common::text::config-utils
+        verible::common::text::text-structure
+        verible::common::text::token-info
+        verible::common::util::file-util
+        verible::verilog::CST::package
+        verible::verilog::analysis::descriptions
+        verible::verilog::analysis::lint-rule-registry
+        absl::status
+        absl::strings
 )
 
-add_library(void-cast-rule STATIC void-cast-rule.cc)
-add_library(verible::verilog::analysis::checkers::void-cast-rule ALIAS void-cast-rule)
-target_include_directories(void-cast-rule PUBLIC ${CMAKE_SOURCE_DIR})
-target_link_libraries(void-cast-rule PUBLIC
-  verible::common::analysis::lint-rule-status
-  verible::common::analysis::syntax-tree-lint-rule
-  verible::common::analysis::matcher::bound-symbol-manager
-  verible::common::analysis::matcher::core-matchers
-  verible::common::text::concrete-syntax-leaf
-  verible::common::text::concrete-syntax-tree
-  verible::common::text::symbol
-  verible::common::text::syntax-tree-context
-  verible::common::text::token-info
-  verible::common::text::tree-utils
-  verible::common::util::logging
-  verible::verilog::CST::verilog-matchers
-  verible::verilog::analysis::descriptions
-  verible::verilog::analysis::lint-rule-registry
+cc_test(
+        NAME
+        "package-filename-rule_test"
+        SRCS
+        "package-filename-rule_test.cc"
+        DEPS
+        package-filename-rule
+        verible::common::analysis::linter-test-utils
+        verible::common::analysis::text-structure-linter-test-utils
+        verible::verilog::analysis::verilog-analyzer
+        verible::verilog::parser::verilog-token-enum
+        GTest::gtest
+        GTest::gtest_main
 )
 
-add_library(undersized-binary-literal-rule STATIC undersized-binary-literal-rule.cc)
-add_library(verible::verilog::analysis::checkers::undersized-binary-literal-rule ALIAS undersized-binary-literal-rule)
-target_include_directories(undersized-binary-literal-rule PUBLIC ${CMAKE_SOURCE_DIR})
-target_link_libraries(undersized-binary-literal-rule PUBLIC
-  verible::common::analysis::lint-rule-status
-  verible::common::analysis::syntax-tree-lint-rule
-  verible::common::analysis::matcher::bound-symbol-manager
-  verible::common::text::concrete-syntax-leaf
-  verible::common::text::concrete-syntax-tree
-  verible::common::text::config-utils
-  verible::common::text::symbol
-  verible::common::text::syntax-tree-context
-  verible::common::text::token-info
-  verible::common::util::logging
-  verible::verilog::CST::numbers
-  verible::verilog::CST::verilog-matchers
-  verible::verilog::analysis::descriptions
-  verible::verilog::analysis::lint-rule-registry
+cc_library(
+        NAME
+        "module-instantiation-rules"
+        SRCS
+        "module-instantiation-rules.cc"
+        DEPS
+        verible::common::analysis::lint-rule-status
+        verible::common::analysis::syntax-tree-lint-rule
+        verible::common::analysis::matcher::bound-symbol-manager
+        verible::common::text::concrete-syntax-leaf
+        verible::common::text::concrete-syntax-tree
+        verible::common::text::symbol
+        verible::common::text::syntax-tree-context
+        verible::common::text::token-info
+        verible::common::text::tree-utils
+        verible::common::util::casts
+        verible::common::util::logging
+        verible::verilog::CST::context-functions
+        verible::verilog::CST::verilog-matchers
+        verible::verilog::CST::verilog-nonterminals
+        verible::verilog::analysis::descriptions
+        verible::verilog::analysis::lint-rule-registry
 )
 
-add_library(truncated-numeric-literal-rule STATIC truncated-numeric-literal-rule.cc)
-add_library(verible::verilog::analysis::checkers::truncated-numeric-literal-rule ALIAS truncated-numeric-literal-rule)
-target_include_directories(truncated-numeric-literal-rule PUBLIC ${CMAKE_SOURCE_DIR})
-target_link_libraries(truncated-numeric-literal-rule PUBLIC
-  verible::common::analysis::lint-rule-status
-  verible::common::analysis::syntax-tree-lint-rule
-  verible::common::analysis::matcher::bound-symbol-manager
-  verible::common::text::concrete-syntax-leaf
-  verible::common::text::concrete-syntax-tree
-  verible::common::text::symbol
-  verible::common::text::syntax-tree-context
-  verible::common::text::token-info
-  verible::verilog::CST::numbers
-  verible::verilog::CST::verilog-matchers
-  verible::verilog::analysis::descriptions
-  verible::verilog::analysis::lint-rule-registry
-  absl::int128
+cc_test(
+        NAME
+        "module-instantiation-rules_test"
+        SRCS
+        "module-instantiation-rules_test.cc"
+        DEPS
+        module-instantiation-rules
+        verible::common::analysis::linter-test-utils
+        verible::common::analysis::syntax-tree-linter-test-utils
+        verible::verilog::analysis::verilog-analyzer
+        verible::verilog::parser::verilog-token-enum
+        GTest::gtest
+        GTest::gtest_main
 )
 
-add_library(create-object-name-match-rule STATIC create-object-name-match-rule.cc)
-add_library(verible::verilog::analysis::checkers::create-object-name-match-rule ALIAS create-object-name-match-rule)
-target_include_directories(create-object-name-match-rule PUBLIC ${CMAKE_SOURCE_DIR})
-target_link_libraries(create-object-name-match-rule PUBLIC
-  verible::common::analysis::lint-rule-status
-  verible::common::analysis::syntax-tree-lint-rule
-  verible::common::analysis::matcher::bound-symbol-manager
-  verible::common::text::concrete-syntax-leaf
-  verible::common::text::concrete-syntax-tree
-  verible::common::text::symbol
-  verible::common::text::syntax-tree-context
-  verible::common::text::token-info
-  verible::common::util::casts
-  verible::verilog::CST::expression
-  verible::verilog::CST::verilog-matchers
-  verible::verilog::CST::verilog-nonterminals
-  verible::verilog::analysis::descriptions
-  verible::verilog::analysis::lint-rule-registry
-  verible::verilog::parser::verilog-token-enum
+cc_library(
+        NAME
+        "one-module-per-file-rule"
+        SRCS
+        "one-module-per-file-rule.cc"
+        DEPS
+        verible::common::analysis::lint-rule-status
+        verible::common::analysis::syntax-tree-search
+        verible::common::analysis::text-structure-lint-rule
+        verible::common::text::text-structure
+        verible::common::util::logging
+        verible::verilog::CST::module
+        verible::verilog::CST::verilog-nonterminals
+        verible::verilog::analysis::descriptions
+        verible::verilog::analysis::lint-rule-registry
+        absl::strings
 )
 
-add_library(always-comb-rule STATIC always-comb-rule.cc)
-add_library(verible::verilog::analysis::checkers::always-comb-rule ALIAS always-comb-rule)
-target_include_directories(always-comb-rule PUBLIC ${CMAKE_SOURCE_DIR})
-target_link_libraries(always-comb-rule PUBLIC
-  verible::common::analysis::lint-rule-status
-  verible::common::analysis::syntax-tree-lint-rule
-  verible::common::analysis::matcher::bound-symbol-manager
-  verible::common::text::concrete-syntax-leaf
-  verible::common::text::concrete-syntax-tree
-  verible::common::text::symbol
-  verible::common::text::syntax-tree-context
-  verible::common::text::tree-utils
-  verible::verilog::CST::statement
-  verible::verilog::CST::verilog-matchers
-  verible::verilog::analysis::descriptions
-  verible::verilog::analysis::lint-rule-registry
+cc_test(
+        NAME
+        "one-module-per-file-rule_test"
+        SRCS
+        "one-module-per-file-rule_test.cc"
+        DEPS
+        one-module-per-file-rule
+        verible::common::analysis::linter-test-utils
+        verible::common::analysis::text-structure-linter-test-utils
+        verible::verilog::analysis::verilog-analyzer
+        verible::verilog::parser::verilog-token-enum
+        GTest::gtest
+        GTest::gtest_main
 )
 
-add_library(forbid-line-continuations-rule STATIC forbid-line-continuations-rule.cc)
-add_library(verible::verilog::analysis::checkers::forbid-line-continuations-rule ALIAS forbid-line-continuations-rule)
-target_include_directories(forbid-line-continuations-rule PUBLIC ${CMAKE_SOURCE_DIR})
-target_link_libraries(forbid-line-continuations-rule PUBLIC
-  verible::common::analysis::lint-rule-status
-  verible::common::analysis::syntax-tree-lint-rule
-  verible::common::analysis::matcher::bound-symbol-manager
-  verible::common::text::symbol
-  verible::common::text::syntax-tree-context
-  verible::common::text::tree-utils
-  verible::verilog::CST::verilog-matchers
-  verible::verilog::analysis::descriptions
-  verible::verilog::analysis::lint-rule-registry
-  verible::verilog::parser::verilog-token-enum
+cc_library(
+        NAME
+        "endif-comment-rule"
+        SRCS
+        "endif-comment-rule.cc"
+        DEPS
+        verible::common::analysis::lint-rule-status
+        verible::common::analysis::token-stream-lint-rule
+        verible::common::strings::comment-utils
+        verible::common::text::token-info
+        verible::verilog::analysis::descriptions
+        verible::verilog::analysis::lint-rule-registry
+        verible::verilog::parser::verilog-token-enum
+        absl::strings
 )
 
-add_library(suggest-parentheses-rule STATIC suggest-parentheses-rule.cc)
-add_library(verible::verilog::analysis::checkers::suggest-parentheses-rule ALIAS suggest-parentheses-rule)
-target_include_directories(suggest-parentheses-rule PUBLIC ${CMAKE_SOURCE_DIR})
-target_link_libraries(suggest-parentheses-rule PUBLIC
-  verible::common::analysis::lint-rule-status
-  verible::common::analysis::syntax-tree-lint-rule
-  verible::common::text::concrete-syntax-tree
-  verible::common::text::symbol
-  verible::common::text::syntax-tree-context
-  verible::common::text::token-info
-  verible::common::text::tree-utils
-  verible::verilog::CST::expression
-  verible::verilog::CST::verilog-nonterminals
-  verible::verilog::analysis::descriptions
-  verible::verilog::analysis::lint-rule-registry
-  verible::verilog::parser::verilog-token-enum
+cc_test(
+        NAME
+        "endif-comment-rule_test"
+        SRCS
+        "endif-comment-rule_test.cc"
+        DEPS
+        endif-comment-rule
+        verible::common::analysis::linter-test-utils
+        verible::common::analysis::token-stream-linter-test-utils
+        verible::verilog::analysis::verilog-analyzer
+        verible::verilog::parser::verilog-token-enum
+        GTest::gtest
+        GTest::gtest_main
 )
 
-add_library(always-comb-blocking-rule STATIC always-comb-blocking-rule.cc)
-add_library(verible::verilog::analysis::checkers::always-comb-blocking-rule ALIAS always-comb-blocking-rule)
-target_include_directories(always-comb-blocking-rule PUBLIC ${CMAKE_SOURCE_DIR})
-target_link_libraries(always-comb-blocking-rule PUBLIC
-  verible::common::analysis::lint-rule-status
-  verible::common::analysis::syntax-tree-lint-rule
-  verible::common::analysis::syntax-tree-search
-  verible::common::analysis::matcher::bound-symbol-manager
-  verible::common::text::concrete-syntax-leaf
-  verible::common::text::concrete-syntax-tree
-  verible::common::text::symbol
-  verible::common::text::syntax-tree-context
-  verible::common::text::tree-utils
-  verible::common::util::casts
-  verible::verilog::CST::verilog-matchers
-  verible::verilog::CST::verilog-nonterminals
-  verible::verilog::analysis::descriptions
-  verible::verilog::analysis::lint-rule-registry
-  verible::verilog::parser::verilog-token-enum
+cc_library(
+        NAME
+        "forbidden-anonymous-enums-rule"
+        SRCS
+        "forbidden-anonymous-enums-rule.cc"
+        DEPS
+        verible::common::analysis::lint-rule-status
+        verible::common::analysis::syntax-tree-lint-rule
+        verible::common::analysis::matcher::bound-symbol-manager
+        verible::common::text::symbol
+        verible::common::text::syntax-tree-context
+        verible::verilog::CST::verilog-matchers
+        verible::verilog::CST::verilog-nonterminals
+        verible::verilog::analysis::descriptions
+        verible::verilog::analysis::lint-rule-registry
 )
 
-add_library(always-ff-non-blocking-rule STATIC always-ff-non-blocking-rule.cc)
-add_library(verible::verilog::analysis::checkers::always-ff-non-blocking-rule ALIAS always-ff-non-blocking-rule)
-target_include_directories(always-ff-non-blocking-rule PUBLIC ${CMAKE_SOURCE_DIR})
-target_link_libraries(always-ff-non-blocking-rule PUBLIC
-  verible::common::analysis::lint-rule-status
-  verible::common::analysis::syntax-tree-lint-rule
-  verible::common::analysis::syntax-tree-search
-  verible::common::analysis::matcher::bound-symbol-manager
-  verible::common::text::concrete-syntax-leaf
-  verible::common::text::concrete-syntax-tree
-  verible::common::text::config-utils
-  verible::common::text::symbol
-  verible::common::text::syntax-tree-context
-  verible::common::util::casts
-  verible::common::util::logging
-  verible::verilog::CST::verilog-matchers
-  verible::verilog::CST::verilog-nonterminals
-  verible::verilog::analysis::descriptions
-  verible::verilog::analysis::lint-rule-registry
+cc_test(
+        NAME
+        "forbidden-anonymous-enums-rule_test"
+        SRCS
+        "forbidden-anonymous-enums-rule_test.cc"
+        DEPS
+        forbidden-anonymous-enums-rule
+        verible::common::analysis::linter-test-utils
+        verible::common::analysis::syntax-tree-linter-test-utils
+        verible::verilog::analysis::verilog-analyzer
+        verible::verilog::parser::verilog-token-enum
+        GTest::gtest
+        GTest::gtest_main
 )
 
-add_library(explicit-begin-rule STATIC explicit-begin-rule.cc)
-add_library(verible::verilog::analysis::checkers::explicit-begin-rule ALIAS explicit-begin-rule)
-target_include_directories(explicit-begin-rule PUBLIC ${CMAKE_SOURCE_DIR})
-target_link_libraries(explicit-begin-rule PUBLIC
-  verible::common::analysis::lint-rule-status
-  verible::common::analysis::token-stream-lint-rule
-  verible::common::text::config-utils
-  verible::common::text::token-info
-  verible::verilog::analysis::descriptions
-  verible::verilog::analysis::lint-rule-registry
-  verible::verilog::parser::verilog-token-enum
-  absl::core_headers
+cc_library(
+        NAME
+        "enum-name-style-rule"
+        SRCS
+        "enum-name-style-rule.cc"
+        DEPS
+        verible::common::analysis::lint-rule-status
+        verible::common::analysis::syntax-tree-lint-rule
+        verible::common::analysis::matcher::bound-symbol-manager
+        verible::common::text::config-utils
+        verible::common::text::symbol
+        verible::common::text::syntax-tree-context
+        verible::common::util::logging
+        verible::verilog::CST::type
+        verible::verilog::CST::verilog-matchers
+        verible::verilog::analysis::descriptions
+        verible::verilog::analysis::lint-rule-registry
+        absl::status
+        absl::strings
+        re2::re2
 )
 
-add_library(explicit-function-lifetime-rule STATIC explicit-function-lifetime-rule.cc)
-add_library(verible::verilog::analysis::checkers::explicit-function-lifetime-rule ALIAS explicit-function-lifetime-rule)
-target_include_directories(explicit-function-lifetime-rule PUBLIC ${CMAKE_SOURCE_DIR})
-target_link_libraries(explicit-function-lifetime-rule PUBLIC
-  verible::common::analysis::lint-rule-status
-  verible::common::analysis::syntax-tree-lint-rule
-  verible::common::analysis::matcher::bound-symbol-manager
-  verible::common::text::symbol
-  verible::common::text::syntax-tree-context
-  verible::common::text::token-info
-  verible::common::text::tree-utils
-  verible::common::util::logging
-  verible::verilog::CST::context-functions
-  verible::verilog::CST::functions
-  verible::verilog::CST::identifier
-  verible::verilog::CST::verilog-matchers
-  verible::verilog::analysis::descriptions
-  verible::verilog::analysis::lint-rule-registry
-  verible::verilog::parser::verilog-token-enum
+cc_test(
+        NAME
+        "enum-name-style-rule_test"
+        SRCS
+        "enum-name-style-rule_test.cc"
+        DEPS
+        enum-name-style-rule
+        verible::common::analysis::linter-test-utils
+        verible::common::analysis::syntax-tree-linter-test-utils
+        verible::verilog::analysis::verilog-analyzer
+        verible::verilog::parser::verilog-token-enum
+        GTest::gtest
+        GTest::gtest_main
 )
 
-add_library(explicit-task-lifetime-rule STATIC explicit-task-lifetime-rule.cc)
-add_library(verible::verilog::analysis::checkers::explicit-task-lifetime-rule ALIAS explicit-task-lifetime-rule)
-target_include_directories(explicit-task-lifetime-rule PUBLIC ${CMAKE_SOURCE_DIR})
-target_link_libraries(explicit-task-lifetime-rule PUBLIC
-  verible::common::analysis::lint-rule-status
-  verible::common::analysis::syntax-tree-lint-rule
-  verible::common::analysis::matcher::bound-symbol-manager
-  verible::common::text::symbol
-  verible::common::text::syntax-tree-context
-  verible::common::text::token-info
-  verible::common::text::tree-utils
-  verible::verilog::CST::context-functions
-  verible::verilog::CST::identifier
-  verible::verilog::CST::tasks
-  verible::verilog::CST::verilog-matchers
-  verible::verilog::analysis::descriptions
-  verible::verilog::analysis::lint-rule-registry
-  verible::verilog::parser::verilog-token-enum
+cc_library(
+        NAME
+        "forbidden-macro-rule"
+        SRCS
+        "forbidden-macro-rule.cc"
+        DEPS
+        verible::common::analysis::citation
+        verible::common::analysis::lint-rule-status
+        verible::common::analysis::syntax-tree-lint-rule
+        verible::common::analysis::matcher::bound-symbol-manager
+        verible::common::text::concrete-syntax-leaf
+        verible::common::text::symbol
+        verible::common::text::syntax-tree-context
+        verible::common::text::token-info
+        verible::common::util::container-util
+        verible::verilog::CST::verilog-matchers
+        verible::verilog::analysis::descriptions
+        verible::verilog::analysis::lint-rule-registry
 )
 
-add_library(packed-dimensions-rule STATIC packed-dimensions-rule.cc)
-add_library(verible::verilog::analysis::checkers::packed-dimensions-rule ALIAS packed-dimensions-rule)
-target_include_directories(packed-dimensions-rule PUBLIC ${CMAKE_SOURCE_DIR})
-target_link_libraries(packed-dimensions-rule PUBLIC
-  verible::common::analysis::lint-rule-status
-  verible::common::analysis::syntax-tree-lint-rule
-  verible::common::analysis::matcher::bound-symbol-manager
-  verible::common::text::symbol
-  verible::common::text::syntax-tree-context
-  verible::common::text::token-info
-  verible::common::text::tree-utils
-  verible::common::util::logging
-  verible::verilog::CST::context-functions
-  verible::verilog::CST::dimensions
-  verible::verilog::CST::expression
-  verible::verilog::CST::verilog-matchers
-  verible::verilog::analysis::descriptions
-  verible::verilog::analysis::lint-rule-registry
-  verible::verilog::parser::verilog-token-enum
+cc_library(
+        NAME
+        "forbidden-anonymous-structs-unions-rule"
+        SRCS
+        "forbidden-anonymous-structs-unions-rule.cc"
+        DEPS
+        verible::common::analysis::lint-rule-status
+        verible::common::analysis::syntax-tree-lint-rule
+        verible::common::analysis::matcher::bound-symbol-manager
+        verible::common::text::config-utils
+        verible::common::text::symbol
+        verible::common::text::syntax-tree-context
+        verible::verilog::CST::verilog-matchers
+        verible::verilog::CST::verilog-nonterminals
+        verible::verilog::analysis::descriptions
+        verible::verilog::analysis::lint-rule-registry
+        absl::status
 )
 
-add_library(unpacked-dimensions-rule STATIC unpacked-dimensions-rule.cc)
-add_library(verible::verilog::analysis::checkers::unpacked-dimensions-rule ALIAS unpacked-dimensions-rule)
-target_include_directories(unpacked-dimensions-rule PUBLIC ${CMAKE_SOURCE_DIR})
-target_link_libraries(unpacked-dimensions-rule PUBLIC
-  verible::common::analysis::lint-rule-status
-  verible::common::analysis::syntax-tree-lint-rule
-  verible::common::analysis::matcher::bound-symbol-manager
-  verible::common::text::symbol
-  verible::common::text::syntax-tree-context
-  verible::common::text::token-info
-  verible::common::text::tree-utils
-  verible::common::util::logging
-  verible::verilog::CST::context-functions
-  verible::verilog::CST::dimensions
-  verible::verilog::CST::expression
-  verible::verilog::CST::verilog-matchers
-  verible::verilog::CST::verilog-nonterminals
-  verible::verilog::analysis::descriptions
-  verible::verilog::analysis::lint-rule-registry
-  verible::verilog::parser::verilog-token-enum
+cc_test(
+        NAME
+        "forbidden-anonymous-structs-unions-rule_test"
+        SRCS
+        "forbidden-anonymous-structs-unions-rule_test.cc"
+        DEPS
+        forbidden-anonymous-structs-unions-rule
+        verible::common::analysis::linter-test-utils
+        verible::common::analysis::syntax-tree-linter-test-utils
+        verible::verilog::analysis::verilog-analyzer
+        verible::verilog::parser::verilog-token-enum
+        absl::status
+        absl::strings
+        GTest::gtest
+        GTest::gtest_main
 )
 
-add_library(forbid-negative-array-dim STATIC forbid-negative-array-dim.cc)
-add_library(verible::verilog::analysis::checkers::forbid-negative-array-dim ALIAS forbid-negative-array-dim)
-target_include_directories(forbid-negative-array-dim PUBLIC ${CMAKE_SOURCE_DIR})
-target_link_libraries(forbid-negative-array-dim PUBLIC
-  verible::common::analysis::lint-rule-status
-  verible::common::analysis::syntax-tree-lint-rule
-  verible::common::analysis::matcher::bound-symbol-manager
-  verible::common::text::symbol
-  verible::common::text::syntax-tree-context
-  verible::common::text::token-info
-  verible::common::text::tree-utils
-  verible::verilog::CST::expression
-  verible::verilog::CST::verilog-matchers
-  verible::verilog::CST::verilog-nonterminals
-  verible::verilog::analysis::descriptions
-  verible::verilog::analysis::lint-rule-registry
-  verible::verilog::parser::verilog-token-enum
+cc_test(
+        NAME
+        "forbidden-macro-rule_test"
+        SRCS
+        "forbidden-macro-rule_test.cc"
+        DEPS
+        forbidden-macro-rule
+        verible::common::analysis::linter-test-utils
+        verible::common::analysis::syntax-tree-linter-test-utils
+        verible::verilog::analysis::verilog-analyzer
+        verible::verilog::parser::verilog-token-enum
+        GTest::gtest
+        GTest::gtest_main
 )
 
-add_library(case-missing-default-rule STATIC case-missing-default-rule.cc)
-add_library(verible::verilog::analysis::checkers::case-missing-default-rule ALIAS case-missing-default-rule)
-target_include_directories(case-missing-default-rule PUBLIC ${CMAKE_SOURCE_DIR})
-target_link_libraries(case-missing-default-rule PUBLIC
-  verible::common::analysis::lint-rule-status
-  verible::common::analysis::syntax-tree-lint-rule
-  verible::common::analysis::matcher::bound-symbol-manager
-  verible::common::analysis::matcher::matcher-builders
-  verible::common::text::concrete-syntax-tree
-  verible::common::text::symbol
-  verible::common::text::syntax-tree-context
-  verible::common::text::tree-utils
-  verible::verilog::CST::verilog-matchers
-  verible::verilog::CST::verilog-nonterminals
-  verible::verilog::analysis::descriptions
-  verible::verilog::analysis::lint-rule-registry
+cc_library(
+        NAME
+        "forbidden-symbol-rule"
+        SRCS
+        "forbidden-symbol-rule.cc"
+        DEPS
+        verible::common::analysis::lint-rule-status
+        verible::common::analysis::syntax-tree-lint-rule
+        verible::common::analysis::matcher::bound-symbol-manager
+        verible::common::text::concrete-syntax-leaf
+        verible::common::text::symbol
+        verible::common::text::syntax-tree-context
+        verible::common::text::token-info
+        verible::common::util::container-util
+        verible::verilog::CST::verilog-matchers
+        verible::verilog::analysis::descriptions
+        verible::verilog::analysis::lint-rule-registry
 )
 
-add_library(constraint-name-style-rule STATIC constraint-name-style-rule.cc)
-add_library(verible::verilog::analysis::checkers::constraint-name-style-rule ALIAS constraint-name-style-rule)
-target_include_directories(constraint-name-style-rule PUBLIC ${CMAKE_SOURCE_DIR})
-target_link_libraries(constraint-name-style-rule PUBLIC
-  verible::common::analysis::lint-rule-status
-  verible::common::analysis::syntax-tree-lint-rule
-  verible::common::analysis::matcher::bound-symbol-manager
-  verible::common::text::config-utils
-  verible::common::text::symbol
-  verible::common::text::syntax-tree-context
-  verible::common::text::token-info
-  verible::verilog::CST::constraints
-  verible::verilog::CST::verilog-matchers
-  verible::verilog::analysis::descriptions
-  verible::verilog::analysis::lint-rule-registry
+cc_test(
+        NAME
+        "forbidden-symbol-rule_test"
+        SRCS
+        "forbidden-symbol-rule_test.cc"
+        DEPS
+        forbidden-symbol-rule
+        verible::common::analysis::linter-test-utils
+        verible::common::analysis::syntax-tree-linter-test-utils
+        verible::verilog::analysis::verilog-analyzer
+        verible::verilog::parser::verilog-token-enum
+        GTest::gtest
+        GTest::gtest_main
 )
 
-add_library(disable-statement-rule STATIC disable-statement-rule.cc)
-add_library(verible::verilog::analysis::checkers::disable-statement-rule ALIAS disable-statement-rule)
-target_include_directories(disable-statement-rule PUBLIC ${CMAKE_SOURCE_DIR})
-target_link_libraries(disable-statement-rule PUBLIC
-  verible::common::analysis::lint-rule-status
-  verible::common::analysis::syntax-tree-lint-rule
-  verible::common::analysis::matcher::bound-symbol-manager
-  verible::common::text::symbol
-  verible::common::text::syntax-tree-context
-  verible::common::text::tree-utils
-  verible::common::util::iterator-adaptors
-  verible::verilog::CST::identifier
-  verible::verilog::CST::verilog-matchers
-  verible::verilog::CST::verilog-nonterminals
-  verible::verilog::analysis::descriptions
-  verible::verilog::analysis::lint-rule-registry
+cc_library(
+        NAME
+        "generate-label-rule"
+        SRCS
+        "generate-label-rule.cc"
+        DEPS
+        verible::common::analysis::lint-rule-status
+        verible::common::analysis::syntax-tree-lint-rule
+        verible::common::analysis::matcher::bound-symbol-manager
+        verible::common::analysis::matcher::core-matchers
+        verible::common::text::symbol
+        verible::common::text::syntax-tree-context
+        verible::verilog::CST::verilog-matchers
+        verible::verilog::analysis::descriptions
+        verible::verilog::analysis::lint-rule-registry
 )
 
-add_library(macro-name-style-rule STATIC macro-name-style-rule.cc)
-add_library(verible::verilog::analysis::checkers::macro-name-style-rule ALIAS macro-name-style-rule)
-target_include_directories(macro-name-style-rule PUBLIC ${CMAKE_SOURCE_DIR})
-target_link_libraries(macro-name-style-rule PUBLIC
-  verible::common::analysis::lint-rule-status
-  verible::common::analysis::token-stream-lint-rule
-  verible::common::text::config-utils
-  verible::common::text::token-info
-  verible::verilog::analysis::descriptions
-  verible::verilog::analysis::lint-rule-registry
-  verible::verilog::parser::verilog-lexer
-  verible::verilog::parser::verilog-token-classifications
-  verible::verilog::parser::verilog-token-enum
+cc_test(
+        NAME
+        "generate-label-rule_test"
+        SRCS
+        "generate-label-rule_test.cc"
+        DEPS
+        generate-label-rule
+        verible::common::analysis::linter-test-utils
+        verible::common::analysis::syntax-tree-linter-test-utils
+        verible::verilog::analysis::verilog-analyzer
+        verible::verilog::parser::verilog-token-enum
+        GTest::gtest
+        GTest::gtest_main
 )
 
-add_library(macro-string-concatenation-rule STATIC macro-string-concatenation-rule.cc)
-add_library(verible::verilog::analysis::checkers::macro-string-concatenation-rule ALIAS macro-string-concatenation-rule)
-target_include_directories(macro-string-concatenation-rule PUBLIC ${CMAKE_SOURCE_DIR})
-target_link_libraries(macro-string-concatenation-rule PUBLIC
-  verible::common::analysis::lint-rule-status
-  verible::common::analysis::token-stream-lint-rule
-  verible::common::text::token-info
-  verible::common::util::value-saver
-  verible::verilog::analysis::descriptions
-  verible::verilog::analysis::lint-rule-registry
-  verible::verilog::parser::verilog-lexer
-  verible::verilog::parser::verilog-token-classifications
-  verible::verilog::parser::verilog-token-enum
+cc_library(
+        NAME
+        "generate-label-prefix-rule"
+        SRCS
+        "generate-label-prefix-rule.cc"
+        DEPS
+        verible::common::analysis::lint-rule-status
+        verible::common::analysis::syntax-tree-lint-rule
+        verible::common::analysis::matcher::bound-symbol-manager
+        verible::common::text::symbol
+        verible::common::text::syntax-tree-context
+        verible::common::text::token-info
+        verible::common::text::tree-utils
+        verible::verilog::CST::seq-block
+        verible::verilog::CST::verilog-matchers
+        verible::verilog::CST::verilog-nonterminals
+        verible::verilog::analysis::descriptions
+        verible::verilog::analysis::lint-rule-registry
+        absl::strings
 )
 
-add_library(numeric-format-string-style-rule STATIC numeric-format-string-style-rule.cc)
-add_library(verible::verilog::analysis::checkers::numeric-format-string-style-rule ALIAS numeric-format-string-style-rule)
-target_include_directories(numeric-format-string-style-rule PUBLIC ${CMAKE_SOURCE_DIR})
-target_link_libraries(numeric-format-string-style-rule PUBLIC
-  verible::common::analysis::lint-rule-status
-  verible::common::analysis::token-stream-lint-rule
-  verible::common::text::token-info
-  verible::verilog::analysis::descriptions
-  verible::verilog::analysis::lint-rule-registry
-  verible::verilog::parser::verilog-lexer
-  verible::verilog::parser::verilog-token-classifications
-  verible::verilog::parser::verilog-token-enum
+cc_test(
+        NAME
+        "generate-label-prefix-rule_test"
+        SRCS
+        "generate-label-prefix-rule_test.cc"
+        DEPS
+        generate-label-prefix-rule
+        verible::common::analysis::linter-test-utils
+        verible::common::analysis::syntax-tree-linter-test-utils
+        verible::verilog::analysis::verilog-analyzer
+        verible::verilog::parser::verilog-token-enum
+        GTest::gtest
+        GTest::gtest_main
 )
 
-add_library(parameter-name-style-rule STATIC parameter-name-style-rule.cc)
-add_library(verible::verilog::analysis::checkers::parameter-name-style-rule ALIAS parameter-name-style-rule)
-target_include_directories(parameter-name-style-rule PUBLIC ${CMAKE_SOURCE_DIR})
-target_link_libraries(parameter-name-style-rule PUBLIC
-  verible::common::analysis::lint-rule-status
-  verible::common::analysis::syntax-tree-lint-rule
-  verible::common::analysis::matcher::bound-symbol-manager
-  verible::common::text::config-utils
-  verible::common::text::symbol
-  verible::common::text::syntax-tree-context
-  verible::common::text::token-info
-  verible::verilog::CST::parameters
-  verible::verilog::CST::verilog-matchers
-  verible::verilog::analysis::descriptions
-  verible::verilog::analysis::lint-rule-registry
-  verible::verilog::parser::verilog-token-enum
+cc_library(
+        NAME
+        "v2001-generate-begin-rule"
+        SRCS
+        "v2001-generate-begin-rule.cc"
+        DEPS
+        verible::common::analysis::lint-rule-status
+        verible::common::analysis::syntax-tree-lint-rule
+        verible::common::analysis::matcher::bound-symbol-manager
+        verible::common::text::concrete-syntax-leaf
+        verible::common::text::concrete-syntax-tree
+        verible::common::text::symbol
+        verible::common::text::syntax-tree-context
+        verible::common::text::tree-utils
+        verible::verilog::CST::verilog-matchers
+        verible::verilog::analysis::descriptions
+        verible::verilog::analysis::lint-rule-registry
 )
 
-add_library(parameter-type-name-style-rule STATIC parameter-type-name-style-rule.cc)
-add_library(verible::verilog::analysis::checkers::parameter-type-name-style-rule ALIAS parameter-type-name-style-rule)
-target_include_directories(parameter-type-name-style-rule PUBLIC ${CMAKE_SOURCE_DIR})
-target_link_libraries(parameter-type-name-style-rule PUBLIC
-  verible::common::analysis::lint-rule-status
-  verible::common::analysis::syntax-tree-lint-rule
-  verible::common::analysis::matcher::bound-symbol-manager
-  verible::common::strings::naming-utils
-  verible::common::text::symbol
-  verible::common::text::syntax-tree-context
-  verible::common::text::token-info
-  verible::verilog::CST::parameters
-  verible::verilog::CST::verilog-matchers
-  verible::verilog::analysis::descriptions
-  verible::verilog::analysis::lint-rule-registry
+cc_test(
+        NAME
+        "v2001-generate-begin-rule_test"
+        SRCS
+        "v2001-generate-begin-rule_test.cc"
+        DEPS
+        forbidden-symbol-rule
+        v2001-generate-begin-rule
+        verible::common::analysis::linter-test-utils
+        verible::common::analysis::syntax-tree-linter-test-utils
+        verible::verilog::analysis::verilog-analyzer
+        verible::verilog::parser::verilog-token-enum
+        GTest::gtest
+        GTest::gtest_main
 )
 
-add_library(proper-parameter-declaration-rule STATIC proper-parameter-declaration-rule.cc)
-add_library(verible::verilog::analysis::checkers::proper-parameter-declaration-rule ALIAS proper-parameter-declaration-rule)
-target_include_directories(proper-parameter-declaration-rule PUBLIC ${CMAKE_SOURCE_DIR})
-target_link_libraries(proper-parameter-declaration-rule PUBLIC
-  verible::common::analysis::lint-rule-status
-  verible::common::analysis::syntax-tree-lint-rule
-  verible::common::analysis::matcher::bound-symbol-manager
-  verible::common::text::config-utils
-  verible::common::text::symbol
-  verible::common::text::syntax-tree-context
-  verible::common::text::token-info
-  verible::verilog::CST::context-functions
-  verible::verilog::CST::parameters
-  verible::verilog::CST::verilog-matchers
-  verible::verilog::analysis::descriptions
-  verible::verilog::analysis::lint-rule-registry
-  verible::verilog::parser::verilog-token-enum
+cc_library(
+        NAME
+        "void-cast-rule"
+        SRCS
+        "void-cast-rule.cc"
+        DEPS
+        verible::common::analysis::lint-rule-status
+        verible::common::analysis::syntax-tree-lint-rule
+        verible::common::analysis::matcher::bound-symbol-manager
+        verible::common::analysis::matcher::core-matchers
+        verible::common::text::concrete-syntax-leaf
+        verible::common::text::concrete-syntax-tree
+        verible::common::text::symbol
+        verible::common::text::syntax-tree-context
+        verible::common::text::token-info
+        verible::common::text::tree-utils
+        verible::common::util::logging
+        verible::verilog::CST::verilog-matchers
+        verible::verilog::analysis::descriptions
+        verible::verilog::analysis::lint-rule-registry
 )
 
-add_library(plusarg-assignment-rule STATIC plusarg-assignment-rule.cc)
-add_library(verible::verilog::analysis::checkers::plusarg-assignment-rule ALIAS plusarg-assignment-rule)
-target_include_directories(plusarg-assignment-rule PUBLIC ${CMAKE_SOURCE_DIR})
-target_link_libraries(plusarg-assignment-rule PUBLIC
-  verible::common::analysis::lint-rule-status
-  verible::common::analysis::syntax-tree-lint-rule
-  verible::common::analysis::matcher::bound-symbol-manager
-  verible::common::text::concrete-syntax-leaf
-  verible::common::text::symbol
-  verible::common::text::syntax-tree-context
-  verible::common::text::token-info
-  verible::verilog::CST::verilog-matchers
-  verible::verilog::analysis::descriptions
-  verible::verilog::analysis::lint-rule-registry
+cc_test(
+        NAME
+        "void-cast-rule_test"
+        SRCS
+        "void-cast-rule_test.cc"
+        DEPS
+        void-cast-rule
+        verible::common::analysis::linter-test-utils
+        verible::common::analysis::syntax-tree-linter-test-utils
+        verible::verilog::analysis::verilog-analyzer
+        verible::verilog::parser::verilog-token-enum
+        GTest::gtest
+        GTest::gtest_main
 )
 
-add_library(port-name-suffix-rule STATIC port-name-suffix-rule.cc)
-add_library(verible::verilog::analysis::checkers::port-name-suffix-rule ALIAS port-name-suffix-rule)
-target_include_directories(port-name-suffix-rule PUBLIC ${CMAKE_SOURCE_DIR})
-target_link_libraries(port-name-suffix-rule PUBLIC
-  verible::common::analysis::lint-rule-status
-  verible::common::analysis::syntax-tree-lint-rule
-  verible::common::analysis::matcher::bound-symbol-manager
-  verible::common::text::symbol
-  verible::common::text::syntax-tree-context
-  verible::common::text::token-info
-  verible::common::util::logging
-  verible::verilog::CST::port
-  verible::verilog::CST::verilog-matchers
-  verible::verilog::analysis::descriptions
-  verible::verilog::analysis::lint-rule-registry
+cc_library(
+        NAME
+        "undersized-binary-literal-rule"
+        SRCS
+        "undersized-binary-literal-rule.cc"
+        DEPS
+        verible::common::analysis::lint-rule-status
+        verible::common::analysis::syntax-tree-lint-rule
+        verible::common::analysis::matcher::bound-symbol-manager
+        verible::common::text::concrete-syntax-leaf
+        verible::common::text::concrete-syntax-tree
+        verible::common::text::config-utils
+        verible::common::text::symbol
+        verible::common::text::syntax-tree-context
+        verible::common::text::token-info
+        verible::common::util::logging
+        verible::verilog::CST::numbers
+        verible::verilog::CST::verilog-matchers
+        verible::verilog::analysis::descriptions
+        verible::verilog::analysis::lint-rule-registry
+        absl::status
+        absl::strings
 )
 
-add_library(explicit-parameter-storage-type-rule STATIC explicit-parameter-storage-type-rule.cc)
-add_library(verible::verilog::analysis::checkers::explicit-parameter-storage-type-rule ALIAS explicit-parameter-storage-type-rule)
-target_include_directories(explicit-parameter-storage-type-rule PUBLIC ${CMAKE_SOURCE_DIR})
-target_link_libraries(explicit-parameter-storage-type-rule PUBLIC
-  verible::common::analysis::lint-rule-status
-  verible::common::analysis::syntax-tree-lint-rule
-  verible::common::analysis::matcher::bound-symbol-manager
-  verible::common::text::config-utils
-  verible::common::text::symbol
-  verible::common::text::syntax-tree-context
-  verible::common::text::token-info
-  verible::common::text::tree-utils
-  verible::common::util::logging
-  verible::verilog::CST::parameters
-  verible::verilog::CST::verilog-matchers
-  # fixdeps:: keep
-  verible::verilog::analysis::descriptions
-  verible::verilog::analysis::lint-rule-registry
-  verible::verilog::parser::verilog-token-enum
+cc_test(
+        NAME
+        "undersized-binary-literal-rule_test"
+        SRCS
+        "undersized-binary-literal-rule_test.cc"
+        DEPS
+        undersized-binary-literal-rule
+        verible::common::analysis::linter-test-utils
+        verible::common::analysis::syntax-tree-linter-test-utils
+        verible::verilog::analysis::verilog-analyzer
+        verible::verilog::parser::verilog-token-enum
+        absl::status
+        GTest::gtest
+        GTest::gtest_main
 )
 
-add_library(explicit-function-task-parameter-type-rule STATIC explicit-function-task-parameter-type-rule.cc)
-add_library(verible::verilog::analysis::checkers::explicit-function-task-parameter-type-rule ALIAS explicit-function-task-parameter-type-rule)
-target_include_directories(explicit-function-task-parameter-type-rule PUBLIC ${CMAKE_SOURCE_DIR})
-target_link_libraries(explicit-function-task-parameter-type-rule PUBLIC
-  verible::common::analysis::lint-rule-status
-  verible::common::analysis::syntax-tree-lint-rule
-  verible::common::analysis::matcher::bound-symbol-manager
-  verible::common::text::symbol
-  verible::common::text::syntax-tree-context
-  verible::common::util::logging
-  verible::verilog::CST::port
-  verible::verilog::CST::type
-  verible::verilog::CST::verilog-matchers
-  verible::verilog::analysis::descriptions
-  verible::verilog::analysis::lint-rule-registry
+cc_library(
+        NAME
+        "truncated-numeric-literal-rule"
+        SRCS
+        "truncated-numeric-literal-rule.cc"
+        DEPS
+        verible::common::analysis::lint-rule-status
+        verible::common::analysis::syntax-tree-lint-rule
+        verible::common::analysis::matcher::bound-symbol-manager
+        verible::common::text::concrete-syntax-leaf
+        verible::common::text::concrete-syntax-tree
+        verible::common::text::symbol
+        verible::common::text::syntax-tree-context
+        verible::common::text::token-info
+        verible::verilog::CST::numbers
+        verible::verilog::CST::verilog-matchers
+        verible::verilog::analysis::descriptions
+        verible::verilog::analysis::lint-rule-registry
+        absl::int128
+        absl::strings
 )
 
-add_library(signal-name-style-rule STATIC signal-name-style-rule.cc)
-add_library(verible::verilog::analysis::checkers::signal-name-style-rule ALIAS signal-name-style-rule)
-target_include_directories(signal-name-style-rule PUBLIC ${CMAKE_SOURCE_DIR})
-target_link_libraries(signal-name-style-rule PUBLIC
-  verible::common::analysis::lint-rule-status
-  verible::common::analysis::syntax-tree-lint-rule
-  verible::common::analysis::matcher::bound-symbol-manager
-  verible::common::text::concrete-syntax-leaf
-  verible::common::text::config-utils
-  verible::common::text::symbol
-  verible::common::text::syntax-tree-context
-  verible::common::text::token-info
-  verible::common::util::logging
-  verible::verilog::CST::data
-  verible::verilog::CST::net
-  verible::verilog::CST::port
-  verible::verilog::CST::verilog-matchers
-  verible::verilog::analysis::descriptions
-  verible::verilog::analysis::lint-rule-registry
+cc_test(
+        NAME
+        "truncated-numeric-literal-rule_test"
+        SRCS
+        "truncated-numeric-literal-rule_test.cc"
+        DEPS
+        truncated-numeric-literal-rule
+        verible::common::analysis::linter-test-utils
+        verible::common::analysis::syntax-tree-linter-test-utils
+        verible::verilog::analysis::verilog-analyzer
+        verible::verilog::parser::verilog-token-enum
+        absl::strings
+        GTest::gtest
+        GTest::gtest_main
 )
 
-add_library(struct-union-name-style-rule STATIC struct-union-name-style-rule.cc)
-add_library(verible::verilog::analysis::checkers::struct-union-name-style-rule ALIAS struct-union-name-style-rule)
-target_include_directories(struct-union-name-style-rule PUBLIC ${CMAKE_SOURCE_DIR})
-target_link_libraries(struct-union-name-style-rule PUBLIC
-  verible::common::analysis::lint-rule-status
-  verible::common::analysis::syntax-tree-lint-rule
-  verible::common::analysis::matcher::bound-symbol-manager
-  verible::common::text::config-utils
-  verible::common::text::symbol
-  verible::common::text::syntax-tree-context
-  verible::common::util::logging
-  verible::verilog::CST::type
-  verible::verilog::CST::verilog-matchers
-  verible::verilog::analysis::descriptions
-  verible::verilog::analysis::lint-rule-registry
+cc_library(
+        NAME
+        "create-object-name-match-rule"
+        SRCS
+        "create-object-name-match-rule.cc"
+        DEPS
+        verible::common::analysis::lint-rule-status
+        verible::common::analysis::syntax-tree-lint-rule
+        verible::common::analysis::matcher::bound-symbol-manager
+        verible::common::text::concrete-syntax-leaf
+        verible::common::text::concrete-syntax-tree
+        verible::common::text::symbol
+        verible::common::text::syntax-tree-context
+        verible::common::text::token-info
+        verible::common::util::casts
+        verible::verilog::CST::expression
+        verible::verilog::CST::verilog-matchers
+        verible::verilog::CST::verilog-nonterminals
+        verible::verilog::analysis::descriptions
+        verible::verilog::analysis::lint-rule-registry
+        verible::verilog::parser::verilog-token-enum
+        absl::strings
 )
 
-add_library(interface-name-style-rule STATIC interface-name-style-rule.cc)
-add_library(verible::verilog::analysis::checkers::interface-name-style-rule ALIAS interface-name-style-rule)
-target_include_directories(interface-name-style-rule PUBLIC ${CMAKE_SOURCE_DIR})
-target_link_libraries(interface-name-style-rule PUBLIC
-  verible::common::analysis::lint-rule-status
-  verible::common::analysis::syntax-tree-lint-rule
-  verible::common::analysis::matcher::bound-symbol-manager
-  verible::common::text::config-utils
-  verible::common::text::symbol
-  verible::common::text::syntax-tree-context
-  verible::common::text::token-info
-  verible::verilog::CST::module
-  verible::verilog::CST::type
-  verible::verilog::CST::verilog-matchers
-  verible::verilog::analysis::descriptions
-  verible::verilog::analysis::lint-rule-registry
+cc_test(
+        NAME
+        "create-object-name-match-rule_test"
+        SRCS
+        "create-object-name-match-rule_test.cc"
+        DEPS
+        create-object-name-match-rule
+        verible::common::analysis::linter-test-utils
+        verible::common::analysis::syntax-tree-linter-test-utils
+        verible::verilog::analysis::verilog-analyzer
+        verible::verilog::parser::verilog-token-enum
+        GTest::gtest
+        GTest::gtest_main
 )
 
-add_library(instance-shadow-rule STATIC instance-shadow-rule.cc)
-add_library(verible::verilog::analysis::checkers::instance-shadow-rule ALIAS instance-shadow-rule)
-target_include_directories(instance-shadow-rule PUBLIC ${CMAKE_SOURCE_DIR})
-target_link_libraries(instance-shadow-rule PUBLIC
-  verible::common::analysis::citation
-  verible::common::analysis::lint-rule-status
-  verible::common::analysis::syntax-tree-lint-rule
-  verible::common::analysis::syntax-tree-search
-  verible::common::analysis::matcher::bound-symbol-manager
-  verible::common::text::symbol
-  verible::common::text::syntax-tree-context
-  verible::common::text::tree-utils
-  verible::common::util::iterator-adaptors
-  verible::verilog::CST::identifier
-  verible::verilog::CST::verilog-matchers
-  verible::verilog::CST::verilog-nonterminals
-  verible::verilog::analysis::descriptions
-  verible::verilog::analysis::lint-rule-registry
+cc_library(
+        NAME
+        "always-comb-rule"
+        SRCS
+        "always-comb-rule.cc"
+        DEPS
+        verible::common::analysis::lint-rule-status
+        verible::common::analysis::syntax-tree-lint-rule
+        verible::common::analysis::matcher::bound-symbol-manager
+        verible::common::text::concrete-syntax-leaf
+        verible::common::text::concrete-syntax-tree
+        verible::common::text::symbol
+        verible::common::text::syntax-tree-context
+        verible::common::text::tree-utils
+        verible::verilog::CST::statement
+        verible::verilog::CST::verilog-matchers
+        verible::verilog::analysis::descriptions
+        verible::verilog::analysis::lint-rule-registry
 )
 
-add_library(legacy-genvar-declaration-rule STATIC legacy-genvar-declaration-rule.cc)
-add_library(verible::verilog::analysis::checkers::legacy-genvar-declaration-rule ALIAS legacy-genvar-declaration-rule)
-target_include_directories(legacy-genvar-declaration-rule PUBLIC ${CMAKE_SOURCE_DIR})
-target_link_libraries(legacy-genvar-declaration-rule PUBLIC
-  verible::common::analysis::lint-rule-status
-  verible::common::analysis::syntax-tree-lint-rule
-  verible::common::text::concrete-syntax-tree
-  verible::common::text::symbol
-  verible::common::text::syntax-tree-context
-  verible::common::text::tree-utils
-  verible::verilog::CST::identifier
-  verible::verilog::CST::verilog-nonterminals
-  verible::verilog::analysis::descriptions
-  verible::verilog::analysis::lint-rule-registry
+cc_test(
+        NAME
+        "always-comb-rule_test"
+        SRCS
+        "always-comb-rule_test.cc"
+        DEPS
+        always-comb-rule
+        verible::common::analysis::linter-test-utils
+        verible::common::analysis::syntax-tree-linter-test-utils
+        verible::verilog::analysis::verilog-analyzer
+        verible::verilog::parser::verilog-token-enum
+        GTest::gtest
+        GTest::gtest_main
 )
 
-add_library(legacy-generate-region-rule STATIC legacy-generate-region-rule.cc)
-add_library(verible::verilog::analysis::checkers::legacy-generate-region-rule ALIAS legacy-generate-region-rule)
-target_include_directories(legacy-generate-region-rule PUBLIC ${CMAKE_SOURCE_DIR})
-target_link_libraries(legacy-generate-region-rule PUBLIC
-  verible::common::analysis::lint-rule-status
-  verible::common::analysis::syntax-tree-lint-rule
-  verible::common::analysis::matcher::matcher-builders
-  verible::common::text::concrete-syntax-tree
-  verible::common::text::symbol
-  verible::common::text::syntax-tree-context
-  verible::common::text::tree-utils
-  verible::common::util::logging
-  verible::verilog::CST::verilog-nonterminals
-  verible::verilog::analysis::descriptions
-  verible::verilog::analysis::lint-rule-registry
-  verible::verilog::parser::verilog-token-enum
+cc_library(
+        NAME
+        "forbid-line-continuations-rule"
+        SRCS
+        "forbid-line-continuations-rule.cc"
+        DEPS
+        verible::common::analysis::lint-rule-status
+        verible::common::analysis::syntax-tree-lint-rule
+        verible::common::analysis::matcher::bound-symbol-manager
+        verible::common::text::symbol
+        verible::common::text::syntax-tree-context
+        verible::common::text::tree-utils
+        verible::verilog::CST::verilog-matchers
+        verible::verilog::analysis::descriptions
+        verible::verilog::analysis::lint-rule-registry
+        verible::verilog::parser::verilog-token-enum
+        absl::strings
 )
 
-add_library(uvm-macro-semicolon-rule STATIC uvm-macro-semicolon-rule.cc)
-add_library(verible::verilog::analysis::checkers::uvm-macro-semicolon-rule ALIAS uvm-macro-semicolon-rule)
-target_include_directories(uvm-macro-semicolon-rule PUBLIC ${CMAKE_SOURCE_DIR})
-target_link_libraries(uvm-macro-semicolon-rule PUBLIC
-  verible::common::analysis::lint-rule-status
-  verible::common::analysis::syntax-tree-lint-rule
-  verible::common::text::concrete-syntax-leaf
-  verible::common::text::symbol
-  verible::common::text::syntax-tree-context
-  verible::common::text::token-info
-  verible::verilog::CST::context-functions
-  verible::verilog::CST::macro
-  verible::verilog::CST::verilog-nonterminals
-  verible::verilog::analysis::descriptions
-  verible::verilog::analysis::lint-rule-registry
-  verible::verilog::parser::verilog-token-enum
+cc_test(
+        NAME
+        "forbid-line-continuations-rule_test"
+        SRCS
+        "forbid-line-continuations-rule_test.cc"
+        DEPS
+        forbid-line-continuations-rule
+        verible::common::analysis::linter-test-utils
+        verible::common::analysis::syntax-tree-linter-test-utils
+        verible::verilog::analysis::verilog-analyzer
+        verible::verilog::parser::verilog-token-enum
+        GTest::gtest
+        GTest::gtest_main
 )
 
-add_library(suspicious-semicolon-rule STATIC suspicious-semicolon-rule.cc)
-add_library(verible::verilog::analysis::checkers::suspicious-semicolon-rule ALIAS suspicious-semicolon-rule)
-target_include_directories(suspicious-semicolon-rule PUBLIC ${CMAKE_SOURCE_DIR})
-target_link_libraries(suspicious-semicolon-rule PUBLIC
-  verible::common::analysis::lint-rule-status
-  verible::common::analysis::syntax-tree-lint-rule
-  verible::common::analysis::matcher::bound-symbol-manager
-  verible::common::text::concrete-syntax-tree
-  verible::common::text::syntax-tree-context
-  verible::common::text::tree-utils
-  verible::verilog::CST::verilog-matchers
-  verible::verilog::CST::verilog-nonterminals
-  verible::verilog::analysis::descriptions
-  verible::verilog::analysis::lint-rule-registry
+cc_library(
+        NAME
+        "suggest-parentheses-rule"
+        SRCS
+        "suggest-parentheses-rule.cc"
+        DEPS
+        verible::common::analysis::lint-rule-status
+        verible::common::analysis::syntax-tree-lint-rule
+        verible::common::text::concrete-syntax-tree
+        verible::common::text::symbol
+        verible::common::text::syntax-tree-context
+        verible::common::text::token-info
+        verible::common::text::tree-utils
+        verible::verilog::CST::expression
+        verible::verilog::CST::verilog-nonterminals
+        verible::verilog::analysis::descriptions
+        verible::verilog::analysis::lint-rule-registry
+        verible::verilog::parser::verilog-token-enum
 )
 
-add_library(dff-name-style-rule STATIC dff-name-style-rule.cc)
-add_library(verible::verilog::analysis::checkers::dff-name-style-rule ALIAS dff-name-style-rule)
-target_include_directories(dff-name-style-rule PUBLIC ${CMAKE_SOURCE_DIR})
-target_link_libraries(dff-name-style-rule PUBLIC
-  verible::common::analysis::lint-rule-status
-  verible::common::analysis::syntax-tree-lint-rule
-  verible::common::analysis::matcher::bound-symbol-manager
-  verible::common::analysis::matcher::core-matchers
-  verible::common::text::concrete-syntax-leaf
-  verible::common::text::concrete-syntax-tree
-  verible::common::text::config-utils
-  verible::common::text::symbol
-  verible::common::text::syntax-tree-context
-  verible::common::text::token-info
-  verible::common::text::tree-utils
-  verible::verilog::CST::expression
-  verible::verilog::CST::statement
-  verible::verilog::CST::verilog-matchers
-  verible::verilog::CST::verilog-nonterminals
-  verible::verilog::analysis::descriptions
-  verible::verilog::analysis::lint-rule-registry
-  verible::verilog::parser::verilog-token-enum
+cc_test(
+        NAME
+        "suggest-parentheses-rule_test"
+        SRCS
+        "suggest-parentheses-rule_test.cc"
+        DEPS
+        suggest-parentheses-rule
+        verible::common::analysis::linter-test-utils
+        verible::common::analysis::syntax-tree-linter-test-utils
+        verible::verilog::analysis::verilog-analyzer
+        GTest::gtest
+        GTest::gtest_main
 )
 
+cc_library(
+        NAME
+        "always-comb-blocking-rule"
+        SRCS
+        "always-comb-blocking-rule.cc"
+        DEPS
+        verible::common::analysis::lint-rule-status
+        verible::common::analysis::syntax-tree-lint-rule
+        verible::common::analysis::syntax-tree-search
+        verible::common::analysis::matcher::bound-symbol-manager
+        verible::common::text::concrete-syntax-leaf
+        verible::common::text::concrete-syntax-tree
+        verible::common::text::symbol
+        verible::common::text::syntax-tree-context
+        verible::common::text::tree-utils
+        verible::common::util::casts
+        verible::verilog::CST::verilog-matchers
+        verible::verilog::CST::verilog-nonterminals
+        verible::verilog::analysis::descriptions
+        verible::verilog::analysis::lint-rule-registry
+        verible::verilog::parser::verilog-token-enum
+)
+
+cc_test(
+        NAME
+        "always-comb-blocking-rule_test"
+        SRCS
+        "always-comb-blocking-rule_test.cc"
+        DEPS
+        always-comb-blocking-rule
+        verible::common::analysis::linter-test-utils
+        verible::common::analysis::syntax-tree-linter-test-utils
+        verible::verilog::analysis::verilog-analyzer
+        verible::verilog::parser::verilog-token-enum
+        GTest::gtest
+        GTest::gtest_main
+)
+
+cc_library(
+        NAME
+        "always-ff-non-blocking-rule"
+        SRCS
+        "always-ff-non-blocking-rule.cc"
+        DEPS
+        verible::common::analysis::lint-rule-status
+        verible::common::analysis::syntax-tree-lint-rule
+        verible::common::analysis::syntax-tree-search
+        verible::common::analysis::matcher::bound-symbol-manager
+        verible::common::text::concrete-syntax-leaf
+        verible::common::text::concrete-syntax-tree
+        verible::common::text::config-utils
+        verible::common::text::symbol
+        verible::common::text::syntax-tree-context
+        verible::common::util::casts
+        verible::common::util::logging
+        verible::verilog::CST::verilog-matchers
+        verible::verilog::CST::verilog-nonterminals
+        verible::verilog::analysis::descriptions
+        verible::verilog::analysis::lint-rule-registry
+        absl::status
+)
+
+cc_test(
+        NAME
+        "always-ff-non-blocking-rule_test"
+        SRCS
+        "always-ff-non-blocking-rule_test.cc"
+        DEPS
+        always-ff-non-blocking-rule
+        verible::common::analysis::linter-test-utils
+        verible::common::analysis::syntax-tree-linter-test-utils
+        verible::verilog::analysis::verilog-analyzer
+        verible::verilog::parser::verilog-token-enum
+        GTest::gtest
+        GTest::gtest_main
+)
+
+cc_library(
+        NAME
+        "explicit-begin-rule"
+        SRCS
+        "explicit-begin-rule.cc"
+        DEPS
+        verible::common::analysis::lint-rule-status
+        verible::common::analysis::token-stream-lint-rule
+        verible::common::text::config-utils
+        verible::common::text::token-info
+        verible::verilog::analysis::descriptions
+        verible::verilog::analysis::lint-rule-registry
+        verible::verilog::parser::verilog-token-enum
+        absl::core_headers
+        absl::status
+        absl::strings
+)
+
+cc_test(
+        NAME
+        "explicit-begin-rule_test"
+        SRCS
+        "explicit-begin-rule_test.cc"
+        DEPS
+        explicit-begin-rule
+        verible::common::analysis::linter-test-utils
+        verible::common::analysis::token-stream-linter-test-utils
+        verible::verilog::analysis::verilog-analyzer
+        verible::verilog::parser::verilog-token-enum
+        GTest::gtest
+        GTest::gtest_main
+)
+
+cc_library(
+        NAME
+        "explicit-function-lifetime-rule"
+        SRCS
+        "explicit-function-lifetime-rule.cc"
+        DEPS
+        verible::common::analysis::lint-rule-status
+        verible::common::analysis::syntax-tree-lint-rule
+        verible::common::analysis::matcher::bound-symbol-manager
+        verible::common::text::symbol
+        verible::common::text::syntax-tree-context
+        verible::common::text::token-info
+        verible::common::text::tree-utils
+        verible::common::util::logging
+        verible::verilog::CST::context-functions
+        verible::verilog::CST::functions
+        verible::verilog::CST::identifier
+        verible::verilog::CST::verilog-matchers
+        verible::verilog::analysis::descriptions
+        verible::verilog::analysis::lint-rule-registry
+        verible::verilog::parser::verilog-token-enum
+)
+
+cc_test(
+        NAME
+        "explicit-function-lifetime-rule_test"
+        SRCS
+        "explicit-function-lifetime-rule_test.cc"
+        DEPS
+        explicit-function-lifetime-rule
+        verible::common::analysis::linter-test-utils
+        verible::common::analysis::syntax-tree-linter-test-utils
+        verible::verilog::analysis::verilog-analyzer
+        verible::verilog::parser::verilog-token-enum
+        GTest::gtest
+        GTest::gtest_main
+)
+
+cc_library(
+        NAME
+        "explicit-task-lifetime-rule"
+        SRCS
+        "explicit-task-lifetime-rule.cc"
+        DEPS
+        verible::common::analysis::lint-rule-status
+        verible::common::analysis::syntax-tree-lint-rule
+        verible::common::analysis::matcher::bound-symbol-manager
+        verible::common::text::symbol
+        verible::common::text::syntax-tree-context
+        verible::common::text::token-info
+        verible::common::text::tree-utils
+        verible::verilog::CST::context-functions
+        verible::verilog::CST::identifier
+        verible::verilog::CST::tasks
+        verible::verilog::CST::verilog-matchers
+        verible::verilog::analysis::descriptions
+        verible::verilog::analysis::lint-rule-registry
+        verible::verilog::parser::verilog-token-enum
+)
+
+cc_test(
+        NAME
+        "explicit-task-lifetime-rule_test"
+        SRCS
+        "explicit-task-lifetime-rule_test.cc"
+        DEPS
+        explicit-task-lifetime-rule
+        verible::common::analysis::linter-test-utils
+        verible::common::analysis::syntax-tree-linter-test-utils
+        verible::verilog::analysis::verilog-analyzer
+        verible::verilog::parser::verilog-token-enum
+        GTest::gtest
+        GTest::gtest_main
+)
+
+cc_library(
+        NAME
+        "packed-dimensions-rule"
+        SRCS
+        "packed-dimensions-rule.cc"
+        DEPS
+        verible::common::analysis::lint-rule-status
+        verible::common::analysis::syntax-tree-lint-rule
+        verible::common::analysis::matcher::bound-symbol-manager
+        verible::common::text::symbol
+        verible::common::text::syntax-tree-context
+        verible::common::text::token-info
+        verible::common::text::tree-utils
+        verible::common::util::logging
+        verible::verilog::CST::context-functions
+        verible::verilog::CST::dimensions
+        verible::verilog::CST::expression
+        verible::verilog::CST::verilog-matchers
+        verible::verilog::analysis::descriptions
+        verible::verilog::analysis::lint-rule-registry
+        verible::verilog::parser::verilog-token-enum
+)
+
+cc_test(
+        NAME
+        "packed-dimensions-rule_test"
+        SRCS
+        "packed-dimensions-rule_test.cc"
+        DEPS
+        packed-dimensions-rule
+        verible::common::analysis::linter-test-utils
+        verible::common::analysis::syntax-tree-linter-test-utils
+        verible::verilog::analysis::verilog-analyzer
+        verible::verilog::parser::verilog-token-enum
+        GTest::gtest
+        GTest::gtest_main
+)
+
+cc_library(
+        NAME
+        "unpacked-dimensions-rule"
+        SRCS
+        "unpacked-dimensions-rule.cc"
+        DEPS
+        verible::common::analysis::lint-rule-status
+        verible::common::analysis::syntax-tree-lint-rule
+        verible::common::analysis::matcher::bound-symbol-manager
+        verible::common::text::symbol
+        verible::common::text::syntax-tree-context
+        verible::common::text::token-info
+        verible::common::text::tree-utils
+        verible::common::util::logging
+        verible::verilog::CST::context-functions
+        verible::verilog::CST::dimensions
+        verible::verilog::CST::expression
+        verible::verilog::CST::verilog-matchers
+        verible::verilog::CST::verilog-nonterminals
+        verible::verilog::analysis::descriptions
+        verible::verilog::analysis::lint-rule-registry
+        verible::verilog::parser::verilog-token-enum
+)
+
+cc_test(
+        NAME
+        "unpacked-dimensions-rule_test"
+        SRCS
+        "unpacked-dimensions-rule_test.cc"
+        DEPS
+        unpacked-dimensions-rule
+        verible::common::analysis::linter-test-utils
+        verible::common::analysis::syntax-tree-linter-test-utils
+        verible::verilog::analysis::verilog-analyzer
+        verible::verilog::parser::verilog-token-enum
+        GTest::gtest
+        GTest::gtest_main
+)
+
+cc_library(
+        NAME
+        "forbid-negative-array-dim"
+        SRCS
+        "forbid-negative-array-dim.cc"
+        DEPS
+        verible::common::analysis::lint-rule-status
+        verible::common::analysis::syntax-tree-lint-rule
+        verible::common::analysis::matcher::bound-symbol-manager
+        verible::common::text::symbol
+        verible::common::text::syntax-tree-context
+        verible::common::text::token-info
+        verible::common::text::tree-utils
+        verible::verilog::CST::expression
+        verible::verilog::CST::verilog-matchers
+        verible::verilog::CST::verilog-nonterminals
+        verible::verilog::analysis::descriptions
+        verible::verilog::analysis::lint-rule-registry
+        verible::verilog::parser::verilog-token-enum
+)
+
+cc_test(
+        NAME
+        "forbid-negative-array-dim_test"
+        SRCS
+        "forbid-negative-array-dim_test.cc"
+        DEPS
+        forbid-negative-array-dim
+        verible::common::analysis::linter-test-utils
+        verible::common::analysis::syntax-tree-linter-test-utils
+        verible::verilog::analysis::verilog-analyzer
+        verible::verilog::parser::verilog-token-enum
+        GTest::gtest
+        GTest::gtest_main
+)
+
+cc_library(
+        NAME
+        "case-missing-default-rule"
+        SRCS
+        "case-missing-default-rule.cc"
+        DEPS
+        verible::common::analysis::lint-rule-status
+        verible::common::analysis::syntax-tree-lint-rule
+        verible::common::analysis::matcher::bound-symbol-manager
+        verible::common::analysis::matcher::matcher-builders
+        verible::common::text::concrete-syntax-tree
+        verible::common::text::symbol
+        verible::common::text::syntax-tree-context
+        verible::common::text::tree-utils
+        verible::verilog::CST::verilog-matchers
+        verible::verilog::CST::verilog-nonterminals
+        verible::verilog::analysis::descriptions
+        verible::verilog::analysis::lint-rule-registry
+)
+
+cc_test(
+        NAME
+        "case-missing-default-rule_test"
+        SRCS
+        "case-missing-default-rule_test.cc"
+        DEPS
+        case-missing-default-rule
+        verible::common::analysis::linter-test-utils
+        verible::common::analysis::syntax-tree-linter-test-utils
+        verible::verilog::analysis::verilog-analyzer
+        verible::verilog::parser::verilog-token-enum
+        GTest::gtest
+        GTest::gtest_main
+)
+
+cc_library(
+        NAME
+        "constraint-name-style-rule"
+        SRCS
+        "constraint-name-style-rule.cc"
+        DEPS
+        verible::common::analysis::lint-rule-status
+        verible::common::analysis::syntax-tree-lint-rule
+        verible::common::analysis::matcher::bound-symbol-manager
+        verible::common::text::config-utils
+        verible::common::text::symbol
+        verible::common::text::syntax-tree-context
+        verible::common::text::token-info
+        verible::verilog::CST::constraints
+        verible::verilog::CST::verilog-matchers
+        verible::verilog::analysis::descriptions
+        verible::verilog::analysis::lint-rule-registry
+        absl::status
+        absl::strings
+        re2::re2
+)
+
+cc_test(
+        NAME
+        "constraint-name-style-rule_test"
+        SRCS
+        "constraint-name-style-rule_test.cc"
+        DEPS
+        constraint-name-style-rule
+        verible::common::analysis::linter-test-utils
+        verible::common::analysis::syntax-tree-linter-test-utils
+        verible::verilog::analysis::verilog-analyzer
+        verible::verilog::parser::verilog-token-enum
+        GTest::gtest
+        GTest::gtest_main
+)
+
+cc_library(
+        NAME
+        "disable-statement-rule"
+        SRCS
+        "disable-statement-rule.cc"
+        DEPS
+        verible::common::analysis::lint-rule-status
+        verible::common::analysis::syntax-tree-lint-rule
+        verible::common::analysis::matcher::bound-symbol-manager
+        verible::common::text::symbol
+        verible::common::text::syntax-tree-context
+        verible::common::text::tree-utils
+        verible::common::util::iterator-adaptors
+        verible::verilog::CST::identifier
+        verible::verilog::CST::verilog-matchers
+        verible::verilog::CST::verilog-nonterminals
+        verible::verilog::analysis::descriptions
+        verible::verilog::analysis::lint-rule-registry
+)
+
+cc_test(
+        NAME
+        "disable-statement-rule_test"
+        SRCS
+        "disable-statement-rule_test.cc"
+        DEPS
+        disable-statement-rule
+        verible::common::analysis::linter-test-utils
+        verible::common::analysis::syntax-tree-linter-test-utils
+        verible::verilog::analysis::verilog-analyzer
+        verible::verilog::parser::verilog-token-enum
+        GTest::gtest
+        GTest::gtest_main
+)
+
+cc_library(
+        NAME
+        "macro-name-style-rule"
+        SRCS
+        "macro-name-style-rule.cc"
+        DEPS
+        verible::common::analysis::lint-rule-status
+        verible::common::analysis::token-stream-lint-rule
+        verible::common::text::config-utils
+        verible::common::text::token-info
+        verible::verilog::analysis::descriptions
+        verible::verilog::analysis::lint-rule-registry
+        verible::verilog::parser::verilog-lexer
+        verible::verilog::parser::verilog-token-classifications
+        verible::verilog::parser::verilog-token-enum
+        absl::status
+        absl::strings
+        re2::re2
+)
+
+cc_test(
+        NAME
+        "macro-name-style-rule_test"
+        SRCS
+        "macro-name-style-rule_test.cc"
+        DEPS
+        macro-name-style-rule
+        verible::common::analysis::linter-test-utils
+        verible::common::analysis::token-stream-linter-test-utils
+        verible::verilog::analysis::verilog-analyzer
+        verible::verilog::parser::verilog-token-enum
+        GTest::gtest
+        GTest::gtest_main
+)
+
+cc_library(
+        NAME
+        "macro-string-concatenation-rule"
+        SRCS
+        "macro-string-concatenation-rule.cc"
+        DEPS
+        verible::common::analysis::lint-rule-status
+        verible::common::analysis::token-stream-lint-rule
+        verible::common::text::token-info
+        verible::common::util::value-saver
+        verible::verilog::analysis::descriptions
+        verible::verilog::analysis::lint-rule-registry
+        verible::verilog::parser::verilog-lexer
+        verible::verilog::parser::verilog-token-classifications
+        verible::verilog::parser::verilog-token-enum
+)
+
+cc_test(
+        NAME
+        "macro-string-concatenation-rule_test"
+        SRCS
+        "macro-string-concatenation-rule_test.cc"
+        DEPS
+        macro-string-concatenation-rule
+        verible::common::analysis::linter-test-utils
+        verible::common::analysis::token-stream-linter-test-utils
+        verible::verilog::analysis::verilog-analyzer
+        verible::verilog::parser::verilog-token-enum
+        GTest::gtest
+        GTest::gtest_main
+)
+
+cc_library(
+        NAME
+        "numeric-format-string-style-rule"
+        SRCS
+        "numeric-format-string-style-rule.cc"
+        DEPS
+        verible::common::analysis::lint-rule-status
+        verible::common::analysis::token-stream-lint-rule
+        verible::common::text::token-info
+        verible::verilog::analysis::descriptions
+        verible::verilog::analysis::lint-rule-registry
+        verible::verilog::parser::verilog-lexer
+        verible::verilog::parser::verilog-token-classifications
+        verible::verilog::parser::verilog-token-enum
+        absl::strings
+)
+
+cc_test(
+        NAME
+        "numeric-format-string-style-rule_test"
+        SRCS
+        "numeric-format-string-style-rule_test.cc"
+        DEPS
+        numeric-format-string-style-rule
+        verible::common::analysis::linter-test-utils
+        verible::common::analysis::token-stream-linter-test-utils
+        verible::verilog::analysis::verilog-analyzer
+        verible::verilog::parser::verilog-token-enum
+        GTest::gtest
+        GTest::gtest_main
+)
+
+cc_library(
+        NAME
+        "parameter-name-style-rule"
+        SRCS
+        "parameter-name-style-rule.cc"
+        DEPS
+        verible::common::analysis::lint-rule-status
+        verible::common::analysis::syntax-tree-lint-rule
+        verible::common::analysis::matcher::bound-symbol-manager
+        verible::common::text::config-utils
+        verible::common::text::symbol
+        verible::common::text::syntax-tree-context
+        verible::common::text::token-info
+        verible::verilog::CST::parameters
+        verible::verilog::CST::verilog-matchers
+        verible::verilog::analysis::descriptions
+        verible::verilog::analysis::lint-rule-registry
+        verible::verilog::parser::verilog-token-enum
+        absl::status
+        absl::strings
+        re2::re2
+)
+
+cc_test(
+        NAME
+        "parameter-name-style-rule_test"
+        SRCS
+        "parameter-name-style-rule_test.cc"
+        DEPS
+        parameter-name-style-rule
+        verible::common::analysis::linter-test-utils
+        verible::common::analysis::syntax-tree-linter-test-utils
+        verible::verilog::analysis::verilog-analyzer
+        verible::verilog::parser::verilog-token-enum
+        absl::status
+        absl::strings
+        GTest::gtest
+        GTest::gtest_main
+)
+
+cc_library(
+        NAME
+        "parameter-type-name-style-rule"
+        SRCS
+        "parameter-type-name-style-rule.cc"
+        DEPS
+        verible::common::analysis::lint-rule-status
+        verible::common::analysis::syntax-tree-lint-rule
+        verible::common::analysis::matcher::bound-symbol-manager
+        verible::common::strings::naming-utils
+        verible::common::text::symbol
+        verible::common::text::syntax-tree-context
+        verible::common::text::token-info
+        verible::verilog::CST::parameters
+        verible::verilog::CST::verilog-matchers
+        verible::verilog::analysis::descriptions
+        verible::verilog::analysis::lint-rule-registry
+        absl::strings
+)
+
+cc_test(
+        NAME
+        "parameter-type-name-style-rule_test"
+        SRCS
+        "parameter-type-name-style-rule_test.cc"
+        DEPS
+        parameter-type-name-style-rule
+        verible::common::analysis::linter-test-utils
+        verible::common::analysis::syntax-tree-linter-test-utils
+        verible::verilog::analysis::verilog-analyzer
+        verible::verilog::parser::verilog-token-enum
+        GTest::gtest
+        GTest::gtest_main
+)
+
+cc_library(
+        NAME
+        "proper-parameter-declaration-rule"
+        SRCS
+        "proper-parameter-declaration-rule.cc"
+        DEPS
+        verible::common::analysis::lint-rule-status
+        verible::common::analysis::syntax-tree-lint-rule
+        verible::common::analysis::matcher::bound-symbol-manager
+        verible::common::text::config-utils
+        verible::common::text::symbol
+        verible::common::text::syntax-tree-context
+        verible::common::text::token-info
+        verible::verilog::CST::context-functions
+        verible::verilog::CST::parameters
+        verible::verilog::CST::verilog-matchers
+        verible::verilog::analysis::descriptions
+        verible::verilog::analysis::lint-rule-registry
+        verible::verilog::parser::verilog-token-enum
+        absl::status
+)
+
+cc_test(
+        NAME
+        "proper-parameter-declaration-rule_test"
+        SRCS
+        "proper-parameter-declaration-rule_test.cc"
+        DEPS
+        proper-parameter-declaration-rule
+        verible::common::analysis::linter-test-utils
+        verible::common::analysis::syntax-tree-linter-test-utils
+        verible::verilog::analysis::verilog-analyzer
+        verible::verilog::parser::verilog-token-enum
+        GTest::gtest
+        GTest::gtest_main
+)
+
+cc_library(
+        NAME
+        "plusarg-assignment-rule"
+        SRCS
+        "plusarg-assignment-rule.cc"
+        DEPS
+        verible::common::analysis::lint-rule-status
+        verible::common::analysis::syntax-tree-lint-rule
+        verible::common::analysis::matcher::bound-symbol-manager
+        verible::common::text::concrete-syntax-leaf
+        verible::common::text::symbol
+        verible::common::text::syntax-tree-context
+        verible::common::text::token-info
+        verible::verilog::CST::verilog-matchers
+        verible::verilog::analysis::descriptions
+        verible::verilog::analysis::lint-rule-registry
+        absl::strings
+)
+
+cc_test(
+        NAME
+        "plusarg-assignment-rule_test"
+        SRCS
+        "plusarg-assignment-rule_test.cc"
+        DEPS
+        plusarg-assignment-rule
+        verible::common::analysis::linter-test-utils
+        verible::common::analysis::syntax-tree-linter-test-utils
+        verible::verilog::analysis::verilog-analyzer
+        verible::verilog::parser::verilog-token-enum
+        GTest::gtest
+        GTest::gtest_main
+)
+
+cc_library(
+        NAME
+        "port-name-suffix-rule"
+        SRCS
+        "port-name-suffix-rule.cc"
+        DEPS
+        verible::common::analysis::lint-rule-status
+        verible::common::analysis::syntax-tree-lint-rule
+        verible::common::analysis::matcher::bound-symbol-manager
+        verible::common::text::symbol
+        verible::common::text::syntax-tree-context
+        verible::common::text::token-info
+        verible::common::util::logging
+        verible::verilog::CST::port
+        verible::verilog::CST::verilog-matchers
+        verible::verilog::analysis::descriptions
+        verible::verilog::analysis::lint-rule-registry
+        absl::strings
+)
+
+cc_test(
+        NAME
+        "port-name-suffix-rule_test"
+        SRCS
+        "port-name-suffix-rule_test.cc"
+        DEPS
+        port-name-suffix-rule
+        verible::common::analysis::linter-test-utils
+        verible::common::analysis::syntax-tree-linter-test-utils
+        verible::verilog::analysis::verilog-analyzer
+        verible::verilog::parser::verilog-token-enum
+        GTest::gtest
+        GTest::gtest_main
+)
+
+cc_library(
+        NAME
+        "explicit-parameter-storage-type-rule"
+        SRCS
+        "explicit-parameter-storage-type-rule.cc"
+        DEPS
+        verible::common::analysis::lint-rule-status
+        verible::common::analysis::syntax-tree-lint-rule
+        verible::common::analysis::matcher::bound-symbol-manager
+        verible::common::text::config-utils
+        verible::common::text::symbol
+        verible::common::text::syntax-tree-context
+        verible::common::text::token-info
+        verible::common::text::tree-utils
+        verible::common::util::logging
+        verible::verilog::CST::parameters
+        verible::verilog::CST::verilog-matchers
+        verible::verilog::analysis::descriptions
+        verible::verilog::analysis::lint-rule-registry
+        verible::verilog::parser::verilog-token-enum
+        absl::status
+        absl::strings
+)
+
+cc_test(
+        NAME
+        "explicit-parameter-storage-type-rule_test"
+        SRCS
+        "explicit-parameter-storage-type-rule_test.cc"
+        DEPS
+        explicit-parameter-storage-type-rule
+        verible::common::analysis::linter-test-utils
+        verible::common::analysis::syntax-tree-linter-test-utils
+        verible::verilog::analysis::verilog-analyzer
+        verible::verilog::parser::verilog-token-enum
+        absl::status
+        absl::strings
+        GTest::gtest
+        GTest::gtest_main
+)
+
+cc_library(
+        NAME
+        "explicit-function-task-parameter-type-rule"
+        SRCS
+        "explicit-function-task-parameter-type-rule.cc"
+        DEPS
+        verible::common::analysis::lint-rule-status
+        verible::common::analysis::syntax-tree-lint-rule
+        verible::common::analysis::matcher::bound-symbol-manager
+        verible::common::text::symbol
+        verible::common::text::syntax-tree-context
+        verible::common::util::logging
+        verible::verilog::CST::port
+        verible::verilog::CST::type
+        verible::verilog::CST::verilog-matchers
+        verible::verilog::analysis::descriptions
+        verible::verilog::analysis::lint-rule-registry
+)
+
+cc_test(
+        NAME
+        "explicit-function-task-parameter-type-rule_test"
+        SRCS
+        "explicit-function-task-parameter-type-rule_test.cc"
+        DEPS
+        explicit-function-task-parameter-type-rule
+        verible::common::analysis::linter-test-utils
+        verible::common::analysis::syntax-tree-linter-test-utils
+        verible::verilog::analysis::verilog-analyzer
+        verible::verilog::parser::verilog-token-enum
+        GTest::gtest
+        GTest::gtest_main
+)
+
+cc_library(
+        NAME
+        "signal-name-style-rule"
+        SRCS
+        "signal-name-style-rule.cc"
+        DEPS
+        verible::common::analysis::lint-rule-status
+        verible::common::analysis::syntax-tree-lint-rule
+        verible::common::analysis::matcher::bound-symbol-manager
+        verible::common::text::concrete-syntax-leaf
+        verible::common::text::config-utils
+        verible::common::text::symbol
+        verible::common::text::syntax-tree-context
+        verible::common::text::token-info
+        verible::common::util::logging
+        verible::verilog::CST::data
+        verible::verilog::CST::net
+        verible::verilog::CST::port
+        verible::verilog::CST::verilog-matchers
+        verible::verilog::analysis::descriptions
+        verible::verilog::analysis::lint-rule-registry
+        absl::status
+        absl::strings
+        re2::re2
+)
+
+cc_test(
+        NAME
+        "signal-name-style-rule_test"
+        SRCS
+        "signal-name-style-rule_test.cc"
+        DEPS
+        signal-name-style-rule
+        verible::common::analysis::linter-test-utils
+        verible::common::analysis::syntax-tree-linter-test-utils
+        verible::verilog::analysis::verilog-analyzer
+        verible::verilog::parser::verilog-token-enum
+        GTest::gtest
+        GTest::gtest_main
+)
+
+cc_library(
+        NAME
+        "struct-union-name-style-rule"
+        SRCS
+        "struct-union-name-style-rule.cc"
+        DEPS
+        verible::common::analysis::lint-rule-status
+        verible::common::analysis::syntax-tree-lint-rule
+        verible::common::analysis::matcher::bound-symbol-manager
+        verible::common::text::config-utils
+        verible::common::text::symbol
+        verible::common::text::syntax-tree-context
+        verible::common::util::logging
+        verible::verilog::CST::type
+        verible::verilog::CST::verilog-matchers
+        verible::verilog::analysis::descriptions
+        verible::verilog::analysis::lint-rule-registry
+        absl::status
+        absl::strings
+)
+
+cc_test(
+        NAME
+        "struct-union-name-style-rule_test"
+        SRCS
+        "struct-union-name-style-rule_test.cc"
+        DEPS
+        struct-union-name-style-rule
+        verible::common::analysis::linter-test-utils
+        verible::common::analysis::syntax-tree-linter-test-utils
+        verible::verilog::analysis::verilog-analyzer
+        verible::verilog::parser::verilog-token-enum
+        absl::status
+        absl::strings
+        GTest::gtest
+        GTest::gtest_main
+)
+
+cc_library(
+        NAME
+        "interface-name-style-rule"
+        SRCS
+        "interface-name-style-rule.cc"
+        DEPS
+        verible::common::analysis::lint-rule-status
+        verible::common::analysis::syntax-tree-lint-rule
+        verible::common::analysis::matcher::bound-symbol-manager
+        verible::common::text::config-utils
+        verible::common::text::symbol
+        verible::common::text::syntax-tree-context
+        verible::common::text::token-info
+        verible::verilog::CST::module
+        verible::verilog::CST::type
+        verible::verilog::CST::verilog-matchers
+        verible::verilog::analysis::descriptions
+        verible::verilog::analysis::lint-rule-registry
+        absl::status
+        absl::strings
+        re2::re2
+)
+
+cc_test(
+        NAME
+        "interface-name-style-rule_test"
+        SRCS
+        "interface-name-style-rule_test.cc"
+        DEPS
+        interface-name-style-rule
+        verible::common::analysis::linter-test-utils
+        verible::common::analysis::syntax-tree-linter-test-utils
+        verible::verilog::analysis::verilog-analyzer
+        verible::verilog::parser::verilog-token-enum
+        GTest::gtest
+        GTest::gtest_main
+)
+
+cc_library(
+        NAME
+        "instance-shadow-rule"
+        SRCS
+        "instance-shadow-rule.cc"
+        DEPS
+        verible::common::analysis::citation
+        verible::common::analysis::lint-rule-status
+        verible::common::analysis::syntax-tree-lint-rule
+        verible::common::analysis::syntax-tree-search
+        verible::common::analysis::matcher::bound-symbol-manager
+        verible::common::text::symbol
+        verible::common::text::syntax-tree-context
+        verible::common::text::tree-utils
+        verible::common::util::iterator-adaptors
+        verible::verilog::CST::identifier
+        verible::verilog::CST::verilog-matchers
+        verible::verilog::CST::verilog-nonterminals
+        verible::verilog::analysis::descriptions
+        verible::verilog::analysis::lint-rule-registry
+)
+
+cc_test(
+        NAME
+        "instance-shadow-rule-test"
+        SRCS
+        "instance-shadow-rule_test.cc"
+        DEPS
+        instance-shadow-rule
+        verible::common::analysis::linter-test-utils
+        verible::common::analysis::syntax-tree-linter
+        verible::common::analysis::syntax-tree-linter-test-utils
+        verible::common::util::logging
+        verible::verilog::analysis::verilog-analyzer
+        verible::verilog::parser::verilog-token-enum
+        absl::status
+        GTest::gtest
+        GTest::gtest_main
+)
+
+cc_library(
+        NAME
+        "legacy-genvar-declaration-rule"
+        SRCS
+        "legacy-genvar-declaration-rule.cc"
+        DEPS
+        verible::common::analysis::lint-rule-status
+        verible::common::analysis::syntax-tree-lint-rule
+        verible::common::text::concrete-syntax-tree
+        verible::common::text::symbol
+        verible::common::text::syntax-tree-context
+        verible::common::text::tree-utils
+        verible::verilog::CST::identifier
+        verible::verilog::CST::verilog-nonterminals
+        verible::verilog::analysis::descriptions
+        verible::verilog::analysis::lint-rule-registry
+)
+
+cc_test(
+        NAME
+        "legacy-genvar-declaration-rule_test"
+        SRCS
+        "legacy-genvar-declaration-rule_test.cc"
+        DEPS
+        legacy-genvar-declaration-rule
+        verible::common::analysis::linter-test-utils
+        verible::common::analysis::syntax-tree-linter-test-utils
+        verible::verilog::analysis::verilog-analyzer
+        verible::verilog::parser::verilog-token-enum
+        GTest::gtest
+        GTest::gtest_main
+)
+
+cc_library(
+        NAME
+        "legacy-generate-region-rule"
+        SRCS
+        "legacy-generate-region-rule.cc"
+        DEPS
+        verible::common::analysis::lint-rule-status
+        verible::common::analysis::syntax-tree-lint-rule
+        verible::common::analysis::matcher::matcher-builders
+        verible::common::text::concrete-syntax-tree
+        verible::common::text::symbol
+        verible::common::text::syntax-tree-context
+        verible::common::text::tree-utils
+        verible::common::util::logging
+        verible::verilog::CST::verilog-nonterminals
+        verible::verilog::analysis::descriptions
+        verible::verilog::analysis::lint-rule-registry
+        verible::verilog::parser::verilog-token-enum
+)
+
+cc_test(
+        NAME
+        "legacy-generate-region-rule_test"
+        SRCS
+        "legacy-generate-region-rule_test.cc"
+        DEPS
+        legacy-generate-region-rule
+        verible::common::analysis::linter-test-utils
+        verible::common::analysis::syntax-tree-linter-test-utils
+        verible::verilog::analysis::verilog-analyzer
+        verible::verilog::parser::verilog-token-enum
+        GTest::gtest
+        GTest::gtest_main
+)
+
+cc_library(
+        NAME
+        "uvm-macro-semicolon-rule"
+        SRCS
+        "uvm-macro-semicolon-rule.cc"
+        DEPS
+        verible::common::analysis::lint-rule-status
+        verible::common::analysis::syntax-tree-lint-rule
+        verible::common::text::concrete-syntax-leaf
+        verible::common::text::symbol
+        verible::common::text::syntax-tree-context
+        verible::common::text::token-info
+        verible::verilog::CST::context-functions
+        verible::verilog::CST::macro
+        verible::verilog::CST::verilog-nonterminals
+        verible::verilog::analysis::descriptions
+        verible::verilog::analysis::lint-rule-registry
+        verible::verilog::parser::verilog-token-enum
+        absl::strings
+)
+
+cc_test(
+        NAME
+        "uvm-macro-semicolon-rule_test"
+        SRCS
+        "uvm-macro-semicolon-rule_test.cc"
+        DEPS
+        uvm-macro-semicolon-rule
+        verible::common::analysis::linter-test-utils
+        verible::common::analysis::syntax-tree-linter-test-utils
+        verible::verilog::analysis::verilog-analyzer
+        GTest::gtest
+        GTest::gtest_main
+)
+
+cc_library(
+        NAME
+        "suspicious-semicolon-rule"
+        SRCS
+        "suspicious-semicolon-rule.cc"
+        DEPS
+        verible::common::analysis::lint-rule-status
+        verible::common::analysis::syntax-tree-lint-rule
+        verible::common::analysis::matcher::bound-symbol-manager
+        verible::common::text::concrete-syntax-tree
+        verible::common::text::syntax-tree-context
+        verible::common::text::tree-utils
+        verible::verilog::CST::verilog-matchers
+        verible::verilog::CST::verilog-nonterminals
+        verible::verilog::analysis::descriptions
+        verible::verilog::analysis::lint-rule-registry
+)
+
+cc_test(
+        NAME
+        "suspicious-semicolon-rule_test"
+        SRCS
+        "suspicious-semicolon-rule_test.cc"
+        DEPS
+        suspicious-semicolon-rule
+        verible::common::analysis::linter-test-utils
+        verible::common::analysis::syntax-tree-linter-test-utils
+        verible::verilog::analysis::verilog-analyzer
+        GTest::gtest
+        GTest::gtest_main
+)
+
+cc_library(
+        NAME
+        "dff-name-style-rule"
+        SRCS
+        "dff-name-style-rule.cc"
+        DEPS
+        verible::common::analysis::lint-rule-status
+        verible::common::analysis::syntax-tree-lint-rule
+        verible::common::analysis::matcher::bound-symbol-manager
+        verible::common::analysis::matcher::core-matchers
+        verible::common::text::concrete-syntax-leaf
+        verible::common::text::concrete-syntax-tree
+        verible::common::text::config-utils
+        verible::common::text::symbol
+        verible::common::text::syntax-tree-context
+        verible::common::text::token-info
+        verible::common::text::tree-utils
+        verible::verilog::CST::expression
+        verible::verilog::CST::statement
+        verible::verilog::CST::verilog-matchers
+        verible::verilog::CST::verilog-nonterminals
+        verible::verilog::analysis::descriptions
+        verible::verilog::analysis::lint-rule-registry
+        verible::verilog::parser::verilog-token-enum
+        absl::status
+        absl::strings
+        re2::re2
+)
+
+cc_test(
+        NAME
+        "dff-name-style-rule_test"
+        SRCS
+        "dff-name-style-rule_test.cc"
+        DEPS
+        dff-name-style-rule
+        verible::common::analysis::linter-test-utils
+        verible::common::analysis::syntax-tree-linter-test-utils
+        verible::verilog::analysis::verilog-analyzer
+        verible::verilog::parser::verilog-token-enum
+        absl::check
+        GTest::gtest
+        GTest::gtest_main
+)

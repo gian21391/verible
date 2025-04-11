@@ -179,9 +179,9 @@ TEST(InstanceShadowingTest, CorrectLocationTest) {
     CHECK_EQ(linter_.ReportStatus()[0].violations.size(), 1);
 
     // Report detailed differences, if any.
-    const std::string_view base_text = analyzer.Data().Contents();
-    std::string_view foo = test.FindImportantTokens(base_text)[0].text();
-    std::string_view bar =
+    const verible::document_view base_text = analyzer.Data().Contents();
+    verible::document_view foo = test.FindImportantTokens(base_text)[0].text();
+    verible::document_view bar =
         linter_.ReportStatus()[0].violations.begin()->token.text();
     ASSERT_TRUE(foo == bar);
   }
