@@ -20,7 +20,7 @@
 #include "absl/strings/str_cat.h"
 
 namespace verible {
-std::string GetStyleGuideCitation(document_view topic) {
+std::string GetStyleGuideCitation(std::string_view topic) {
   return absl::StrCat("[Style: ", topic, "]");
 }
 }  // namespace verible
