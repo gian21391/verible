@@ -1,7 +1,7 @@
 function(cc_library)
     set(options OPTIONAL)
     set(oneValueArgs NAME)
-    set(multiValueArgs SRCS HDRS DEPS DEFINES)
+    set(multiValueArgs SRCS INTERFACE_SRCS HDRS DEPS DEFINES)
     cmake_parse_arguments(PARSE_ARGV 0 arg
             "${options}" "${oneValueArgs}" "${multiValueArgs}"
     )
@@ -28,6 +28,7 @@ function(cc_library)
     target_compile_definitions(${target} ${target_options_visibility} "${arg_DEFINES}")
     target_link_libraries(${target} ${target_visibility} ${arg_DEPS})
     target_compile_features(${target} ${target_options_visibility} cxx_std_17)
+    target_sources(${target} ${target_visibility} ${arg_INTERFACE_SRCS})
 endfunction()
 
 function(cc_test)

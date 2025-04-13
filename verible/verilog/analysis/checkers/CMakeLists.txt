@@ -67,7 +67,7 @@ cc_library(
 cc_library(
         NAME
         "banned-declared-name-patterns-rule"
-        SRCS
+        INTERFACE_SRCS
         "banned-declared-name-patterns-rule.cc"
         DEPS
         verible::common::analysis::lint-rule-status
@@ -103,7 +103,7 @@ cc_test(
 cc_library(
         NAME
         "no-tabs-rule"
-        SRCS
+        INTERFACE_SRCS
         "no-tabs-rule.cc"
         DEPS
         verible::common::analysis::line-lint-rule
@@ -132,7 +132,7 @@ cc_test(
 cc_library(
         NAME
         "no-trailing-spaces-rule"
-        SRCS
+        INTERFACE_SRCS
         "no-trailing-spaces-rule.cc"
         DEPS
         verible::common::analysis::line-lint-rule
@@ -162,7 +162,7 @@ cc_test(
 cc_library(
         NAME
         "positive-meaning-parameter-name-rule"
-        SRCS
+        INTERFACE_SRCS
         "positive-meaning-parameter-name-rule.cc"
         DEPS
         verible::common::analysis::lint-rule-status
@@ -196,7 +196,7 @@ cc_test(
 cc_library(
         NAME
         "posix-eof-rule"
-        SRCS
+        INTERFACE_SRCS
         "posix-eof-rule.cc"
         DEPS
         verible::common::analysis::lint-rule-status
@@ -226,7 +226,7 @@ cc_test(
 cc_library(
         NAME
         "line-length-rule"
-        SRCS
+        INTERFACE_SRCS
         "line-length-rule.cc"
         DEPS
         verible::common::analysis::lint-rule-status
@@ -269,7 +269,7 @@ cc_test(
 cc_library(
         NAME
         "forbid-consecutive-null-statements-rule"
-        SRCS
+        INTERFACE_SRCS
         "forbid-consecutive-null-statements-rule.cc"
         DEPS
         verible::common::analysis::lint-rule-status
@@ -300,7 +300,7 @@ cc_test(
 cc_library(
         NAME
         "forbid-defparam-rule"
-        SRCS
+        INTERFACE_SRCS
         "forbid-defparam-rule.cc"
         DEPS
         verible::common::analysis::lint-rule-status
@@ -336,7 +336,7 @@ cc_test(
 cc_library(
         NAME
         "mismatched-labels-rule"
-        SRCS
+        INTERFACE_SRCS
         "mismatched-labels-rule.cc"
         DEPS
         verible::common::analysis::lint-rule-status
@@ -369,7 +369,7 @@ cc_test(
 cc_library(
         NAME
         "module-begin-block-rule"
-        SRCS
+        INTERFACE_SRCS
         "module-begin-block-rule.cc"
         DEPS
         verible::common::analysis::lint-rule-status
@@ -400,7 +400,7 @@ cc_test(
 cc_library(
         NAME
         "module-filename-rule"
-        SRCS
+        INTERFACE_SRCS
         "module-filename-rule.cc"
         DEPS
         verible::common::analysis::lint-rule-status
@@ -439,7 +439,7 @@ cc_test(
 cc_library(
         NAME
         "package-filename-rule"
-        SRCS
+        INTERFACE_SRCS
         "package-filename-rule.cc"
         DEPS
         verible::common::analysis::lint-rule-status
@@ -474,7 +474,7 @@ cc_test(
 cc_library(
         NAME
         "module-instantiation-rules"
-        SRCS
+        INTERFACE_SRCS
         "module-instantiation-rules.cc"
         DEPS
         verible::common::analysis::lint-rule-status
@@ -513,7 +513,7 @@ cc_test(
 cc_library(
         NAME
         "one-module-per-file-rule"
-        SRCS
+        INTERFACE_SRCS
         "one-module-per-file-rule.cc"
         DEPS
         verible::common::analysis::lint-rule-status
@@ -546,7 +546,7 @@ cc_test(
 cc_library(
         NAME
         "endif-comment-rule"
-        SRCS
+        INTERFACE_SRCS
         "endif-comment-rule.cc"
         DEPS
         verible::common::analysis::lint-rule-status
@@ -577,7 +577,7 @@ cc_test(
 cc_library(
         NAME
         "forbidden-anonymous-enums-rule"
-        SRCS
+        INTERFACE_SRCS
         "forbidden-anonymous-enums-rule.cc"
         DEPS
         verible::common::analysis::lint-rule-status
@@ -609,7 +609,7 @@ cc_test(
 cc_library(
         NAME
         "enum-name-style-rule"
-        SRCS
+        INTERFACE_SRCS
         "enum-name-style-rule.cc"
         DEPS
         verible::common::analysis::lint-rule-status
@@ -646,7 +646,7 @@ cc_test(
 cc_library(
         NAME
         "forbidden-macro-rule"
-        SRCS
+        INTERFACE_SRCS
         "forbidden-macro-rule.cc"
         DEPS
         verible::common::analysis::citation
@@ -666,7 +666,7 @@ cc_library(
 cc_library(
         NAME
         "forbidden-anonymous-structs-unions-rule"
-        SRCS
+        INTERFACE_SRCS
         "forbidden-anonymous-structs-unions-rule.cc"
         DEPS
         verible::common::analysis::lint-rule-status
@@ -717,7 +717,7 @@ cc_test(
 cc_library(
         NAME
         "forbidden-symbol-rule"
-        SRCS
+        INTERFACE_SRCS
         "forbidden-symbol-rule.cc"
         DEPS
         verible::common::analysis::lint-rule-status
@@ -751,7 +751,7 @@ cc_test(
 cc_library(
         NAME
         "generate-label-rule"
-        SRCS
+        INTERFACE_SRCS
         "generate-label-rule.cc"
         DEPS
         verible::common::analysis::lint-rule-status
@@ -783,7 +783,7 @@ cc_test(
 cc_library(
         NAME
         "generate-label-prefix-rule"
-        SRCS
+        INTERFACE_SRCS
         "generate-label-prefix-rule.cc"
         DEPS
         verible::common::analysis::lint-rule-status
@@ -819,7 +819,7 @@ cc_test(
 cc_library(
         NAME
         "v2001-generate-begin-rule"
-        SRCS
+        INTERFACE_SRCS
         "v2001-generate-begin-rule.cc"
         DEPS
         verible::common::analysis::lint-rule-status
@@ -854,7 +854,7 @@ cc_test(
 cc_library(
         NAME
         "void-cast-rule"
-        SRCS
+        INTERFACE_SRCS
         "void-cast-rule.cc"
         DEPS
         verible::common::analysis::lint-rule-status
@@ -891,7 +891,7 @@ cc_test(
 cc_library(
         NAME
         "undersized-binary-literal-rule"
-        SRCS
+        INTERFACE_SRCS
         "undersized-binary-literal-rule.cc"
         DEPS
         verible::common::analysis::lint-rule-status
@@ -931,7 +931,7 @@ cc_test(
 cc_library(
         NAME
         "truncated-numeric-literal-rule"
-        SRCS
+        INTERFACE_SRCS
         "truncated-numeric-literal-rule.cc"
         DEPS
         verible::common::analysis::lint-rule-status
@@ -969,7 +969,7 @@ cc_test(
 cc_library(
         NAME
         "create-object-name-match-rule"
-        SRCS
+        INTERFACE_SRCS
         "create-object-name-match-rule.cc"
         DEPS
         verible::common::analysis::lint-rule-status
@@ -1008,7 +1008,7 @@ cc_test(
 cc_library(
         NAME
         "always-comb-rule"
-        SRCS
+        INTERFACE_SRCS
         "always-comb-rule.cc"
         DEPS
         verible::common::analysis::lint-rule-status
@@ -1043,7 +1043,7 @@ cc_test(
 cc_library(
         NAME
         "forbid-line-continuations-rule"
-        SRCS
+        INTERFACE_SRCS
         "forbid-line-continuations-rule.cc"
         DEPS
         verible::common::analysis::lint-rule-status
@@ -1077,7 +1077,7 @@ cc_test(
 cc_library(
         NAME
         "suggest-parentheses-rule"
-        SRCS
+        INTERFACE_SRCS
         "suggest-parentheses-rule.cc"
         DEPS
         verible::common::analysis::lint-rule-status
@@ -1111,7 +1111,7 @@ cc_test(
 cc_library(
         NAME
         "always-comb-blocking-rule"
-        SRCS
+        INTERFACE_SRCS
         "always-comb-blocking-rule.cc"
         DEPS
         verible::common::analysis::lint-rule-status
@@ -1149,7 +1149,7 @@ cc_test(
 cc_library(
         NAME
         "always-ff-non-blocking-rule"
-        SRCS
+        INTERFACE_SRCS
         "always-ff-non-blocking-rule.cc"
         DEPS
         verible::common::analysis::lint-rule-status
@@ -1188,7 +1188,7 @@ cc_test(
 cc_library(
         NAME
         "explicit-begin-rule"
-        SRCS
+        INTERFACE_SRCS
         "explicit-begin-rule.cc"
         DEPS
         verible::common::analysis::lint-rule-status
@@ -1221,7 +1221,7 @@ cc_test(
 cc_library(
         NAME
         "explicit-function-lifetime-rule"
-        SRCS
+        INTERFACE_SRCS
         "explicit-function-lifetime-rule.cc"
         DEPS
         verible::common::analysis::lint-rule-status
@@ -1259,7 +1259,7 @@ cc_test(
 cc_library(
         NAME
         "explicit-task-lifetime-rule"
-        SRCS
+        INTERFACE_SRCS
         "explicit-task-lifetime-rule.cc"
         DEPS
         verible::common::analysis::lint-rule-status
@@ -1296,7 +1296,7 @@ cc_test(
 cc_library(
         NAME
         "packed-dimensions-rule"
-        SRCS
+        INTERFACE_SRCS
         "packed-dimensions-rule.cc"
         DEPS
         verible::common::analysis::lint-rule-status
@@ -1334,7 +1334,7 @@ cc_test(
 cc_library(
         NAME
         "unpacked-dimensions-rule"
-        SRCS
+        INTERFACE_SRCS
         "unpacked-dimensions-rule.cc"
         DEPS
         verible::common::analysis::lint-rule-status
@@ -1373,7 +1373,7 @@ cc_test(
 cc_library(
         NAME
         "forbid-negative-array-dim"
-        SRCS
+        INTERFACE_SRCS
         "forbid-negative-array-dim.cc"
         DEPS
         verible::common::analysis::lint-rule-status
@@ -1409,7 +1409,7 @@ cc_test(
 cc_library(
         NAME
         "case-missing-default-rule"
-        SRCS
+        INTERFACE_SRCS
         "case-missing-default-rule.cc"
         DEPS
         verible::common::analysis::lint-rule-status
@@ -1444,7 +1444,7 @@ cc_test(
 cc_library(
         NAME
         "constraint-name-style-rule"
-        SRCS
+        INTERFACE_SRCS
         "constraint-name-style-rule.cc"
         DEPS
         verible::common::analysis::lint-rule-status
@@ -1481,7 +1481,7 @@ cc_test(
 cc_library(
         NAME
         "disable-statement-rule"
-        SRCS
+        INTERFACE_SRCS
         "disable-statement-rule.cc"
         DEPS
         verible::common::analysis::lint-rule-status
@@ -1516,7 +1516,7 @@ cc_test(
 cc_library(
         NAME
         "macro-name-style-rule"
-        SRCS
+        INTERFACE_SRCS
         "macro-name-style-rule.cc"
         DEPS
         verible::common::analysis::lint-rule-status
@@ -1551,7 +1551,7 @@ cc_test(
 cc_library(
         NAME
         "macro-string-concatenation-rule"
-        SRCS
+        INTERFACE_SRCS
         "macro-string-concatenation-rule.cc"
         DEPS
         verible::common::analysis::lint-rule-status
@@ -1583,7 +1583,7 @@ cc_test(
 cc_library(
         NAME
         "numeric-format-string-style-rule"
-        SRCS
+        INTERFACE_SRCS
         "numeric-format-string-style-rule.cc"
         DEPS
         verible::common::analysis::lint-rule-status
@@ -1615,7 +1615,7 @@ cc_test(
 cc_library(
         NAME
         "parameter-name-style-rule"
-        SRCS
+        INTERFACE_SRCS
         "parameter-name-style-rule.cc"
         DEPS
         verible::common::analysis::lint-rule-status
@@ -1655,7 +1655,7 @@ cc_test(
 cc_library(
         NAME
         "parameter-type-name-style-rule"
-        SRCS
+        INTERFACE_SRCS
         "parameter-type-name-style-rule.cc"
         DEPS
         verible::common::analysis::lint-rule-status
@@ -1690,7 +1690,7 @@ cc_test(
 cc_library(
         NAME
         "proper-parameter-declaration-rule"
-        SRCS
+        INTERFACE_SRCS
         "proper-parameter-declaration-rule.cc"
         DEPS
         verible::common::analysis::lint-rule-status
@@ -1727,7 +1727,7 @@ cc_test(
 cc_library(
         NAME
         "plusarg-assignment-rule"
-        SRCS
+        INTERFACE_SRCS
         "plusarg-assignment-rule.cc"
         DEPS
         verible::common::analysis::lint-rule-status
@@ -1761,7 +1761,7 @@ cc_test(
 cc_library(
         NAME
         "port-name-suffix-rule"
-        SRCS
+        INTERFACE_SRCS
         "port-name-suffix-rule.cc"
         DEPS
         verible::common::analysis::lint-rule-status
@@ -1796,7 +1796,7 @@ cc_test(
 cc_library(
         NAME
         "explicit-parameter-storage-type-rule"
-        SRCS
+        INTERFACE_SRCS
         "explicit-parameter-storage-type-rule.cc"
         DEPS
         verible::common::analysis::lint-rule-status
@@ -1837,7 +1837,7 @@ cc_test(
 cc_library(
         NAME
         "explicit-function-task-parameter-type-rule"
-        SRCS
+        INTERFACE_SRCS
         "explicit-function-task-parameter-type-rule.cc"
         DEPS
         verible::common::analysis::lint-rule-status
@@ -1871,7 +1871,7 @@ cc_test(
 cc_library(
         NAME
         "signal-name-style-rule"
-        SRCS
+        INTERFACE_SRCS
         "signal-name-style-rule.cc"
         DEPS
         verible::common::analysis::lint-rule-status
@@ -1912,7 +1912,7 @@ cc_test(
 cc_library(
         NAME
         "struct-union-name-style-rule"
-        SRCS
+        INTERFACE_SRCS
         "struct-union-name-style-rule.cc"
         DEPS
         verible::common::analysis::lint-rule-status
@@ -1950,7 +1950,7 @@ cc_test(
 cc_library(
         NAME
         "interface-name-style-rule"
-        SRCS
+        INTERFACE_SRCS
         "interface-name-style-rule.cc"
         DEPS
         verible::common::analysis::lint-rule-status
@@ -1988,7 +1988,7 @@ cc_test(
 cc_library(
         NAME
         "instance-shadow-rule"
-        SRCS
+        INTERFACE_SRCS
         "instance-shadow-rule.cc"
         DEPS
         verible::common::analysis::citation
@@ -2028,7 +2028,7 @@ cc_test(
 cc_library(
         NAME
         "legacy-genvar-declaration-rule"
-        SRCS
+        INTERFACE_SRCS
         "legacy-genvar-declaration-rule.cc"
         DEPS
         verible::common::analysis::lint-rule-status
@@ -2061,7 +2061,7 @@ cc_test(
 cc_library(
         NAME
         "legacy-generate-region-rule"
-        SRCS
+        INTERFACE_SRCS
         "legacy-generate-region-rule.cc"
         DEPS
         verible::common::analysis::lint-rule-status
@@ -2096,7 +2096,7 @@ cc_test(
 cc_library(
         NAME
         "uvm-macro-semicolon-rule"
-        SRCS
+        INTERFACE_SRCS
         "uvm-macro-semicolon-rule.cc"
         DEPS
         verible::common::analysis::lint-rule-status
@@ -2131,7 +2131,7 @@ cc_test(
 cc_library(
         NAME
         "suspicious-semicolon-rule"
-        SRCS
+        INTERFACE_SRCS
         "suspicious-semicolon-rule.cc"
         DEPS
         verible::common::analysis::lint-rule-status
@@ -2163,7 +2163,7 @@ cc_test(
 cc_library(
         NAME
         "dff-name-style-rule"
-        SRCS
+        INTERFACE_SRCS
         "dff-name-style-rule.cc"
         DEPS
         verible::common::analysis::lint-rule-status

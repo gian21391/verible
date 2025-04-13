@@ -1,228 +1,504 @@
-add_library(default-rules INTERFACE)
-add_library(verible::verilog::analysis::default-rules ALIAS default-rules)
-target_include_directories(default-rules INTERFACE ${CMAKE_SOURCE_DIR})
-target_link_libraries(default-rules INTERFACE
-  verible::verilog::analysis::checkers::verilog-lint-rules
+cc_library(
+        NAME
+        "default-rules"
+        DEPS
+        verible::verilog::analysis::checkers::verilog-lint-rules
 )
 
-add_library(descriptions INTERFACE)
-add_library(verible::verilog::analysis::descriptions ALIAS descriptions)
-target_include_directories(descriptions INTERFACE ${CMAKE_SOURCE_DIR})
-
-add_library(extractors STATIC extractors.cc)
-add_library(verible::verilog::analysis::extractors ALIAS extractors)
-target_include_directories(extractors PUBLIC ${CMAKE_SOURCE_DIR})
-target_link_libraries(extractors PUBLIC
-  verible::verilog::analysis::verilog-analyzer
-  verible::common::text::tree-utils
-  verible::common::util::logging
-  verible::verilog::CST::identifier
-  verible::verilog::CST::module
-  verible::verilog::preprocessor::verilog-preprocess
+cc_test(
+        NAME
+        "default-rules_test"
+        SRCS
+        "default-rules_test.cc"
+        DEPS
+        default-rules
+        lint-rule-registry
+        verible::verilog::analysis::checkers::verilog-lint-rules
+        GTest::gtest
+        GTest::gtest_main
 )
 
-add_library(json-diagnostics STATIC json-diagnostics.cc)
-add_library(verible::verilog::analysis::json-diagnostics ALIAS json-diagnostics)
-target_include_directories(json-diagnostics PUBLIC ${CMAKE_SOURCE_DIR})
-target_link_libraries(json-diagnostics PUBLIC
-  verible::verilog::analysis::verilog-analyzer
-  verible::common::analysis::file-analyzer
-  verible::common::strings::line-column-map
-  nlohmann_json::nlohmann_json
+cc_library(
+        NAME
+        "descriptions"
 )
 
-add_library(flow-tree STATIC flow-tree.cc)
-add_library(verible::verilog::analysis::flow-tree ALIAS flow-tree)
-target_include_directories(flow-tree PUBLIC ${CMAKE_SOURCE_DIR})
-target_link_libraries(flow-tree PUBLIC
-  verible::common::text::token-stream-view
-  verible::common::util::logging
-  verible::verilog::parser::verilog-token-enum
+cc_library(
+        NAME
+        "extractors"
+        SRCS
+        "extractors.cc"
+        DEPS
+        verilog-analyzer
+        verible::common::text::tree-utils
+        verible::common::util::logging
+        verible::verilog::CST::identifier
+        verible::verilog::CST::module
+        verible::verilog::preprocessor::verilog-preprocess
+        absl::status
 )
 
-add_library(lint-rule-registry STATIC lint-rule-registry.cc)
-add_library(verible::verilog::analysis::lint-rule-registry ALIAS lint-rule-registry)
-target_include_directories(lint-rule-registry PUBLIC ${CMAKE_SOURCE_DIR})
-target_link_libraries(lint-rule-registry PUBLIC
-  verible::verilog::analysis::descriptions
-  verible::common::analysis::line-lint-rule
-  verible::common::analysis::syntax-tree-lint-rule
-  verible::common::analysis::text-structure-lint-rule
-  verible::common::analysis::token-stream-lint-rule
-  verible::common::strings::compare
-  verible::common::util::container-util
-  verible::common::util::logging
-  absl::node_hash_map
+cc_test(
+        NAME
+        "extractors_test"
+        SRCS
+        "extractors_test.cc"
+        DEPS
+        extractors
+        verible::verilog::preprocessor::verilog-preprocess
+        GTest::gtest
+        GTest::gtest_main
 )
 
-add_library(verilog-analyzer STATIC verilog-analyzer.cc verilog-excerpt-parse.cc)
-add_library(verible::verilog::analysis::verilog-analyzer ALIAS verilog-analyzer)
-target_include_directories(verilog-analyzer PUBLIC ${CMAKE_SOURCE_DIR})
-target_link_libraries(verilog-analyzer PUBLIC
-  verible::common::analysis::file-analyzer
-  verible::common::lexer::token-stream-adapter
-  verible::common::strings::comment-utils
-  verible::common::strings::mem-block
-  verible::common::text::concrete-syntax-leaf
-  verible::common::text::concrete-syntax-tree
-  verible::common::text::symbol
-  verible::common::text::text-structure
-  verible::common::text::token-info
-  verible::common::text::token-stream-view
-  verible::common::text::visitors
-  verible::common::util::container-util
-  verible::common::util::logging
-  verible::common::util::status-macros
-  verible::verilog::parser::verilog-lexer
-  verible::verilog::parser::verilog-lexical-context
-  verible::verilog::parser::verilog-parser
-  verible::verilog::parser::verilog-token-classifications
-  verible::verilog::parser::verilog-token-enum
-  verible::verilog::preprocessor::verilog-preprocess
-  absl::config
+cc_library(
+        NAME
+        "json-diagnostics"
+        SRCS
+        "json-diagnostics.cc"
+        DEPS
+        verilog-analyzer
+        verible::common::analysis::file-analyzer
+        verible::common::strings::line-column-map
+        nlohmann_json::nlohmann_json
 )
 
-add_library(verilog-equivalence STATIC verilog-equivalence.cc)
-add_library(verible::verilog::analysis::verilog-equivalence ALIAS verilog-equivalence)
-target_include_directories(verilog-equivalence PUBLIC ${CMAKE_SOURCE_DIR})
-target_link_libraries(verilog-equivalence PUBLIC
-  verible::common::lexer::token-stream-adapter
-  verible::common::text::token-info
-  verible::common::text::token-stream-view
-  verible::common::util::enum-flags
-  verible::common::util::logging
-  verible::verilog::parser::verilog-lexer
-  verible::verilog::parser::verilog-parser
-  verible::verilog::parser::verilog-token-classifications
-  verible::verilog::parser::verilog-token-enum
+cc_library(
+        NAME
+        "flow-tree"
+        SRCS
+        "flow-tree.cc"
+        DEPS
+        verible::common::text::token-stream-view
+        verible::common::util::logging
+        verible::verilog::parser::verilog-token-enum
+        absl::status
 )
 
-add_library(verilog-linter-configuration STATIC verilog-linter-configuration.cc)
-add_library(verible::verilog::analysis::verilog-linter-configuration ALIAS verilog-linter-configuration)
-target_include_directories(verilog-linter-configuration PUBLIC ${CMAKE_SOURCE_DIR})
-target_link_libraries(verilog-linter-configuration PUBLIC
-  verible::verilog::analysis::default-rules
-  verible::verilog::analysis::descriptions
-  verible::verilog::analysis::lint-rule-registry
-  verible::common::analysis::line-lint-rule
-  verible::common::analysis::syntax-tree-lint-rule
-  verible::common::analysis::text-structure-lint-rule
-  verible::common::analysis::token-stream-lint-rule
-  verible::common::util::container-util
-  verible::common::util::enum-flags
-  verible::common::util::file-util
-  verible::common::util::logging
-  verible::common::util::status-macros
-  absl::statusor
+cc_test(
+        NAME
+        "flow-tree_test"
+        SRCS
+        "flow-tree_test.cc"
+        DEPS
+        flow-tree
+        verible::common::text::token-stream-view
+        verible::verilog::parser::verilog-lexer
+        absl::status
+        GTest::gtest
+        GTest::gtest_main
 )
 
-add_library(verilog-linter-constants INTERFACE)
-add_library(verible::verilog::analysis::verilog-linter-constants ALIAS verilog-linter-constants)
-target_include_directories(verilog-linter-constants INTERFACE ${CMAKE_SOURCE_DIR})
-
-add_library(verilog-linter STATIC verilog-linter.cc)
-add_library(verible::verilog::analysis::verilog-linter ALIAS verilog-linter)
-target_include_directories(verilog-linter PUBLIC ${CMAKE_SOURCE_DIR})
-target_link_libraries(verilog-linter PUBLIC
-  verible::verilog::analysis::default-rules
-  verible::verilog::analysis::lint-rule-registry
-  verible::verilog::analysis::verilog-analyzer
-  verible::verilog::analysis::verilog-linter-configuration
-  verible::verilog::analysis::verilog-linter-constants
-  verible::common::analysis::citation
-  verible::common::analysis::line-linter
-  verible::common::analysis::lint-rule-status
-  verible::common::analysis::lint-waiver
-  verible::common::analysis::syntax-tree-linter
-  verible::common::analysis::text-structure-linter
-  verible::common::analysis::token-stream-linter
-  verible::common::analysis::violation-handler
-  verible::common::strings::line-column-map
-  verible::common::text::concrete-syntax-tree
-  verible::common::text::text-structure
-  verible::common::text::token-info
-  verible::common::util::file-util
-  verible::common::util::logging
-  verible::common::util::status-macros
-  verible::verilog::parser::verilog-token-classifications
-  verible::verilog::parser::verilog-token-enum
-  absl::config
-  absl_flag
-  absl::statusor
+cc_library(
+        NAME
+        "lint-rule-registry"
+        SRCS
+        "lint-rule-registry.cc"
+        DEPS
+        descriptions
+        verible::common::analysis::line-lint-rule
+        verible::common::analysis::syntax-tree-lint-rule
+        verible::common::analysis::text-structure-lint-rule
+        verible::common::analysis::token-stream-lint-rule
+        verible::common::strings::compare
+        verible::common::util::container-util
+        verible::common::util::logging
+        absl::node_hash_map
 )
 
-add_library(verilog-filelist STATIC verilog-filelist.cc)
-add_library(verible::verilog::analysis::verilog-filelist ALIAS verilog-filelist)
-target_include_directories(verilog-filelist PUBLIC ${CMAKE_SOURCE_DIR})
-target_link_libraries(verilog-filelist PUBLIC
-  verible::common::util::file-util
-  verible::common::util::iterator-range
+cc_test(
+        NAME
+        "json-diagnostics_test"
+        SRCS
+        "json-diagnostics_test.cc"
+        DEPS
+        json-diagnostics
+        verilog-analyzer
+        verible::common::util::logging
+        GTest::gtest
+        GTest::gtest_main
+        nlohmann_json::nlohmann_json
 )
 
-add_library(verilog-project STATIC verilog-project.cc)
-add_library(verible::verilog::analysis::verilog-project ALIAS verilog-project)
-target_include_directories(verilog-project PUBLIC ${CMAKE_SOURCE_DIR})
-target_link_libraries(verilog-project PUBLIC
-  verible::verilog::analysis::verilog-analyzer
-  verible::common::strings::mem-block
-  verible::common::strings::string-memory-map
-  verible::common::text::text-structure
-  verible::common::util::file-util
-  verible::common::util::logging
-  absl::statusor
-  absl::optional
+cc_test(
+        NAME
+        "lint-rule-registry_test"
+        SRCS
+        "lint-rule-registry_test.cc"
+        DEPS
+        descriptions
+        lint-rule-registry
+        verible::common::analysis::line-lint-rule
+        verible::common::analysis::lint-rule-status
+        verible::common::analysis::syntax-tree-lint-rule
+        verible::common::analysis::text-structure-lint-rule
+        verible::common::analysis::token-stream-lint-rule
+        verible::common::text::concrete-syntax-leaf
+        verible::common::text::concrete-syntax-tree
+        verible::common::text::syntax-tree-context
+        verible::common::text::text-structure
+        verible::common::text::token-info
+        absl::status
+        absl::strings
+        GTest::gtest
+        GTest::gtest_main
 )
 
-add_library(symbol-table STATIC symbol-table.cc)
-add_library(verible::verilog::analysis::symbol-table ALIAS symbol-table)
-target_include_directories(symbol-table PUBLIC ${CMAKE_SOURCE_DIR})
-target_link_libraries(symbol-table PUBLIC
-  verible::verilog::analysis::verilog-project
-  verible::common::strings::compare
-  verible::common::strings::display-utils
-  verible::common::text::concrete-syntax-leaf
-  verible::common::text::concrete-syntax-tree
-  verible::common::text::symbol
-  verible::common::text::token-info
-  verible::common::text::tree-compare
-  verible::common::text::tree-context-visitor
-  verible::common::text::tree-utils
-  verible::common::text::visitors
-  verible::common::util::casts
-  verible::common::util::enum-flags
-  verible::common::util::logging
-  verible::common::util::map-tree
-  verible::common::util::spacer
-  verible::common::util::tree-operations
-  verible::common::util::value-saver
-  verible::common::util::vector-tree
-  verible::verilog::CST::class
-  verible::verilog::CST::declaration
-  verible::verilog::CST::functions
-  verible::verilog::CST::macro
-  verible::verilog::CST::module
-  verible::verilog::CST::net
-  verible::verilog::CST::package
-  verible::verilog::CST::parameters
-  verible::verilog::CST::port
-  verible::verilog::CST::seq-block
-  verible::verilog::CST::statement
-  verible::verilog::CST::tasks
-  verible::verilog::CST::type
-  verible::verilog::CST::verilog-nonterminals
-  verible::verilog::parser::verilog-parser
-  verible::verilog::parser::verilog-token-enum
-  absl::statusor
+cc_library(
+        NAME
+        "verilog-analyzer"
+        SRCS
+        "verilog-analyzer.cc"
+        "verilog-excerpt-parse.cc"
+        DEPS
+        verible::common::analysis::file-analyzer
+        verible::common::lexer::token-stream-adapter
+        verible::common::strings::comment-utils
+        verible::common::strings::mem-block
+        verible::common::text::concrete-syntax-leaf
+        verible::common::text::concrete-syntax-tree
+        verible::common::text::symbol
+        verible::common::text::text-structure
+        verible::common::text::token-info
+        verible::common::text::token-stream-view
+        verible::common::text::visitors
+        verible::common::util::container-util
+        verible::common::util::logging
+        verible::common::util::status-macros
+        verible::verilog::parser::verilog-lexer
+        verible::verilog::parser::verilog-lexical-context
+        verible::verilog::parser::verilog-parser
+        verible::verilog::parser::verilog-token-classifications
+        verible::verilog::parser::verilog-token-enum
+        verible::verilog::preprocessor::verilog-preprocess
+        absl::config
+        absl::log
+        absl::status
+        absl::strings
 )
 
-add_library(dependencies STATIC dependencies.cc)
-add_library(verible::verilog::analysis::dependencies ALIAS dependencies)
-target_include_directories(dependencies PUBLIC ${CMAKE_SOURCE_DIR})
-target_link_libraries(dependencies PUBLIC
-  verible::verilog::analysis::symbol-table
-  verible::verilog::analysis::verilog-project
-  verible::common::strings::compare
-  verible::common::strings::display-utils
-  verible::common::util::logging
+cc_library(
+        NAME
+        "verilog-equivalence"
+        SRCS
+        "verilog-equivalence.cc"
+        DEPS
+        verible::common::lexer::token-stream-adapter
+        verible::common::text::token-info
+        verible::common::text::token-stream-view
+        verible::common::util::enum-flags
+        verible::common::util::logging
+        verible::verilog::parser::verilog-lexer
+        verible::verilog::parser::verilog-parser
+        verible::verilog::parser::verilog-token-classifications
+        verible::verilog::parser::verilog-token-enum
+)
+
+cc_library(
+        NAME
+        "verilog-linter-configuration"
+        SRCS
+        "verilog-linter-configuration.cc"
+        DEPS
+        default-rules
+        descriptions
+        lint-rule-registry
+        verible::common::analysis::line-lint-rule
+        verible::common::analysis::syntax-tree-lint-rule
+        verible::common::analysis::text-structure-lint-rule
+        verible::common::analysis::token-stream-lint-rule
+        verible::common::util::container-util
+        verible::common::util::enum-flags
+        verible::common::util::file-util
+        verible::common::util::logging
+        verible::common::util::status-macros
+        absl::status
+        absl::statusor
+        absl::strings
+)
+
+cc_library(
+        NAME
+        "verilog-linter-constants"
+)
+
+cc_library(
+        NAME
+        "verilog-linter"
+        SRCS
+        "verilog-linter.cc"
+        DEPS
+        default-rules
+        lint-rule-registry
+        verilog-analyzer
+        verilog-linter-configuration
+        verilog-linter-constants
+        verible::common::analysis::citation
+        verible::common::analysis::line-linter
+        verible::common::analysis::lint-rule-status
+        verible::common::analysis::lint-waiver
+        verible::common::analysis::syntax-tree-linter
+        verible::common::analysis::text-structure-linter
+        verible::common::analysis::token-stream-linter
+        verible::common::analysis::violation-handler
+        verible::common::strings::line-column-map
+        verible::common::text::concrete-syntax-tree
+        verible::common::text::text-structure
+        verible::common::text::token-info
+        verible::common::util::file-util
+        verible::common::util::logging
+        verible::common::util::status-macros
+        verible::verilog::parser::verilog-token-classifications
+        verible::verilog::parser::verilog-token-enum
+        absl::config
+        absl::flags
+        absl::log
+        absl::status
+        absl::statusor
+        absl::strings
+)
+
+cc_test(
+        NAME
+        "verilog-analyzer_test"
+        SRCS
+        "verilog-analyzer_test.cc"
+        DEPS
+        verilog-analyzer
+        verible::common::analysis::file-analyzer
+        verible::common::strings::display-utils
+        verible::common::text::concrete-syntax-leaf
+        verible::common::text::concrete-syntax-tree
+        verible::common::text::symbol
+        verible::common::text::text-structure
+        verible::common::text::token-info
+        verible::common::text::token-info-test-util
+        verible::common::text::tree-utils
+        verible::common::util::casts
+        verible::common::util::logging
+        verible::verilog::parser::verilog-token-enum
+        absl::status
+        absl::strings
+        GTest::gtest
+        GTest::gtest_main
+)
+
+cc_test(
+        NAME
+        "verilog-linter-configuration_test"
+        SRCS
+        "verilog-linter-configuration_test.cc"
+        DEPS
+        default-rules
+        descriptions
+        lint-rule-registry
+        verilog-linter
+        verilog-linter-configuration
+        verible::common::analysis::line-lint-rule
+        verible::common::analysis::lint-rule-status
+        verible::common::analysis::syntax-tree-lint-rule
+        verible::common::analysis::text-structure-lint-rule
+        verible::common::analysis::token-stream-lint-rule
+        verible::common::strings::line-column-map
+        verible::common::text::concrete-syntax-leaf
+        verible::common::text::concrete-syntax-tree
+        verible::common::text::syntax-tree-context
+        verible::common::text::text-structure
+        verible::common::text::token-info
+        verible::common::text::tree-builder-test-util
+        absl::strings
+        GTest::gtest
+        GTest::gtest_main
+)
+
+cc_test(
+        NAME
+        "verilog-linter_test"
+        SRCS
+        "verilog-linter_test.cc"
+        DEPS
+        default-rules
+        verilog-analyzer
+        verilog-linter
+        verilog-linter-configuration
+        verible::common::analysis::lint-rule-status
+        verible::common::analysis::violation-handler
+        verible::common::util::file-util
+        verible::common::util::logging
+        absl::status
+        absl::statusor
+        absl::strings
+        GTest::gtest
+        GTest::gtest_main
+)
+
+cc_test(
+        NAME
+        "verilog-equivalence_test"
+        SRCS
+        "verilog-equivalence_test.cc"
+        DEPS
+        verilog-equivalence
+        absl::strings
+        absl::span
+        GTest::gtest
+        GTest::gtest_main
+)
+
+cc_library(
+        NAME
+        "verilog-filelist"
+        SRCS
+        "verilog-filelist.cc"
+        DEPS
+        verible::common::util::file-util
+        verible::common::util::iterator-range
+        absl::status
+        absl::strings
+)
+
+cc_test(
+        NAME
+        "verilog-filelist_test"
+        SRCS
+        "verilog-filelist_test.cc"
+        DEPS
+        verilog-filelist
+        verible::common::util::file-util
+        GTest::gtest
+        GTest::gtest_main
+)
+
+cc_library(
+        NAME
+        "verilog-project"
+        SRCS
+        "verilog-project.cc"
+        DEPS
+        verilog-analyzer
+        verible::common::strings::mem-block
+        verible::common::strings::string-memory-map
+        verible::common::text::text-structure
+        verible::common::util::file-util
+        verible::common::util::logging
+        absl::status
+        absl::statusor
+        absl::strings
+        absl::time
+        absl::optional
+)
+
+cc_test(
+        NAME
+        "verilog-project_test"
+        SRCS
+        "verilog-project_test.cc"
+        DEPS
+        verilog-analyzer
+        verilog-project
+        verible::common::text::text-structure
+        verible::common::util::file-util
+        verible::common::util::logging
+        verible::common::util::range
+        verible::verilog::CST::module
+        absl::status
+        absl::strings
+        GTest::gtest
+        GTest::gtest_main
+)
+
+cc_library(
+        NAME
+        "symbol-table"
+        SRCS
+        "symbol-table.cc"
+        DEPS
+        verilog-project
+        verible::common::strings::compare
+        verible::common::strings::display-utils
+        verible::common::text::concrete-syntax-leaf
+        verible::common::text::concrete-syntax-tree
+        verible::common::text::symbol
+        verible::common::text::token-info
+        verible::common::text::tree-compare
+        verible::common::text::tree-context-visitor
+        verible::common::text::tree-utils
+        verible::common::text::visitors
+        verible::common::util::casts
+        verible::common::util::enum-flags
+        verible::common::util::logging
+        verible::common::util::map-tree
+        verible::common::util::spacer
+        verible::common::util::tree-operations
+        verible::common::util::value-saver
+        verible::common::util::vector-tree
+        verible::verilog::CST::class
+        verible::verilog::CST::declaration
+        verible::verilog::CST::functions
+        verible::verilog::CST::macro
+        verible::verilog::CST::module
+        verible::verilog::CST::net
+        verible::verilog::CST::package
+        verible::verilog::CST::parameters
+        verible::verilog::CST::port
+        verible::verilog::CST::seq-block
+        verible::verilog::CST::statement
+        verible::verilog::CST::tasks
+        verible::verilog::CST::type
+        verible::verilog::CST::verilog-nonterminals
+        verible::verilog::parser::verilog-parser
+        verible::verilog::parser::verilog-token-enum
+        absl::status
+        absl::statusor
+        absl::strings
+        absl::time
+)
+
+cc_test(
+        NAME
+        "symbol-table_test"
+        SRCS
+        "symbol-table_test.cc"
+        DEPS
+        symbol-table
+        verilog-filelist
+        verilog-project
+        verible::common::text::tree-utils
+        verible::common::util::file-util
+        verible::common::util::logging
+        verible::common::util::range
+        verible::common::util::tree-operations
+        absl::core_headers
+        absl::status
+        GTest::gtest
+        GTest::gtest_main
+)
+
+cc_library(
+        NAME
+        "dependencies"
+        SRCS
+        "dependencies.cc"
+        DEPS
+        symbol-table
+        verilog-project
+        verible::common::strings::compare
+        verible::common::strings::display-utils
+        verible::common::util::logging
+)
+
+cc_test(
+        NAME
+        "dependencies_test"
+        SRCS
+        "dependencies_test.cc"
+        DEPS
+        dependencies
+        symbol-table
+        verilog-project
+        verible::common::util::file-util
+        verible::common::util::logging
+        absl::status
+        GTest::gtest
+        GTest::gtest_main
 )
 

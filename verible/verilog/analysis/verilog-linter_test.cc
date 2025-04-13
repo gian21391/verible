@@ -85,7 +85,7 @@ TEST_F(LintOneFileTest, FileNotFound) {
 
 // Tests that clean code exits 0 (success).
 TEST_F(LintOneFileTest, LintCleanFiles) {
-  constexpr std::string_view kTestCases[] = {
+  constexpr verible::document_view kTestCases[] = {
       "",  // empty file
       "\n",
       "class foo;\n"
@@ -116,7 +116,7 @@ TEST_F(LintOneFileTest, LintCleanFiles) {
 
 // Tests that invalid code is handled according to 'parse_fatal' parameter.
 TEST_F(LintOneFileTest, SyntaxError) {
-  constexpr std::string_view kTestCases[] = {
+  constexpr verible::document_view kTestCases[] = {
       "class foo;\n",                     // no endclass
       "endclass : foo\n",                 // no begin class
       "module 444bad_name; endmodule\n",  // lexical error
@@ -163,7 +163,7 @@ TEST_F(LintOneFileTest, SyntaxError) {
 }
 
 TEST_F(LintOneFileTest, LintError) {
-  constexpr std::string_view kTestCases[] = {
+  constexpr verible::document_view kTestCases[] = {
       "task automatic foo;\n"
       "  $psprintf(\"blah\");\n"  // forbidden function
       "endtask\n",
@@ -200,7 +200,7 @@ class VerilogLinterTest : public DefaultLinterConfigTestFixture,
  protected:
   // Returns diagnostic text from analyzing source code.
   std::pair<absl::Status, std::string> LintAnalyzeText(
-      std::string_view filename, std::string_view content) const {
+      std::string_view filename, verible::document_view content) const {
     // Run the analyzer to produce a syntax tree from source code.
     const auto analyzer = std::make_unique<VerilogAnalyzer>(content, filename);
     const absl::Status status = ABSL_DIE_IF_NULL(analyzer)->Analyze();
@@ -496,7 +496,7 @@ class ViolationFixerTest : public testing::Test {
  protected:
   LinterConfiguration config_;
 
-  absl::Status LintAnalyzeFixText(std::string_view content,
+  absl::Status LintAnalyzeFixText(verible::document_view content,
                                   ViolationFixer *violation_fixer,
                                   std::string *fixed_content) const {
     const ScopedTestFile temp_file(testing::TempDir(), content);
@@ -525,8 +525,8 @@ class ViolationFixerTest : public testing::Test {
 
   void DoFixerTest(
       std::initializer_list<ViolationFixer::Answer> choices,
-      std::initializer_list<std::string_view> expected_fixed_sources) const {
-    static constexpr std::array<const std::string_view, 3> input_sources{
+      std::initializer_list<verible::document_view> expected_fixed_sources) const {
+    static constexpr std::array<verible::document_view, 3> input_sources{
         // Input source 0:
         // :2:10: no-trailing-spaces
         // :3:10: forbid-consecutive-null-statements
@@ -575,7 +575,7 @@ class ViolationFixerTest : public testing::Test {
       std::vector<std::string> fixed_sources(input_sources.size());
 
       for (size_t i = 0; i < input_sources.size(); ++i) {
-        const std::string_view input_source = input_sources[i];
+        const verible::document_view input_source = input_sources[i];
         std::string &fixed_source = fixed_sources[i];
 
         const absl::Status status =
@@ -588,7 +588,7 @@ class ViolationFixerTest : public testing::Test {
 
       for (size_t i = 0; i < input_sources.size(); ++i) {
         const std::string &fixed_source = fixed_sources[i];
-        const std::string_view expected_fixed_source =
+        const verible::document_view expected_fixed_source =
             *(expected_fixed_sources.begin() + i);
 
         EXPECT_EQ(fixed_source, expected_fixed_source);
@@ -605,7 +605,7 @@ class ViolationFixerTest : public testing::Test {
       std::vector<std::string> fixed_sources(input_sources.size());
 
       for (size_t i = 0; i < input_sources.size(); ++i) {
-        const std::string_view input_source = input_sources[i];
+        const verible::document_view input_source = input_sources[i];
         std::string &fixed_source = fixed_sources[i];
 
         const absl::Status status =
@@ -619,9 +619,9 @@ class ViolationFixerTest : public testing::Test {
       bool expect_empty_patch = true;
 
       for (size_t i = 0; i < input_sources.size(); ++i) {
-        const std::string_view input_source = input_sources[i];
+        const verible::document_view input_source = input_sources[i];
         const std::string &fixed_source = fixed_sources[i];
-        const std::string_view expected_fixed_source =
+        const verible::document_view expected_fixed_source =
             *(expected_fixed_sources.begin() + i);
 
         EXPECT_EQ(input_source, fixed_source);

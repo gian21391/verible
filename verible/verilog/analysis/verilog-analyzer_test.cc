@@ -512,7 +512,7 @@ TEST(AnalyzeVerilogAutomaticMode, AutomaticWithFallback) {
   };
 
   // Test cases that are known to syntax error without branch filter enabled.
-  constexpr std::string_view test_cases[] = {
+  constexpr verible::document_view test_cases[] = {
       R"(
 module foo();
   always @(*) begin
@@ -524,7 +524,7 @@ module foo();
   end
 endmodule
 )"};
-  for (const std::string_view code : test_cases) {
+  for (const verible::document_view code : test_cases) {
     const auto should_fail =
         VerilogAnalyzer::AnalyzeAutomaticMode(code, "<file>", kNoBranchFilter);
     const auto should_succeed = VerilogAnalyzer::AnalyzeAutomaticMode(
@@ -857,7 +857,7 @@ class VerilogAnalyzerInternalsTest : public testing::Test,
 
 // Tests that parser-selection directive is properly detected.
 TEST_F(VerilogAnalyzerInternalsTest, ScanParsingModeDirective) {
-  const std::pair<std::string, std::string_view> test_cases[] = {
+  const std::pair<std::string, verible::document_view> test_cases[] = {
       // code, expected parsing mode
       {"", ""},
       {"\n", ""},
@@ -908,7 +908,7 @@ TEST_F(VerilogAnalyzerInternalsTest, ScanParsingModeDirective) {
     VerilogAnalyzer analyzer(test.first, "<file>", kDefaultPreprocess);
     const auto lexer_status = analyzer.Tokenize();
     EXPECT_OK(lexer_status);
-    std::string_view mode =
+    verible::document_view mode =
         ScanParsingModeDirective(analyzer.Data().TokenStream());
     EXPECT_EQ(mode, test.second) << " mismatched mode with input:\n"
                                  << test.first;

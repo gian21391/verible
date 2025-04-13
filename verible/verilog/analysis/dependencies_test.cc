@@ -38,7 +38,7 @@ using verible::file::testing::ScopedTestFile;
 
 TEST(FileDependenciesTest, EmptyData) {
   const auto tempdir = ::testing::TempDir();
-  const std::string sources_dir = JoinPath(tempdir, __FUNCTION__);
+  const std::string sources_dir = JoinPath(tempdir, ::testing::UnitTest::GetInstance()->current_test_info()->name());
   ASSERT_TRUE(CreateDir(sources_dir).ok());
   VerilogProject project(sources_dir, {/* no include paths */});
 
@@ -62,11 +62,11 @@ TEST(FileDependenciesTest, EmptyData) {
 
 TEST(FileDependenciesTest, OneFileNoDeps) {
   const auto tempdir = ::testing::TempDir();
-  const std::string sources_dir = JoinPath(tempdir, __FUNCTION__);
+  const std::string sources_dir = JoinPath(tempdir, ::testing::UnitTest::GetInstance()->current_test_info()->name());
   ASSERT_TRUE(CreateDir(sources_dir).ok());
 
   // None of these test cases will yield any inter-file deps.
-  constexpr std::string_view kTestCases[] = {
+  constexpr verible::document_view kTestCases[] = {
       "",
       // one module
       "module mmm;\n"
@@ -106,7 +106,7 @@ TEST(FileDependenciesTest, OneFileNoDeps) {
 
 TEST(FileDependenciesTest, TwoFilesNoDeps) {
   const auto tempdir = ::testing::TempDir();
-  const std::string sources_dir = JoinPath(tempdir, __FUNCTION__);
+  const std::string sources_dir = JoinPath(tempdir, ::testing::UnitTest::GetInstance()->current_test_info()->name());
   ASSERT_TRUE(CreateDir(sources_dir).ok());
 
   VerilogProject project(sources_dir, {/* no include paths */});
@@ -143,7 +143,7 @@ static std::ostream &operator<<(std::ostream &stream,
 
 TEST(FileDependenciesTest, TwoFilesWithParamDepAtRootScope) {
   const auto tempdir = ::testing::TempDir();
-  const std::string sources_dir = JoinPath(tempdir, __FUNCTION__);
+  const std::string sources_dir = JoinPath(tempdir, ::testing::UnitTest::GetInstance()->current_test_info()->name());
   ASSERT_TRUE(CreateDir(sources_dir).ok());
 
   VerilogProject project(sources_dir, {/* no include paths */});
@@ -180,7 +180,7 @@ TEST(FileDependenciesTest, TwoFilesWithParamDepAtRootScope) {
 
 TEST(FileDependenciesTest, TwoFilesWithParamDep) {
   const auto tempdir = ::testing::TempDir();
-  const std::string sources_dir = JoinPath(tempdir, __FUNCTION__);
+  const std::string sources_dir = JoinPath(tempdir, ::testing::UnitTest::GetInstance()->current_test_info()->name());
   ASSERT_TRUE(CreateDir(sources_dir).ok());
 
   VerilogProject project(sources_dir, {/* no include paths */});
@@ -221,7 +221,7 @@ TEST(FileDependenciesTest, TwoFilesWithParamDep) {
 
 TEST(FileDependenciesTest, TwoFilesWithCyclicDep) {
   const auto tempdir = ::testing::TempDir();
-  const std::string sources_dir = JoinPath(tempdir, __FUNCTION__);
+  const std::string sources_dir = JoinPath(tempdir, ::testing::UnitTest::GetInstance()->current_test_info()->name());
   ASSERT_TRUE(CreateDir(sources_dir).ok());
 
   VerilogProject project(sources_dir, {/* no include paths */});
@@ -272,7 +272,7 @@ TEST(FileDependenciesTest, TwoFilesWithCyclicDep) {
 
 TEST(FileDependenciesTest, ModuleDiamondDependencies) {
   const auto tempdir = ::testing::TempDir();
-  const std::string sources_dir = JoinPath(tempdir, __FUNCTION__);
+  const std::string sources_dir = JoinPath(tempdir, ::testing::UnitTest::GetInstance()->current_test_info()->name());
   ASSERT_TRUE(CreateDir(sources_dir).ok());
 
   VerilogProject project(sources_dir, {/* no include paths */});

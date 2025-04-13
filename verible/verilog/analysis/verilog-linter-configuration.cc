@@ -90,14 +90,14 @@ std::string ProjectPolicy::ListPathGlobs() const {
                        });
 }
 
-bool RuleBundle::ParseConfiguration(verible::document_view text, char separator,
+bool RuleBundle::ParseConfiguration(std::string_view text, char separator,
                                     std::string *error) {
   // Clear the vector to overwrite any existing value.
   rules.clear();
 
   bool parsed_correctly = true;
-  for (verible::document_view part :
-       text.str_split(separator, absl::SkipEmpty())) {
+  for (std::string_view part :
+       absl::StrSplit(text, separator, absl::SkipEmpty())) {
     if (separator == '\n') {
       // In configuration files, we can ignore #-comments
       // TODO(hzeller): this will fall short if in the configuration string
@@ -109,8 +109,7 @@ bool RuleBundle::ParseConfiguration(verible::document_view text, char separator,
         part = part.substr(0, comment_pos);
       }
     }
-    auto stripped_part = absl::StripAsciiWhitespace(part.to_string_view());
-    part = verible::document_view(stripped_part.data(), stripped_part.size(), part);
+    part = absl::StripAsciiWhitespace(part);
     while (!part.empty() && part[part.size() - 1] == ',') {
       // Not fatal, just report
       absl::StrAppend(error, error->empty() ? "" : "\n", kStrayCommaWarning,
@@ -148,7 +147,7 @@ bool RuleBundle::ParseConfiguration(verible::document_view text, char separator,
     }
     const auto rule_name = rule_name_with_config.substr(0, equals_pos);
     const auto rule_name_set = analysis::GetAllRegisteredLintRuleNames();
-    const auto rule_iter = rule_name_set.find(rule_name.to_string_view());
+    const auto rule_iter = rule_name_set.find(rule_name);
 
     // Check if text is a valid lint rule.
     if (rule_iter == rule_name_set.end()) {
@@ -435,7 +434,7 @@ std::string AbslUnparseFlag(const RuleBundle &bundle) {
   return bundle.UnparseConfiguration(',');
 }
 
-bool AbslParseFlag(verible::document_view text, RuleBundle *bundle,
+bool AbslParseFlag(std::string_view text, RuleBundle *bundle,
                    std::string *error) {
   return bundle->ParseConfiguration(text, ',', error);
 }

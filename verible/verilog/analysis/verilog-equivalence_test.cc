@@ -60,9 +60,9 @@ static DiffStatus FlipStatus(DiffStatus status) {
 }
 
 static void ExpectCompareWithErrstream(
-    const std::function<DiffStatus(std::string_view, std::string_view,
+    const std::function<DiffStatus(verible::document_view, verible::document_view,
                                    std::ostream *)> &func,
-    DiffStatus expect_compare, std::string_view left, std::string_view right,
+    DiffStatus expect_compare, verible::document_view left, verible::document_view right,
     std::ostream *errstream = &std::cout) {
   EXPECT_EQ(func(left, right, errstream), expect_compare)
       << "left:\n"
@@ -357,8 +357,8 @@ TEST(FormatEquivalentTest, LexErrorOnRightInMacroDefinitionBody) {
 }
 
 struct ObfuscationTestCase {
-  std::string_view before;
-  std::string_view after;
+  verible::document_view before;
+  verible::document_view after;
   DiffStatus expect_match;
 };
 

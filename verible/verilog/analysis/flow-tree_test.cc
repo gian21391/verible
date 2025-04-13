@@ -29,7 +29,7 @@ namespace {
 using testing::StartsWith;
 
 // Lexes a SystemVerilog source code, and returns a TokenSequence.
-verible::TokenSequence LexToSequence(std::string_view source_contents) {
+verible::TokenSequence LexToSequence(verible::document_view source_contents) {
   verible::TokenSequence lexed_sequence;
   VerilogLexer lexer(source_contents);
   for (lexer.DoNextToken(); !lexer.GetLastToken().isEOF();
@@ -42,7 +42,7 @@ verible::TokenSequence LexToSequence(std::string_view source_contents) {
 }
 
 TEST(FlowTree, MultipleConditionalsSameMacro) {
-  const std::string_view test_case =
+  const verible::document_view test_case =
       R"(
     `ifdef A
       A_TRUE_1
@@ -92,7 +92,7 @@ TEST(FlowTree, MultipleConditionalsSameMacro) {
 }
 
 TEST(FlowTree, UnmatchedElses) {
-  const std::string_view test_cases[] = {
+  const verible::document_view test_cases[] = {
       R"(
     `elsif A
       A_TRUE
@@ -132,7 +132,7 @@ TEST(FlowTree, UnmatchedElses) {
 }
 
 TEST(FlowTree, UnvalidConditionals) {
-  const std::string_view test_cases[] = {
+  const verible::document_view test_cases[] = {
       R"(
     `ifdef A
       A_TRUE
@@ -162,7 +162,7 @@ TEST(FlowTree, UnvalidConditionals) {
 }
 
 TEST(FlowTree, UncompletedConditionals) {
-  const std::string_view test_cases[] = {
+  const verible::document_view test_cases[] = {
       R"(
     `ifdef A
       A_TRUE
@@ -189,7 +189,7 @@ TEST(FlowTree, UncompletedConditionals) {
 }
 
 TEST(FlowTree, NestedConditionals) {
-  const std::string_view test_cases[] = {
+  const verible::document_view test_cases[] = {
       R"(
     `ifdef A
       `ifdef B
@@ -229,7 +229,7 @@ TEST(FlowTree, NestedConditionals) {
 }
 
 TEST(FlowTree, MultipleElseIfs) {
-  const std::string_view test_case =
+  const verible::document_view test_case =
       R"(
     `ifdef A
       A_TRUE
@@ -275,7 +275,7 @@ TEST(FlowTree, MultipleElseIfs) {
 }
 
 TEST(FlowTree, SwappedNegatedIfs) {
-  const std::string_view test_case =
+  const verible::document_view test_case =
       R"(
     `ifndef A
       A_FALSE
@@ -316,7 +316,7 @@ TEST(FlowTree, SwappedNegatedIfs) {
 }
 
 TEST(FlowTree, CompleteConditional) {
-  const std::string_view test_case =
+  const verible::document_view test_case =
       R"(
     `ifdef A
       A_TRUE

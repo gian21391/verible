@@ -119,7 +119,7 @@ class TestRule4 : public LineLintRule {
     return d;
   }
 
-  void HandleLine(std::string_view) final {}
+  void HandleLine(verible::document_view) final {}
 
   verible::LintRuleStatus Report() const final {
     return verible::LintRuleStatus();

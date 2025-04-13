@@ -432,7 +432,7 @@ TEST(BuildSymbolTableTest, IntegrityCheckDeclaredType) {
 }
 
 TEST(BuildSymbolTableTest, InvalidSyntax) {
-  constexpr std::string_view invalid_codes[] = {
+  constexpr verible::document_view invalid_codes[] = {
       "module;\nendmodule\n",
   };
   for (const auto &code : invalid_codes) {
@@ -458,7 +458,7 @@ TEST(BuildSymbolTableTest, InvalidSyntax) {
 
 TEST(BuildSymbolTableTest, AvoidCrashFromFuzzer) {
   // All that matters is that these test cases do not trigger crashes.
-  constexpr std::string_view codes[] = {
+  constexpr verible::document_view codes[] = {
       // some of these test cases come from fuzz testing
       // and may contain syntax errors
       "`e(C*C);\n",              // expect two distinct reference trees
@@ -527,7 +527,7 @@ TEST(BuildSymbolTableTest, ModuleDeclarationLocalNetsVariables) {
             nullptr);  // there is no module meta-type
   EXPECT_EMPTY_STATUSES(build_diagnostics);
 
-  static constexpr std::string_view members[] = {"w1", "w2", "l1", "l2"};
+  static constexpr verible::document_view members[] = {"w1", "w2", "l1", "l2"};
   for (const auto &member : members) {
     MUST_ASSIGN_LOOKUP_SYMBOL(member_node, module_node, member);
     EXPECT_EQ(member_node_info.metatype,
@@ -575,7 +575,7 @@ TEST(BuildSymbolTableTest, ModuleDeclarationLocalDuplicateNets) {
 }
 
 TEST(BuildSymbolTableTest, ModuleDeclarationConditionalGenerateAnonymous) {
-  constexpr std::string_view source_variants[] = {
+  constexpr verible::document_view source_variants[] = {
       // with begin/end
       "module m;\n"
       "  if (1) begin\n"
@@ -720,7 +720,7 @@ TEST(BuildSymbolTableTest, ModuleDeclarationWithPorts) {
   EXPECT_EQ(module_node_info.declared_type.syntax_origin,
             nullptr);  // there is no module meta-type
 
-  static constexpr std::string_view members[] = {"clk", "q"};
+  static constexpr verible::document_view members[] = {"clk", "q"};
   for (const auto &member : members) {
     MUST_ASSIGN_LOOKUP_SYMBOL(member_node, module_node, member);
     EXPECT_EQ(member_node_info.metatype,
@@ -748,7 +748,7 @@ TEST(BuildSymbolTableTest, ModuleDeclarationMultiple) {
   const auto build_diagnostics = BuildSymbolTable(src, &symbol_table);
   EXPECT_EMPTY_STATUSES(build_diagnostics);
 
-  const std::string_view expected_modules[] = {"m1", "m2"};
+  const verible::document_view expected_modules[] = {"m1", "m2"};
   for (const auto &expected_module : expected_modules) {
     MUST_ASSIGN_LOOKUP_SYMBOL(module_node, root_symbol, expected_module);
     EXPECT_EQ(module_node_info.metatype, SymbolMetaType::kModule);
@@ -888,7 +888,7 @@ TEST(BuildSymbolTableTest, ModuleDeclarationNestedDuplicate) {
 
 TEST(BuildSymbolTableTest, ModuleInstance) {
   // The following code variants should yield the same symbol table results:
-  static constexpr std::string_view source_variants[] = {
+  static constexpr verible::document_view source_variants[] = {
       // pp defined earlier in file
       "module pp;\n"
       "endmodule\n"
@@ -1033,7 +1033,7 @@ TEST(BuildSymbolTableTest, ModuleInstanceUndefined) {
 }
 
 TEST(BuildSymbolTableTest, ModuleInstanceTwoInSameDecl) {
-  static constexpr std::string_view source_variants[] = {
+  static constexpr verible::document_view source_variants[] = {
       // The following all yield equivalent symbol tables bindings.
       "module pp;\n"
       "endmodule\n"
@@ -1090,7 +1090,7 @@ TEST(BuildSymbolTableTest, ModuleInstanceTwoInSameDecl) {
     }
 
     // "r1" and "r2" are both instances of type "pp"
-    static constexpr std::string_view pp_instances[] = {"r1", "r2"};
+    static constexpr verible::document_view pp_instances[] = {"r1", "r2"};
     for (const auto &pp_inst : pp_instances) {
       MUST_ASSIGN_LOOKUP_SYMBOL(rr, qq, pp_inst);
       EXPECT_TRUE(rr_info.local_references_to_bind.empty());
@@ -8101,13 +8101,13 @@ TEST(BuildSymbolTableTest, MultiFileModuleInstance) {
 
 TEST(BuildSymbolTableTest, ModuleInstancesFromProjectOneFileAtATime) {
   const auto tempdir = ::testing::TempDir();
-  const std::string sources_dir = JoinPath(tempdir, __FUNCTION__);
+  const std::string sources_dir = JoinPath(tempdir, ::testing::UnitTest::GetInstance()->current_test_info()->name());
   ASSERT_TRUE(CreateDir(sources_dir).ok());
 
   VerilogProject project(sources_dir, {/* no include path */});
 
   // Linear dependency chain between 3 files.  Order arbitrarily chosen.
-  constexpr std::string_view  //
+  constexpr verible::document_view  //
       text1(
           "module ss;\n"
           "  qq qq_inst();\n"  // instance
@@ -8241,7 +8241,7 @@ TEST(BuildSymbolTableTest, ModuleInstancesFromProjectOneFileAtATime) {
 
 TEST(BuildSymbolTableTest, ModuleInstancesFromProjectMissingFile) {
   const auto tempdir = ::testing::TempDir();
-  const std::string sources_dir = JoinPath(tempdir, __FUNCTION__);
+  const std::string sources_dir = JoinPath(tempdir, ::testing::UnitTest::GetInstance()->current_test_info()->name());
   VerilogProject project(sources_dir, {/* no include path */});
 
   SymbolTable symbol_table(&project);
@@ -8257,13 +8257,13 @@ TEST(BuildSymbolTableTest, ModuleInstancesFromProjectMissingFile) {
 
 TEST(BuildSymbolTableTest, ModuleInstancesFromProjectFilesGood) {
   const auto tempdir = ::testing::TempDir();
-  const std::string sources_dir = JoinPath(tempdir, __FUNCTION__);
+  const std::string sources_dir = JoinPath(tempdir, ::testing::UnitTest::GetInstance()->current_test_info()->name());
   ASSERT_TRUE(CreateDir(sources_dir).ok());
 
   VerilogProject project(sources_dir, {/* no include path */});
 
   // Linear dependency chain between 3 files.  Order arbitrarily chosen.
-  constexpr std::string_view  //
+  constexpr verible::document_view  //
       text1(
           "module ss;\n"
           "  qq qq_inst();\n"  // instance
@@ -8755,7 +8755,7 @@ TEST(BuildSymbolTableTest, MultiFileModuleInstanceCyclicDependencies) {
 
 TEST(BuildSymbolTableTest, IncludeModuleDefinition) {
   const auto tempdir = ::testing::TempDir();
-  const std::string sources_dir = JoinPath(tempdir, __FUNCTION__);
+  const std::string sources_dir = JoinPath(tempdir, ::testing::UnitTest::GetInstance()->current_test_info()->name());
   ASSERT_TRUE(CreateDir(sources_dir).ok());
 
   // Create files.
@@ -8791,7 +8791,7 @@ TEST(BuildSymbolTableTest, IncludeModuleDefinition) {
 
 TEST(BuildSymbolTableTest, IncludeWithoutProject) {
   const auto tempdir = ::testing::TempDir();
-  const std::string sources_dir = JoinPath(tempdir, __FUNCTION__);
+  const std::string sources_dir = JoinPath(tempdir, ::testing::UnitTest::GetInstance()->current_test_info()->name());
   ASSERT_TRUE(CreateDir(sources_dir).ok());
 
   // Create files.
@@ -8815,7 +8815,7 @@ TEST(BuildSymbolTableTest, IncludeWithoutProject) {
 
 TEST(BuildSymbolTableTest, IncludeFileNotFound) {
   const auto tempdir = ::testing::TempDir();
-  const std::string sources_dir = JoinPath(tempdir, __FUNCTION__);
+  const std::string sources_dir = JoinPath(tempdir, ::testing::UnitTest::GetInstance()->current_test_info()->name());
   ASSERT_TRUE(CreateDir(sources_dir).ok());
 
   // Create files.
@@ -8844,7 +8844,7 @@ TEST(BuildSymbolTableTest, IncludeFileNotFound) {
 
 TEST(BuildSymbolTableTest, IncludeFileParseError) {
   const auto tempdir = ::testing::TempDir();
-  const std::string sources_dir = JoinPath(tempdir, __FUNCTION__);
+  const std::string sources_dir = JoinPath(tempdir, ::testing::UnitTest::GetInstance()->current_test_info()->name());
   ASSERT_TRUE(CreateDir(sources_dir).ok());
 
   // Create files.
@@ -8875,7 +8875,7 @@ TEST(BuildSymbolTableTest, IncludeFileParseError) {
 
 TEST(BuildSymbolTableTest, IncludeFileEmpty) {
   const auto tempdir = ::testing::TempDir();
-  const std::string sources_dir = JoinPath(tempdir, __FUNCTION__);
+  const std::string sources_dir = JoinPath(tempdir, ::testing::UnitTest::GetInstance()->current_test_info()->name());
   ASSERT_TRUE(CreateDir(sources_dir).ok());
 
   // Create files.
@@ -8903,7 +8903,7 @@ TEST(BuildSymbolTableTest, IncludeFileEmpty) {
 
 TEST(BuildSymbolTableTest, IncludedTwiceFromOneFile) {
   const auto tempdir = ::testing::TempDir();
-  const std::string sources_dir = JoinPath(tempdir, __FUNCTION__);
+  const std::string sources_dir = JoinPath(tempdir, ::testing::UnitTest::GetInstance()->current_test_info()->name());
   ASSERT_TRUE(CreateDir(sources_dir).ok());
 
   // Create files.
@@ -8954,7 +8954,7 @@ TEST(BuildSymbolTableTest, IncludedTwiceFromOneFile) {
 
 TEST(BuildSymbolTableTest, IncludedTwiceFromDifferentFiles) {
   const auto tempdir = ::testing::TempDir();
-  const std::string sources_dir = JoinPath(tempdir, __FUNCTION__);
+  const std::string sources_dir = JoinPath(tempdir, ::testing::UnitTest::GetInstance()->current_test_info()->name());
   ASSERT_TRUE(CreateDir(sources_dir).ok());
 
   // Create files.
@@ -9270,7 +9270,7 @@ TEST(BuildSymbolTableTest, InterfaceDeclarationLocalNetsVariables) {
             nullptr);  // there is no interface meta-type
   EXPECT_EMPTY_STATUSES(build_diagnostics);
 
-  static constexpr std::string_view members[] = {"l1", "l2"};
+  static constexpr verible::document_view members[] = {"l1", "l2"};
   for (const auto &member : members) {
     MUST_ASSIGN_LOOKUP_SYMBOL(member_node, interface_node, member);
     EXPECT_EQ(member_node_info.metatype,
@@ -9315,7 +9315,7 @@ TEST(BuildSymbolTableTest, InterfaceDeclarationWithPorts) {
   EXPECT_EQ(interface_node_info.declared_type.syntax_origin,
             nullptr);  // there is no interface meta-type
 
-  static constexpr std::string_view members[] = {"clk", "reset", "d", "q"};
+  static constexpr verible::document_view members[] = {"clk", "reset", "d", "q"};
   for (const auto &member : members) {
     MUST_ASSIGN_LOOKUP_SYMBOL(member_node, interface_node, member);
     EXPECT_EQ(member_node_info.metatype,
@@ -9343,7 +9343,7 @@ TEST(BuildSymbolTableTest, InterfaceDeclarationMultiple) {
   const auto build_diagnostics = BuildSymbolTable(src, &symbol_table);
   EXPECT_EMPTY_STATUSES(build_diagnostics);
 
-  const std::string_view expected_interfaces[] = {"foobar1_if", "foobar2_if"};
+  const verible::document_view expected_interfaces[] = {"foobar1_if", "foobar2_if"};
   for (const auto &expected_interface : expected_interfaces) {
     MUST_ASSIGN_LOOKUP_SYMBOL(interface_node, root_symbol, expected_interface);
     EXPECT_EQ(interface_node_info.metatype, SymbolMetaType::kInterface);
@@ -9422,7 +9422,7 @@ TEST(BuildSymbolTableTest, InterfaceDeclarationDuplicateSeparateFiles) {
 }
 
 struct FileListTestCase {
-  std::string_view contents;
+  verible::document_view contents;
   std::vector<std::string_view> expected_files;
 };
 

@@ -42,7 +42,7 @@ using verible::file::testing::ScopedTestFile;
 
 class TempDirFile : public ScopedTestFile {
  public:
-  explicit TempDirFile(std::string_view content)
+  explicit TempDirFile(verible::document_view content)
       : ScopedTestFile(::testing::TempDir(), content) {}
 };
 
@@ -56,7 +56,7 @@ TEST(VerilogSourceFileTest, Initialization) {
 }
 
 TEST(VerilogSourceFileTest, OpenExistingFile) {
-  constexpr std::string_view text("localparam int p = 1;\n");
+  constexpr verible::document_view text("localparam int p = 1;\n");
   TempDirFile tf(text);
   const std::string_view basename(Basename(tf.filename()));
   VerilogSourceFile file(basename, tf.filename(), "");
@@ -64,7 +64,7 @@ TEST(VerilogSourceFileTest, OpenExistingFile) {
   EXPECT_TRUE(file.Status().ok());
   EXPECT_EQ(file.ReferencedPath(), basename);
   EXPECT_EQ(file.ResolvedPath(), tf.filename());
-  const std::string_view owned_string_range(file.GetContent());
+  const verible::document_view owned_string_range(file.GetContent());
   EXPECT_EQ(owned_string_range, text);
 
   // Re-opening doesn't change anything
@@ -85,7 +85,7 @@ TEST(VerilogSourceFileTest, NonExistingFile) {
 }
 
 TEST(VerilogSourceFileTest, ParseValidFile) {
-  constexpr std::string_view text("localparam int p = 1;\n");
+  constexpr verible::document_view text("localparam int p = 1;\n");
   TempDirFile tf(text);
   const std::string_view basename(Basename(tf.filename()));
   VerilogSourceFile file(basename, tf.filename(), "");
@@ -94,7 +94,7 @@ TEST(VerilogSourceFileTest, ParseValidFile) {
   EXPECT_TRUE(file.Status().ok());
   const TextStructureView *text_structure =
       ABSL_DIE_IF_NULL(file.GetTextStructure());
-  const std::string_view owned_string_range(text_structure->Contents());
+  const verible::document_view owned_string_range(text_structure->Contents());
   EXPECT_EQ(owned_string_range, text);
   const auto *tokens = &text_structure->TokenStream();
   EXPECT_NE(tokens, nullptr);
@@ -110,7 +110,7 @@ TEST(VerilogSourceFileTest, ParseValidFile) {
 }
 
 TEST(VerilogSourceFileTest, ParseInvalidFile) {
-  constexpr std::string_view text("localparam 1 = p;\n");
+  constexpr verible::document_view text("localparam 1 = p;\n");
   TempDirFile tf(text);
   const std::string_view basename(Basename(tf.filename()));
   VerilogSourceFile file(basename, tf.filename(), "");
@@ -119,7 +119,7 @@ TEST(VerilogSourceFileTest, ParseInvalidFile) {
   EXPECT_FALSE(file.Status().ok());
   const TextStructureView *text_structure =
       ABSL_DIE_IF_NULL(file.GetTextStructure());
-  const std::string_view owned_string_range(text_structure->Contents());
+  const verible::document_view owned_string_range(text_structure->Contents());
   EXPECT_EQ(owned_string_range, text);
   const auto *tokens = &text_structure->TokenStream();
   EXPECT_NE(tokens, nullptr);
@@ -136,7 +136,7 @@ TEST(VerilogSourceFileTest, ParseInvalidFile) {
 }
 
 TEST(VerilogSourceFileTest, StreamPrint) {
-  constexpr std::string_view text("localparam foo = bar;\n");
+  constexpr verible::document_view text("localparam foo = bar;\n");
   TempDirFile tf(text);
   const std::string_view basename(Basename(tf.filename()));
   VerilogSourceFile file(basename, tf.filename(), "");
@@ -163,14 +163,14 @@ TEST(VerilogSourceFileTest, StreamPrint) {
 }
 
 TEST(InMemoryVerilogSourceFileTest, ParseValidFile) {
-  constexpr std::string_view text("localparam int p = 1;\n");
+  constexpr verible::document_view text("localparam int p = 1;\n");
   InMemoryVerilogSourceFile file("/not/using/file/system.v", text);
   // Parse automatically opens.
   EXPECT_TRUE(file.Parse().ok());
   EXPECT_TRUE(file.Status().ok());
   const TextStructureView *text_structure =
       ABSL_DIE_IF_NULL(file.GetTextStructure());
-  const std::string_view owned_string_range(text_structure->Contents());
+  const verible::document_view owned_string_range(text_structure->Contents());
   EXPECT_EQ(owned_string_range, text);
   const auto *tokens = &text_structure->TokenStream();
   EXPECT_NE(tokens, nullptr);
@@ -186,14 +186,14 @@ TEST(InMemoryVerilogSourceFileTest, ParseValidFile) {
 }
 
 TEST(InMemoryVerilogSourceFileTest, ParseInvalidFile) {
-  constexpr std::string_view text("class \"dismissed\"!\n");
+  constexpr verible::document_view text("class \"dismissed\"!\n");
   InMemoryVerilogSourceFile file("/not/using/file/system.v", text);
   // Parse automatically opens.
   EXPECT_FALSE(file.Parse().ok());
   EXPECT_FALSE(file.Status().ok());
   const TextStructureView *text_structure =
       ABSL_DIE_IF_NULL(file.GetTextStructure());
-  const std::string_view owned_string_range(text_structure->Contents());
+  const verible::document_view owned_string_range(text_structure->Contents());
   EXPECT_EQ(owned_string_range, text);
   const auto *tokens = &text_structure->TokenStream();
   EXPECT_NE(tokens, nullptr);
@@ -210,7 +210,7 @@ TEST(InMemoryVerilogSourceFileTest, ParseInvalidFile) {
 }
 
 TEST(ParsedVerilogSourceFileTest, PreparsedValidFile) {
-  constexpr std::string_view text("localparam int p = 1;\n");
+  constexpr verible::document_view text("localparam int p = 1;\n");
   std::unique_ptr<VerilogAnalyzer> analyzed_structure =
       std::make_unique<VerilogAnalyzer>(text, "internal");
   absl::Status status = analyzed_structure->Analyze();
@@ -223,7 +223,7 @@ TEST(ParsedVerilogSourceFileTest, PreparsedValidFile) {
   const TextStructureView *text_structure =
       ABSL_DIE_IF_NULL(file.GetTextStructure());
   EXPECT_EQ(&analyzed_structure->Data(), text_structure);
-  const std::string_view owned_string_range(text_structure->Contents());
+  const verible::document_view owned_string_range(text_structure->Contents());
   EXPECT_EQ(owned_string_range, text);
   const auto *tokens = &text_structure->TokenStream();
   EXPECT_NE(tokens, nullptr);
@@ -239,7 +239,7 @@ TEST(ParsedVerilogSourceFileTest, PreparsedValidFile) {
 }
 
 TEST(ParsedVerilogSourceFileTest, PreparsedInvalidValidFile) {
-  constexpr std::string_view text("localp_TYPO_aram int p = 1;\n");
+  constexpr verible::document_view text("localp_TYPO_aram int p = 1;\n");
   std::unique_ptr<VerilogAnalyzer> analyzed_structure =
       std::make_unique<VerilogAnalyzer>(text, "internal");
   absl::Status status = analyzed_structure->Analyze();
@@ -252,7 +252,7 @@ TEST(ParsedVerilogSourceFileTest, PreparsedInvalidValidFile) {
   const TextStructureView *text_structure =
       ABSL_DIE_IF_NULL(file.GetTextStructure());
   EXPECT_EQ(&analyzed_structure->Data(), text_structure);
-  const std::string_view owned_string_range(text_structure->Contents());
+  const verible::document_view owned_string_range(text_structure->Contents());
   EXPECT_EQ(owned_string_range, text);
 }
 
@@ -299,15 +299,15 @@ TEST(VerilogProjectTest, UpdateFileContents) {
   VerilogProject project(project_root_dir, {});
 
   // Prepare file to be auto-loaded later
-  constexpr std::string_view file_content("module foo();\nendmodule\n");
+  constexpr verible::document_view file_content("module foo();\nendmodule\n");
   const ScopedTestFile tf(project_root_dir, file_content);
   const std::string_view reference_name = Basename(tf.filename());
 
   VerilogSourceFile *from_file;
-  std::string_view search_substring;
+  verible::document_view search_substring;
 
   // Push a local analyzed name under the name of the file.
-  constexpr std::string_view external_content("localparam int p = 1;\n");
+  constexpr verible::document_view external_content("localparam int p = 1;\n");
   std::unique_ptr<VerilogAnalyzer> analyzed_structure =
       std::make_unique<VerilogAnalyzer>(external_content, "internal");
   project.UpdateFileContents(tf.filename(), analyzed_structure.get());
@@ -351,14 +351,14 @@ TEST(VerilogProjectTest, UpdateFileContentsEmptyFile) {
   const std::string_view reference_name = Basename(tf.filename());
 
   // Push a local analyzed name under the name of the file.
-  constexpr std::string_view external_content("localparam int p = 1;\n");
+  constexpr verible::document_view external_content("localparam int p = 1;\n");
   std::unique_ptr<VerilogAnalyzer> analyzed_structure =
       std::make_unique<VerilogAnalyzer>(external_content, "internal");
   project.UpdateFileContents(tf.filename(), analyzed_structure.get());
 
   // Look up the file and see that content is the external content
   VerilogSourceFile *from_file;
-  std::string_view search_substring;
+  verible::document_view search_substring;
   from_file = *project.OpenTranslationUnit(reference_name);
   EXPECT_EQ(from_file->GetContent(), external_content);
 
@@ -367,7 +367,7 @@ TEST(VerilogProjectTest, UpdateFileContentsEmptyFile) {
   EXPECT_EQ(project.LookupFileOrigin(search_substring), from_file);
 
   // Prepare an empty file
-  constexpr std::string_view empty_file_content;
+  constexpr verible::document_view empty_file_content;
   const ScopedTestFile empty_file(project_root_dir, empty_file_content);
   const std::string_view empty_file_reference = Basename(empty_file.filename());
 
@@ -403,7 +403,7 @@ TEST(VerilogProjectTest, LookupFileOriginTest) {
   // no files yet
 
   {
-    constexpr std::string_view foreign_text("not from any file");
+    constexpr verible::document_view foreign_text("not from any file");
     EXPECT_EQ(project.LookupFileOrigin(foreign_text), nullptr);
   }
 
@@ -412,10 +412,10 @@ TEST(VerilogProjectTest, LookupFileOriginTest) {
   const auto status_or_file =
       project.OpenTranslationUnit(Basename(tf.filename()));
   VerilogSourceFile *verilog_source_file = *status_or_file;
-  const std::string_view content1(verilog_source_file->GetContent());
+  const verible::document_view content1(verilog_source_file->GetContent());
 
   {
-    constexpr std::string_view foreign_text("still not from any file");
+    constexpr verible::document_view foreign_text("still not from any file");
     EXPECT_EQ(project.LookupFileOrigin(foreign_text), nullptr);
   }
 
@@ -428,7 +428,7 @@ TEST(VerilogProjectTest, LookupFileOriginTest) {
   const auto status_or_file2 =
       project.OpenTranslationUnit(Basename(tf2.filename()));
   VerilogSourceFile *verilog_source_file2 = *status_or_file2;
-  const std::string_view content2(verilog_source_file2->GetContent());
+  const verible::document_view content2(verilog_source_file2->GetContent());
 
   // Pick substrings known to come from those files.
   EXPECT_EQ(project.LookupFileOrigin(content1.substr(5, 5)),
@@ -445,7 +445,7 @@ TEST(VerilogProjectTest, LookupFileOriginTestMoreFiles) {
   VerilogProject project(sources_dir, {});
   // no files yet
 
-  constexpr std::string_view foreign_text("not from any file");
+  constexpr verible::document_view foreign_text("not from any file");
 
   // WArning: Test size is quadratic in N, but linear in memory in N.
   constexpr int N = 50;
@@ -478,7 +478,7 @@ TEST(VerilogProjectTest, ValidTranslationUnit) {
   EXPECT_TRUE(CreateDir(includes_dir).ok());
   VerilogProject project(sources_dir, {includes_dir});
 
-  constexpr std::string_view text("module m;\nendmodule\n");
+  constexpr verible::document_view text("module m;\nendmodule\n");
   const ScopedTestFile tf(sources_dir, text);
   const auto status_or_file =
       project.OpenTranslationUnit(Basename(tf.filename()));
@@ -488,7 +488,7 @@ TEST(VerilogProjectTest, ValidTranslationUnit) {
   EXPECT_EQ(verilog_source_file->ResolvedPath(), tf.filename());
   EXPECT_EQ(project.LookupRegisteredFile(Basename(tf.filename())),
             verilog_source_file);
-  const std::string_view content(verilog_source_file->GetContent());
+  const verible::document_view content(verilog_source_file->GetContent());
   {  // const-lookup overload
     const VerilogProject &cproject(project);
     EXPECT_EQ(cproject.LookupRegisteredFile(Basename(tf.filename())),
@@ -535,7 +535,7 @@ TEST(VerilogProjectTest, ValidIncludeFile) {
   EXPECT_TRUE(CreateDir(includes_dir).ok());
   VerilogProject project(sources_dir, {includes_dir});
 
-  constexpr std::string_view text("`define FOO 1\n");
+  constexpr verible::document_view text("`define FOO 1\n");
   const ScopedTestFile tf(includes_dir, text);
   const std::string_view basename(Basename(tf.filename()));
   const auto status_or_file = project.OpenIncludedFile(basename);
@@ -576,7 +576,7 @@ TEST(VerilogProjectTest, OpenVirtualIncludeFile) {
   EXPECT_TRUE(CreateDir(includes_dir).ok());
   VerilogProject project(sources_dir, {includes_dir});
 
-  constexpr std::string_view text("`define FOO 1\n");
+  constexpr verible::document_view text("`define FOO 1\n");
   const std::string basename = "virtual_include_file1";
   const std::string full_path = JoinPath(includes_dir, basename);
   // The virtual file is added by its full path. But the include is opened by
@@ -619,7 +619,7 @@ TEST(VerilogProjectTest, TranslationUnitNotFound) {
   EXPECT_TRUE(CreateDir(includes_dir).ok());
   VerilogProject project(sources_dir, {includes_dir});
 
-  constexpr std::string_view text("module m;\nendmodule\n");
+  constexpr verible::document_view text("module m;\nendmodule\n");
   // deliberately plant this file in the includes dir != sources dir
   const ScopedTestFile tf(includes_dir, text);
   {
@@ -642,7 +642,7 @@ TEST(VerilogProjectTest, IncludeFileNotFound) {
   EXPECT_TRUE(CreateDir(includes_dir).ok());
   VerilogProject project(sources_dir, {includes_dir});
 
-  constexpr std::string_view text("module m;\nendmodule\n");
+  constexpr verible::document_view text("module m;\nendmodule\n");
   // deliberately plant this file in the sources dir != include dir
   const ScopedTestFile tf(sources_dir, text);
   {
