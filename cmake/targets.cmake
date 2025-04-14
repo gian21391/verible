@@ -6,6 +6,11 @@ function(cc_library)
             "${options}" "${oneValueArgs}" "${multiValueArgs}"
     )
 
+    if (NOT VERIBLE_TEST AND ${arg_NAME} MATCHES ".*test.*")
+        message("Not adding ${arg_NAME}")
+        return()
+    endif ()
+
     set(target ${arg_NAME})
     cmake_path(RELATIVE_PATH CMAKE_CURRENT_LIST_DIR BASE_DIRECTORY "${CMAKE_SOURCE_DIR}" OUTPUT_VARIABLE current_dir)
     cmake_path(NORMAL_PATH current_dir)
