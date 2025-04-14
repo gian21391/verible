@@ -24,7 +24,7 @@ function(cc_library)
 
     add_library(${target} ${target_type} ${arg_SRCS})
     add_library(${target_with_namespace} ALIAS ${target})
-    target_include_directories(${target} ${target_visibility} ${CMAKE_SOURCE_DIR} ${CMAKE_BINARY_DIR})
+    target_include_directories(${target} ${target_visibility} $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}> $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}>)
     target_compile_definitions(${target} ${target_options_visibility} "${arg_DEFINES}")
     target_link_libraries(${target} ${target_visibility} ${arg_DEPS})
     target_compile_features(${target} ${target_options_visibility} cxx_std_17)

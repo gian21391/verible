@@ -59,7 +59,15 @@ install(FILES
         ${CMAKE_CURRENT_BINARY_DIR}/verible-config.cmake
         ${CMAKE_CURRENT_BINARY_DIR}/verible-config-version.cmake
         DESTINATION ${CMAKE_INSTALL_DATADIR}/verible)
-install(TARGETS verible-verilog-syntax EXPORT verible-targets)
+install(TARGETS
+        verilog-parser verilog-y-cc bison-parser-adapter parse parser-param value-saver bison-parser-common tree-utils
+        casts logging DPI declaration expression functions module parameters port type verilog-nonterminals
+        verilog-treebuilder-utils token-generator concrete-syntax-tree token-info concrete-syntax-leaf symbol
+        visitors iterator-adaptors spacer type-traits verilog-matchers syntax-tree-search symbol-ptr
+        verilog-token-classifications verilog-token-enum identifier constants container-util tree-compare iterator-range
+        rebase range auto-iterator matcher-builders bound-symbol-manager syntax-tree-context tree-context-visitor
+        descent-path inner-match-handlers matcher auto-pop-stack display-utils
+        EXPORT verible-targets)
 install(DIRECTORY verible/
         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
         FILES_MATCHING PATTERN "*.h")
