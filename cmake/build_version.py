@@ -14,15 +14,20 @@ def main():
     parser.add_argument("-v", "--version", help="Git describe")
     args = parser.parse_args()
 
-    commit_timestamp = get_stdout(['git', 'log', '-n1', '--format=%cd', '--date=unix'])
-    if args.commit != "":
+    if args.commit is not None:
         commit_timestamp = args.commit
+    else:
+        commit_timestamp = get_stdout(['git', 'log', '-n1', '--format=%cd', '--date=unix'])
+
     if commit_timestamp == "":
         commit_timestamp = "0"
 
-    git_describe = get_stdout(['git', 'describe', '--tags', '--match=v*'])
-    if args.version != "":
+
+    if args.version is not None:
         git_describe = args.version
+    else:
+        git_describe = get_stdout(['git', 'describe', '--tags', '--match=v*'])
+
     if git_describe == "":
         git_describe = "No git info"
 
