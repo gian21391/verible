@@ -81,16 +81,11 @@ add_custom_target(generated-verible-build-version-gen
         DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/generated-verible-build-version.h
 )
 
-add_library(generated-verible-build-version-lib INTERFACE)
-target_include_directories(generated-verible-build-version-lib INTERFACE ${CMAKE_BINARY_DIR})
-add_dependencies(generated-verible-build-version-lib generated-verible-build-version-gen)
-
 cc_library(
         NAME
         "build-version"
-        DEPS
-        generated-verible-build-version-lib
 )
+add_dependencies(build-version generated-verible-build-version-gen)
 
 cc_library(
         NAME
