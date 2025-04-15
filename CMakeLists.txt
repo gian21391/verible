@@ -6,8 +6,6 @@ project(verible
         HOMEPAGE_URL "https://github.com/chipsalliance/verible"
         LANGUAGES CXX)
 
-set(CMAKE_CXX_STANDARD 20)
-
 if(WIN32)
     find_package(BISON)
     if(NOT BISON_FOUND)
@@ -61,13 +59,37 @@ install(FILES
         DESTINATION ${CMAKE_INSTALL_DATADIR}/verible)
 install(TARGETS
         verilog-parser verilog-y-cc bison-parser-adapter parse parser-param value-saver bison-parser-common tree-utils
-        casts logging DPI declaration expression functions module parameters port type verilog-nonterminals
-        verilog-treebuilder-utils token-generator concrete-syntax-tree token-info concrete-syntax-leaf symbol
-        visitors iterator-adaptors spacer type-traits verilog-matchers syntax-tree-search symbol-ptr
+        casts logging DPI declaration expression functions module parameters port type verilog-nonterminals with-reason
+        verilog-treebuilder-utils token-generator concrete-syntax-tree token-info concrete-syntax-leaf symbol lexer
+        visitors iterator-adaptors spacer type-traits verilog-matchers syntax-tree-search symbol-ptr verilog-lexer
         verilog-token-classifications verilog-token-enum identifier constants container-util tree-compare iterator-range
         rebase range auto-iterator matcher-builders bound-symbol-manager syntax-tree-context tree-context-visitor
-        descent-path inner-match-handlers matcher auto-pop-stack display-utils verilog-token
-        EXPORT verible-targets)
+        descent-path inner-match-handlers matcher auto-pop-stack display-utils verilog-token verilog-tree-json
+        token-info-json verilog-tree-print json-diagnostics token-stream-adapter utf8 document-view flex-lexer-adapter
+        mem-block file-analyzer line-column-map token-stream-view status-macros bijective-map compare build-version
+        parser-verifier comment-utils verilog-lexical-context verilog-preprocess macro-definition lint-rule-registry
+        text-structure verilog-filelist lint-rule-status syntax-tree-lint-rule descriptions line-lint-rule package net
+        enum-flags text-structure-lint-rule token-stream-lint-rule citation lint-rule statement config-utils tasks
+        file-util constraints core-matchers context-functions seq-block verilog-linter-constants dimensions data
+        init-command-line naming-utils numbers macro verilog-analyzer verilog-lint-rules always-comb-blocking-rule
+        always-comb-rule always-ff-non-blocking-rule banned-declared-name-patterns-rule case-missing-default-rule
+        constraint-name-style-rule create-object-name-match-rule dff-name-style-rule disable-statement-rule
+        endif-comment-rule enum-name-style-rule explicit-begin-rule explicit-function-lifetime-rule
+        explicit-function-task-parameter-type-rule explicit-parameter-storage-type-rule explicit-task-lifetime-rule
+        forbid-consecutive-null-statements-rule forbid-defparam-rule forbid-line-continuations-rule
+        forbid-negative-array-dim forbidden-anonymous-enums-rule
+        forbidden-anonymous-structs-unions-rule forbidden-macro-rule forbidden-symbol-rule generate-label-prefix-rule
+        generate-label-rule instance-shadow-rule interface-name-style-rule legacy-generate-region-rule
+        legacy-genvar-declaration-rule line-length-rule macro-name-style-rule macro-string-concatenation-rule
+        mismatched-labels-rule module-begin-block-rule module-filename-rule module-instantiation-rules
+        no-tabs-rule no-trailing-spaces-rule numeric-format-string-style-rule one-module-per-file-rule
+        package-filename-rule packed-dimensions-rule parameter-name-style-rule parameter-type-name-style-rule
+        plusarg-assignment-rule port-name-suffix-rule positive-meaning-parameter-name-rule posix-eof-rule
+        proper-parameter-declaration-rule signal-name-style-rule struct-union-name-style-rule suggest-parentheses-rule
+        suspicious-semicolon-rule truncated-numeric-literal-rule undersized-binary-literal-rule
+        unpacked-dimensions-rule uvm-macro-semicolon-rule v2001-generate-begin-rule void-cast-rule
+        EXPORT verible-targets
+        FILE_SET sources DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/verible")
 install(DIRECTORY verible/
         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/verible
         FILES_MATCHING PATTERN "*.h")

@@ -29,11 +29,14 @@ function(cc_library)
 
     add_library(${target} ${target_type} ${arg_SRCS})
     add_library(${target_with_namespace} ALIAS ${target})
-    target_include_directories(${target} ${target_visibility} $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}> $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}>)
+    target_include_directories(${target} ${target_visibility}
+            $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}>
+            $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}>
+            $<BUILD_INTERFACE:${FLEX_INCLUDE_DIR}>)
     target_compile_definitions(${target} ${target_options_visibility} "${arg_DEFINES}")
     target_link_libraries(${target} ${target_visibility} ${arg_DEPS})
-    target_compile_features(${target} ${target_options_visibility} cxx_std_17)
-    target_sources(${target} ${target_visibility} ${arg_INTERFACE_SRCS})
+    target_compile_features(${target} ${target_options_visibility} cxx_std_20)
+    target_sources(${target} PUBLIC FILE_SET sources TYPE HEADERS FILES ${arg_INTERFACE_SRCS})
 endfunction()
 
 function(cc_test)
