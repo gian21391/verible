@@ -66,7 +66,7 @@ install(TARGETS
         visitors iterator-adaptors spacer type-traits verilog-matchers syntax-tree-search symbol-ptr
         verilog-token-classifications verilog-token-enum identifier constants container-util tree-compare iterator-range
         rebase range auto-iterator matcher-builders bound-symbol-manager syntax-tree-context tree-context-visitor
-        descent-path inner-match-handlers matcher auto-pop-stack display-utils
+        descent-path inner-match-handlers matcher auto-pop-stack display-utils verilog-token
         EXPORT verible-targets)
 install(DIRECTORY verible/
         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/verible
