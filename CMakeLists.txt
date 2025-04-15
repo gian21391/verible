@@ -69,7 +69,7 @@ install(TARGETS
         descent-path inner-match-handlers matcher auto-pop-stack display-utils
         EXPORT verible-targets)
 install(DIRECTORY verible/
-        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/verible
         FILES_MATCHING PATTERN "*.h")
 install(EXPORT verible-targets
         NAMESPACE verible::
