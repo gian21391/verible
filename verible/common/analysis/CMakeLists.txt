@@ -37,9 +37,8 @@ flex_target(command-file-lex
         ${CMAKE_CURRENT_SOURCE_DIR}/command_file.lex
         ${CMAKE_CURRENT_BINARY_DIR}/command-file.yy.cc
 )
-add_library(command-file-lex-gen INTERFACE)
-target_sources(command-file-lex-gen INTERFACE ${CMAKE_CURRENT_BINARY_DIR}/command-file.yy.cc)
-target_include_directories(command-file-lex-gen INTERFACE ${FLEX_INCLUDE_DIR})
+
+add_custom_target(command-file-lex-gen DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/command-file.yy.cc)
 
 cc_library(
         NAME
@@ -48,7 +47,6 @@ cc_library(
         "command-file.yy.cc"
         "command-file-lexer.cc"
         DEPS
-        command-file-lex-gen
         verible::common::lexer::flex-lexer-adapter
         verible::common::lexer::token-stream-adapter
         verible::common::text::token-info
@@ -56,6 +54,7 @@ cc_library(
         verible::common::util::iterator-range
         verible::common::util::logging
 )
+add_dependencies(command-file-lexer command-file-lex-gen)
 
 cc_library(
         NAME

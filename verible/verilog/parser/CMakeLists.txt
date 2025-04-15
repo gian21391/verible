@@ -55,7 +55,6 @@ cc_library(
         "verilog-lexer.cc"
         DEPS
         verilog-token-enum
-        command-file-lex-gen
         verible::common::lexer::flex-lexer-adapter
         verible::common::text::token-info
 )
