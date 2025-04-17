@@ -267,6 +267,14 @@ public:
         return npos;
     }
 
+    constexpr size_type find_first_of(char ch, size_type pos = 0) const noexcept {
+        return to_string_view().find_first_of(ch, pos);
+    }
+
+    constexpr size_type find_first_of(document_view str, size_type pos = 0) const noexcept {
+        return to_string_view().find_first_of(str.to_string_view(), pos);
+    }
+
     constexpr size_type find_first_not_of(char ch, size_type pos = 0) const noexcept {
         for (; pos < size_; ++pos) {
             if (!traits_type::eq(data_[pos], ch))
@@ -287,6 +295,14 @@ public:
             if (!found) return pos;
         }
         return npos;
+    }
+
+    constexpr size_type find_last_of(char ch, size_type pos = npos) const noexcept {
+        return to_string_view().find_last_of(ch, pos);
+    }
+
+    constexpr size_type find_last_of(document_view str, size_type pos = npos) const noexcept {
+        return to_string_view().find_last_of(str.to_string_view(), pos);
     }
 
     constexpr bool starts_with(document_view str) const noexcept {
