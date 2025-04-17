@@ -93,6 +93,9 @@ install(TARGETS
 install(DIRECTORY verible/
         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/verible
         FILES_MATCHING PATTERN "*.h")
+install(FILES
+        ${CMAKE_BINARY_DIR}/verible/verilog/parser/verilog-token-enum.h
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/verible/verilog/parser)
 install(EXPORT verible-targets
         NAMESPACE verible::
         DESTINATION ${CMAKE_INSTALL_DATADIR}/verible)
