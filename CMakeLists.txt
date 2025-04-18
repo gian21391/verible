@@ -22,7 +22,10 @@ endif ()
 
 find_package(FLEX REQUIRED)
 find_package(BISON REQUIRED)
-cmake_path(GET FLEX_EXECUTABLE PARENT_PATH FLEX_INCLUDE_DIR)
+
+if(WIN32)
+    cmake_path(GET FLEX_EXECUTABLE PARENT_PATH FLEX_INCLUDE_DIRS)
+endif ()
 
 include(cmake/targets.cmake)
 include(CMakePackageConfigHelpers)

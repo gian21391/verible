@@ -47,7 +47,7 @@ function(cc_library)
     target_include_directories(${target} ${target_visibility}
             $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}>
             $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}>
-            $<BUILD_INTERFACE:${FLEX_INCLUDE_DIR}>)
+            $<BUILD_INTERFACE:${FLEX_INCLUDE_DIRS}>)
     target_compile_definitions(${target} ${target_options_visibility} "${arg_DEFINES}")
     target_link_libraries(${target} ${target_visibility} ${arg_DEPS} ${object_files})
     target_compile_features(${target} ${target_options_visibility} cxx_std_20)
